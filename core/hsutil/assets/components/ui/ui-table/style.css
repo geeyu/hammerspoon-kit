@@ -1,0 +1,49 @@
+/* ===== UiTable（ui/ui-table/style.css）===== */
+/* 依赖 styles/base.css 的 CSS 变量 */
+
+/* ── UiTable ── */
+.ui-table-wrapper {
+  overflow-x: auto;
+}
+.ui-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.ui-table__th {
+  padding: 6px 8px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--fg-3);
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  user-select: none;
+}
+.ui-table__td {
+  padding: 5px 8px;
+  color: var(--fg-1);
+  border-bottom: 1px solid var(--border-weak);
+  line-height: 1.4;
+}
+.ui-table__tr:hover .ui-table__td {
+  background: var(--bg-row-h);
+}
+.ui-table--striped .ui-table__tr:nth-child(even) .ui-table__td {
+  background: var(--bg-row-alt);
+}
+.ui-table--striped .ui-table__tr:hover .ui-table__td {
+  background: var(--bg-row-h);
+}
+.ui-table__empty {
+  padding: 20px !important;
+  text-align: center;
+}
+
+/* 行动画（transition-group）：进入淡入下移、离开淡出。
+   删除行淡出时其余行因 key 稳定不重播——不再全表闪动。
+   注：tr 不支持 transform，行移动动画由浏览器瞬间重排承担（无挤压跳动因离开行先淡出）。 */
+.row-enter-active { transition: opacity 0.22s var(--ease), transform 0.22s var(--ease); }
+.row-enter-from { opacity: 0; transform: translateY(8px); }
+.row-leave-active { transition: opacity 0.16s var(--ease); }
+.row-leave-to { opacity: 0; }

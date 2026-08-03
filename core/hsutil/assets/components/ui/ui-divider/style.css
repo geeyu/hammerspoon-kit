@@ -1,0 +1,24 @@
+/* ===== UiDivider（ui/ui-divider/style.css）===== */
+/* 依赖 styles/base.css 的 CSS 变量 */
+
+/* ── UiDivider ── */
+.ui-divider {
+  display: flex;
+  align-items: center;
+  margin: 10px 0;
+}
+.ui-divider::before,
+.ui-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+.ui-divider:not(.ui-divider--labeled)::after { display: none; }
+.ui-divider__label {
+  padding: 0 10px;
+  font-size: 11px;
+  color: var(--fg-3);
+  white-space: nowrap;
+  flex-shrink: 0;
+}

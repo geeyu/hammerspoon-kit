@@ -1,0 +1,17 @@
+<template id="tpl-detail-panel">
+  <div class="detail-overlay" :class="{ open: open }" v-if="item">
+    <div class="detail-header">
+      <span class="label">内容详情</span>
+      <button class="close-btn" @click="$emit('close')" title="关闭 (←)">✕</button>
+    </div>
+    <div class="detail-body thin-scroll">
+      <div class="detail-img" v-if="item.kind === 'image'">
+        <img :src="item.imgUrl">
+      </div>
+      <code v-else-if="item.subKind === 'code'" v-highlight v-text="item.text"
+            class="detail-text is-code"></code>
+      <div v-else class="detail-text" :class="{ 'is-link': item.subKind === 'link' }">{{ item.text }}</div>
+    </div>
+    <div class="detail-meta">创建于 {{ item.timeText }} · ID {{ item.id }}</div>
+  </div>
+</template>

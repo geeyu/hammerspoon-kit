@@ -1,0 +1,9 @@
+<template id="tpl-ui-confirm">
+  <ui-modal :open="open" :title="title" @update:open="handleCancel" :closable="true" width="380px">
+    <p class="ui-confirm__message">{{ message }}</p>
+    <template #footer>
+      <button class="ui-btn ui-btn--sm" @click="handleCancel">{{ cancelText }}</button>
+      <button class="ui-btn ui-btn--sm" :class="danger ? 'ui-btn--danger' : 'ui-btn--primary'" @click="handleOk">{{ okText }}</button>
+    </template>
+  </ui-modal>
+</template>

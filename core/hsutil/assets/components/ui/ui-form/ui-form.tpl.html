@@ -1,0 +1,62 @@
+<template id="tpl-ui-form">
+  <div class="ui-form" @keydown="onKeydown" tabindex="0" ref="formEl">
+    <template v-if="schema && schema.length">
+      <div class="ui-form__grid" :style="{ gridTemplateColumns: 'repeat(' + columns + ', 1fr)' }">
+        <ui-form-field
+          v-for="(field, idx) in schema"
+          :key="field.key"
+          :label="field.label"
+          :required="field.required"
+          :hint="field.hint"
+          :focused="focusIndex === idx"
+          :error="errors[field.key] || ''"
+          @click="focusIndex = idx"
+        >
+          <ui-input
+            v-if="field.type === 'text'"
+            :model-value="localModel[field.key]"
+            @update:model-value="v => handleFieldChange(field.key, v)"
+            :placeholder="field.placeholder"
+            :class="{ 'ui-input--error': errors[field.key] }"
+          ></ui-input>
+          <ui-select
+            v-else-if="field.type === 'select'"
+            :model-value="localModel[field.key]"
+            @update:model-value="v => handleFieldChange(field.key, v)"
+            :options="field.options"
+            :placeholder="field.placeholder"
+            :class="{ 'ui-input--error': errors[field.key] }"
+          ></ui-select>
+          <ui-switch
+            v-else-if="field.type === 'checkbox'"
+            :model-value="!!localModel[field.key]"
+            @update:model-value="v => handleFieldChange(field.key, v)"
+          ></ui-switch>
+          <ui-radio-group
+            v-else-if="field.type === 'radio'"
+            :model-value="localModel[field.key]"
+            @update:model-value="v => handleFieldChange(field.key, v)"
+            :options="field.options"
+          ></ui-radio-group>
+          <input
+            v-else-if="field.type === 'number'"
+            type="number"
+            class="ui-input"
+            :value="localModel[field.key]"
+            @input="e => handleFieldChange(field.key, e.target.value === '' ? null : (isNaN(e.target.valueAsNumber) ? 0 : e.target.valueAsNumber))"
+            :placeholder="field.placeholder"
+          />
+          <textarea
+            v-else-if="field.type === 'textarea'"
+            class="ui-input ui-textarea"
+            :value="localModel[field.key]"
+            @input="e => handleFieldChange(field.key, e.target.value)"
+            :placeholder="field.placeholder"
+            rows="3"
+          ></textarea>
+        </ui-form-field>
+      </div>
+    </template>
+    <slot v-else />
+  </div>
+</template>

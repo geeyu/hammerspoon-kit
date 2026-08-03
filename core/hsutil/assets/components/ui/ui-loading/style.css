@@ -1,0 +1,24 @@
+/* ===== UiLoading（ui/ui-loading/style.css）===== */
+/* 依赖 styles/base.css 的 CSS 变量 */
+
+/* ── UiLoading ── */
+.ui-loading {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  color: var(--fg-2);
+  white-space: nowrap;
+}
+.ui-loading__spinner {
+  display: inline-block;
+  border: 2px solid rgba(255,255,255,0.15);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+.ui-loading__text {
+  font-size: 12px;
+  color: var(--fg-2);
+}

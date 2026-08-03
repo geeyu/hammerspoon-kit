@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>Home - Tool</title>
+<link rel="stylesheet" href="/tool/assets/styles/app.css">
+<!-- 业务共享组件样式：由页面自己引（占位符只管 hsutil ui 库） -->
+<link rel="stylesheet" href="/tool/assets/components/hello-card/style.css">
+</head>
+<body>
+<!-- 占位符：服务端展开注入 base.css + 组件资源 + glass 特效（声明即可，勿手动加 link/script） -->
+<!-- hsutil:ui button,form,table,tabs,status-badge,avatar,toast,confirm -->
+<!-- hsutil:fx glass -->
+
+<div id="app" v-cloak>
+  <div class="fx-layer" v-if="fxOn"></div>
+  <div class="page-head">
+    <div class="page-title">Tool 首页</div>
+    <ui-tabs v-model="tab" :tabs="[{label:'总览',value:'overview'},{label:'数据',value:'data'}]" />
+  </div>
+
+  <!-- 总览：表单 + 按钮 -->
+  <template v-if="tab === 'overview'">
+    <ui-form :schema="formSchema" :model="formValues" @submit="onSubmit" />
+    <div class="row">
+      <ui-button variant="primary" @click="save">保存</ui-button>
+      <ui-button variant="ghost" @click="loadItems">刷新</ui-button>
+      <ui-button variant="danger" @click="confirmReset">重置</ui-button>
+    </div>
+    <div class="row">
+      <!-- 业务共享组件示例：模板就近内联（见下方 #tpl-hello-card） -->
+      <hello-card title="欢迎使用 Tool 模板">
+        这是业务共享组件 hello-card 的演示，复制后按需改造。
+      </hello-card>
+    </div>
+  </template>
+
+  <!-- 数据：表格 -->
+  <template v-else>
+    <ui-table :columns="columns" :items="items" striped />
+  </template>
+</div>
+
+<!-- 业务私有模板就近内联（hello-card 的 tpl 源文件在 components/hello-card/hello-card.tpl.html） -->
+<template id="tpl-hello-card">
+  <div class="hello-card">
+    <div class="hello-card__title">{{ title }}</div>
+    <slot />
+  </div>
+</template>
+
+<script src="store.js" defer></script>
+<script src="/tool/assets/components/hello-card/index.js" defer></script>
+<script src="app.js" defer></script>
+</body>
+</html>

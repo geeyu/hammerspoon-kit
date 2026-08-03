@@ -1,0 +1,90 @@
+/* ===== UiSelect（ui/ui-select/style.css）===== */
+/* 依赖 styles/base.css 的 CSS 变量 */
+
+/* ── UiSelect（按钮式下拉）── */
+.ui-select {
+  position: relative;
+  display: inline-block;
+  min-width: 100px;
+}
+.ui-select__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  width: 100%;
+  height: 28px;
+  padding: 0 8px;
+  font-size: 12px;
+  font-family: var(--font);
+  color: var(--fg-1);
+  background: var(--bg-row);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-c);
+  cursor: pointer;
+  outline: none;
+  white-space: nowrap;
+  transition: border-color 0.15s var(--ease), background 0.15s var(--ease), box-shadow 0.15s var(--ease);
+}
+.ui-select__btn:hover {
+  border-color: var(--border-h);
+  background: var(--bg-row-h);
+}
+.ui-select--open .ui-select__btn {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-soft);
+}
+.ui-select--disabled .ui-select__btn {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.ui-select__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ui-select__arrow {
+  font-size: 10px;
+  color: var(--fg-3);
+  transition: transform 0.15s var(--ease);
+  flex-shrink: 0;
+}
+.ui-select--open .ui-select__arrow {
+  transform: rotate(180deg);
+}
+.ui-select__dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-c);
+  box-shadow: var(--shadow-overlay);
+  overflow: hidden;
+  max-height: 180px;
+  overflow-y: auto;
+}
+.ui-select__option {
+  padding: 4px 10px;
+  font-size: 12px;
+  color: var(--fg-1);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.1s var(--ease);
+}
+.ui-select__option:hover {
+  background: var(--bg-row-h);
+}
+.ui-select__option--active {
+  color: var(--accent);
+  font-weight: 500;
+}
+
+/* 键盘高亮（↑↓ 导航） */
+.ui-select__option--focus {
+  background: var(--bg-row-h);
+}
+
+/* 键盘焦点环 */
+.ui-select__btn:focus-visible { outline: 2px solid var(--accent-ring); outline-offset: 1px; }

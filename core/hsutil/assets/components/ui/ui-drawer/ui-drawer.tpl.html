@@ -1,0 +1,20 @@
+<template id="tpl-ui-drawer">
+  <teleport to="body">
+    <transition name="drawer" :css="false" @enter="onEnter" @leave="onLeave">
+      <div v-if="open" class="ui-drawer__overlay" role="dialog" aria-modal="true" :aria-label="title" @click.self="close">
+        <div class="ui-drawer__panel" :style="{width: width}">
+          <div class="ui-drawer__header">
+            <span class="ui-drawer__title">{{ title }}</span>
+            <button v-if="closable" class="ui-drawer__close" @click="close" aria-label="关闭"><ui-icon name="close" :size="12"></ui-icon></button>
+          </div>
+          <div class="ui-drawer__body">
+            <slot />
+          </div>
+          <div v-if="$slots.footer" class="ui-drawer__footer">
+            <slot name="footer" />
+          </div>
+        </div>
+      </div>
+    </transition>
+  </teleport>
+</template>

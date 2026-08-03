@@ -1,0 +1,16 @@
+/* hello-card 卡片样式（页面通过 <link> 引入本文件） */
+.hello-card {
+  flex: 1;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-1);
+  font-size: 13px;
+  color: var(--fg-2);
+}
+.hello-card__title {
+  margin-bottom: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--fg-1);
+}

@@ -1,0 +1,7 @@
+/* Tool 业务全局样式（组件样式由 hsutil 注入，这里只放页面布局） */
+body { margin: 0; font-family: -apple-system, "PingFang SC", sans-serif; }
+.page-head { display: flex; align-items: center; gap: 16px; padding: 12px 16px; }
+.page-title { font-size: 15px; font-weight: 600; color: var(--fg-1); }
+.row { display: flex; gap: 8px; padding: 8px 16px; }
+.row-item { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--fg-2); }
+.nav-back { font-size: 13px; color: var(--accent); text-decoration: none; }

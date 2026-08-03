@@ -1,0 +1,51 @@
+/* ===== UiTabs（ui/ui-tabs/style.css）===== */
+/* 依赖 styles/base.css 的 CSS 变量 */
+
+/* ── UiTabs ── */
+.ui-tabs {
+  display: flex;
+  position: relative;
+  border-bottom: 1px solid var(--border);
+  gap: 0;
+  outline: none;
+}
+.ui-tabs__tab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-family: var(--font);
+  color: var(--fg-2);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  outline: none;
+  white-space: nowrap;
+  transition: color 0.15s var(--ease);
+}
+.ui-tabs__tab:hover {
+  color: var(--fg-1);
+}
+.ui-tabs__tab--active {
+  color: var(--accent);
+}
+.ui-tabs__icon {
+  font-size: 13px;
+  line-height: 1;
+}
+/* 指示条：位置/宽度由 anime 驱动（ui-tabs/index.js positionIndicator：mounted 初始定位 + watch 切换）；无 anime 时隐藏（index.js mounted 置 display:none） */
+.ui-tabs__indicator {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  width: 0;
+  opacity: 0;
+  background: var(--accent);
+  pointer-events: none;
+}
+
+/* 键盘焦点环 */
+.ui-tabs__tab:focus-visible { outline: 2px solid var(--accent-ring); outline-offset: 1px; }

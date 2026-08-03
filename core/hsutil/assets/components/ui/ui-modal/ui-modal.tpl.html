@@ -1,0 +1,20 @@
+<template id="tpl-ui-modal">
+  <teleport to="body">
+    <transition name="modal" :css="false" @enter="onEnter" @leave="onLeave">
+      <div v-if="open" class="ui-modal__overlay" role="dialog" aria-modal="true" :aria-label="title" @click.self="close">
+        <div class="ui-modal__panel" :style="{maxWidth: width}">
+          <div class="ui-modal__header">
+            <span class="ui-modal__title">{{ title }}</span>
+            <button v-if="closable" class="ui-modal__close" @click="close" aria-label="关闭"><ui-icon name="close" :size="12"></ui-icon></button>
+          </div>
+          <div class="ui-modal__body">
+            <slot />
+          </div>
+          <div v-if="$slots.footer" class="ui-modal__footer">
+            <slot name="footer" />
+          </div>
+        </div>
+      </div>
+    </transition>
+  </teleport>
+</template>

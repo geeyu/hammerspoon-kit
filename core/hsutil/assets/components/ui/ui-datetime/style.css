@@ -1,0 +1,77 @@
+/* ===== UiDatetime（ui/ui-datetime/style.css）===== */
+/* 依赖 styles/base.css 的 CSS 变量 + vendor flatpickr dark.css */
+
+.ui-datetime {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+.ui-datetime input {
+  width: 100%;
+  background: var(--bg-row);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-c);
+  color: var(--fg-1);
+  font-size: 12px;
+  font-family: var(--font);
+  padding: 5px 26px 5px 10px;
+  height: 26px;
+  outline: none;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: border-color 0.15s var(--ease), background 0.15s var(--ease);
+}
+.ui-datetime input:hover { border-color: var(--border-h); }
+.ui-datetime input:focus { border-color: var(--accent-ring); }
+.ui-datetime input::placeholder { color: var(--fg-3); }
+.ui-datetime--disabled input { opacity: 0.5; cursor: not-allowed; }
+.ui-datetime__icon {
+  position: absolute;
+  right: 8px; top: 50%;
+  transform: translateY(-50%);
+  color: var(--fg-3);
+  pointer-events: none;
+}
+.ui-datetime__clear {
+  position: absolute;
+  right: 6px; top: 50%;
+  transform: translateY(-50%);
+  border: none; background: transparent;
+  color: var(--fg-3); font-size: 11px;
+  cursor: pointer; padding: 2px 3px;
+  border-radius: 4px;
+}
+.ui-datetime__clear:hover { color: var(--fg-1); background: var(--bg-row-h); }
+
+/* ── flatpickr 日历适配主题（覆盖 dark.css 默认色）── */
+.flatpickr-calendar {
+  font-family: var(--font);
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-c);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+.flatpickr-calendar::before,
+.flatpickr-calendar::after { display: none; }   /* 去掉箭头，深色下更干净 */
+.flatpickr-day.selected,
+.flatpickr-day.selected:hover {
+  background: var(--accent) !important;
+  border-color: var(--accent) !important;
+  color: var(--fg-invert) !important;
+}
+.flatpickr-day.today { border-color: var(--accent); }
+.flatpickr-day:hover { background: var(--bg-row-h) !important; }
+.flatpickr-day.flatpickr-disabled,
+.flatpickr-day.prevMonthDay,
+.flatpickr-day.nextMonthDay { color: var(--fg-3); }
+.flatpickr-months .flatpickr-month,
+.flatpickr-current-month,
+.flatpickr-weekday { color: var(--fg-1); }
+.flatpickr-weekday { font-weight: 500; }
+.flatpickr-time input { color: var(--fg-1); }
+.flatpickr-time input:hover,
+.flatpickr-time input:focus { background: var(--bg-row-h); }
+.flatpickr-time .flatpickr-time-separator,
+.flatpickr-time .flatpickr-am-pm { color: var(--fg-2); }

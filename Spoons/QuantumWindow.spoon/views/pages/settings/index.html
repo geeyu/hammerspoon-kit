@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>窗口管理</title>
+<link rel="icon" href="data:,">
+<!-- 占位符：服务端展开注入 vue + theme.css + base.css + 组件（声明即可，勿手写 link/script）
+     switch/hotkey/toast/button：每功能一行（启用开关 + 热键录制），改动即保存 -->
+<!-- hsutil:ui switch,hotkey,toast,button -->
+<link rel="stylesheet" href="/quantumwindow/view/pages/settings/style.css">
+</head>
+<body>
+<div id="app" v-cloak>
+  <div class="qw-panel">
+    <!-- 页头：标题 + 返回 -->
+    <div class="page-head">
+      <div class="page-title">🪟 窗口管理</div>
+      <ui-button variant="ghost" size="sm" @click="goBack">← 返回</ui-button>
+    </div>
+
+    <!-- 中间滚动区（顶/底固定，对齐防睡眠 control 页） -->
+    <div class="ctrl-body">
+
+      <!-- 每个功能一行：启用开关 + 热键录制（改动即保存；关闭的功能热键置灰） -->
+      <div class="setting-row" v-for="a in actions" :key="a.key">
+        <div class="setting-label">
+          <div class="setting-name">{{ a.label }}</div>
+          <div class="setting-desc">{{ a.desc }}</div>
+        </div>
+        <div class="row-controls">
+          <!-- 注意：in-DOM 模板里事件名必须用 kebab-case（浏览器会把属性名小写化，
+               驼峰 @update:modelValue 会变成 modelvalue 与 emit 的 update:modelValue 匹配不上）
+               → 统一 :model-value + @update:model-value 手动赋值 -->
+          <ui-switch :model-value="a.enabled" @update:model-value="onChange(a, 'enabled', $event)"></ui-switch>
+          <ui-hotkey :model-value="a.hotkey" :disabled="!a.enabled" remote remote-url="/quantumwindow/api/hotkey-guard"
+                     @update:model-value="onChange(a, 'hotkey', $event)"></ui-hotkey>
+        </div>
+      </div>
+
+    </div><!-- /ctrl-body -->
+  </div>
+</div>
+<!-- 加载顺序（defer 按文档序）：store → app -->
+<script src="store.js" defer></script>
+<script src="app.js" defer></script>
+</body>
+</html>

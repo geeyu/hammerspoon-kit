@@ -1,0 +1,54 @@
+/* ===== UiBadge（ui/ui-badge/style.css）===== */
+/* 依赖 styles/base.css 的 CSS 变量 */
+
+/* ── UiBadge ── */
+.ui-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 8px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.5;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+}
+.ui-badge--neutral {
+  color: var(--fg-2);
+  background: var(--bg-row-h);
+}
+.ui-badge--accent {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+.ui-badge--success {
+  color: var(--success);
+  background: var(--success-soft);
+}
+.ui-badge--warning {
+  color: var(--warning);
+  background: var(--warning-soft);
+}
+.ui-badge--danger {
+  color: var(--danger);
+  background: var(--danger-soft);
+}
+
+/* dot 模式 */
+.ui-badge--dot {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border-radius: 50%;
+}
+.ui-badge--dot .ui-badge__dot {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+.ui-badge--dot.ui-badge--neutral .ui-badge__dot { background: var(--fg-2); }
+.ui-badge--dot.ui-badge--accent  .ui-badge__dot { background: var(--accent); }
+.ui-badge--dot.ui-badge--success .ui-badge__dot { background: var(--success); }
+.ui-badge--dot.ui-badge--warning .ui-badge__dot { background: var(--warning); }
+.ui-badge--dot.ui-badge--danger  .ui-badge__dot { background: var(--danger); }

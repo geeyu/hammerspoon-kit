@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>HSUtil UI Demo</title>
+<link rel="stylesheet" href="/hsutil/assets/pages/demo/style.css">
+</head>
+<body>
+<!-- 组件占位符：声明即自动注入 base.css + 组件资源（含 icon 依赖 IconPark）；勿手动加 hsutil 的 link/script -->
+<!-- hsutil:ui button,badge,status-badge,divider,avatar,empty,loading,input,select,switch,radio,form-field,form,modal,confirm,toast,drawer,tabs,table,pagination,use-crud -->
+<!-- hsutil:fx glass -->
+
+<div id="app" v-cloak>
+  <div class="fx-layer"></div>
+  <h1>HSUtil UI 组件预览</h1>
+
+  <!-- 基础 -->
+  <section><h2>Button</h2>
+    <div class="row">
+      <ui-button variant="primary" icon="plus" @click="toast('primary 点击')">Primary</ui-button>
+      <ui-button @click="toast('default 点击')">Default</ui-button>
+      <ui-button variant="danger" @click="toast('danger 点击')">Danger</ui-button>
+      <ui-button variant="ghost" icon="refresh" @click="toast('ghost 点击')">Ghost</ui-button>
+      <ui-button loading>Loading</ui-button>
+      <ui-button disabled>Disabled</ui-button>
+    </div>
+    <div class="row"><ui-button variant="primary" block>Block 通栏</ui-button></div>
+  </section>
+
+  <section><h2>Badge / StatusBadge</h2>
+    <div class="row">
+      <ui-badge text="中性"></ui-badge>
+      <ui-badge text="强调" tone="accent"></ui-badge>
+      <ui-badge text="成功" tone="success"></ui-badge>
+      <ui-badge text="警告" tone="warning"></ui-badge>
+      <ui-badge text="危险" tone="danger"></ui-badge>
+      <ui-badge dot tone="danger"></ui-badge>
+      <ui-status-badge status="success" text="运行中" pulse></ui-status-badge>
+      <ui-status-badge status="warning" text="告警"></ui-status-badge>
+      <ui-status-badge status="danger" text="故障"></ui-status-badge>
+      <ui-status-badge status="info" text="信息"></ui-status-badge>
+      <ui-status-badge status="offline" text="离线"></ui-status-badge>
+    </div>
+  </section>
+
+  <section><h2>Avatar / Divider / Loading / Empty</h2>
+    <div class="row wrap">
+      <ui-avatar text="张" color="#4A8BF5" :size="30"></ui-avatar>
+      <ui-avatar text="李" color="#30A46C" :size="30"></ui-avatar>
+      <ui-avatar text="王" color="#E5484D" :size="30"></ui-avatar>
+      <ui-divider label="分隔线"></ui-divider>
+      <ui-loading text="加载中…"></ui-loading>
+      <ui-empty icon="inbox" text="暂无数据" hint="这是空态提示文字"></ui-empty>
+    </div>
+  </section>
+
+  <!-- 表单 -->
+  <section><h2>Input / Select / Switch / Radio</h2>
+    <div class="col">
+      <div class="row">
+        <ui-input v-model="inputVal" placeholder="输入框"></ui-input>
+        <ui-select v-model="selectVal" :options="selectOpts" placeholder="选择一项"></ui-select>
+        <ui-switch v-model="switchVal"></ui-switch>
+        <span class="hint">开关：{{ switchVal ? '开' : '关' }}｜输入：{{ inputVal || '空' }}｜选择：{{ selectVal }}</span>
+      </div>
+      <ui-radio-group v-model="radioVal" :options="radioOpts" direction="row"></ui-radio-group>
+    </div>
+  </section>
+
+  <section><h2>FormField + Form（schema 驱动）</h2>
+    <ui-form-field label="字段标签" required hint="提示文字">
+      <ui-input v-model="inputVal" placeholder="被 FormField 包裹"></ui-input>
+    </ui-form-field>
+    <ui-form :schema="formSchema" :model="formValues" @submit="onFormSubmit" @change="onFormChange"></ui-form>
+  </section>
+
+  <!-- 反馈 -->
+  <section><h2>Modal / Confirm / Toast / Drawer</h2>
+    <div class="row">
+      <ui-button variant="primary" icon="full-screen" @click="modalOpen = true">打开 Modal</ui-button>
+      <ui-button variant="danger" icon="delete" @click="confirmDel">Confirm 删除</ui-button>
+      <ui-button icon="bell-ring" @click="toast('这是一条信息')">Toast 信息</ui-button>
+      <ui-button variant="primary" @click="toast('操作成功', 'success')">Toast 成功</ui-button>
+      <ui-button @click="toast('出错了', 'error')">Toast 错误</ui-button>
+      <ui-button icon="right" @click="drawerOpen = true">打开 Drawer</ui-button>
+    </div>
+    <ui-modal v-model:open="modalOpen" title="模态框" width="420px">
+      <p class="modal-body">这是 Modal 内容区。<br>Esc / 点击遮罩可关闭，入场为 spring 动效。</p>
+      <template #footer>
+        <div class="row">
+          <ui-button @click="modalOpen = false">取消</ui-button>
+          <ui-button variant="primary" @click="modalOpen = false">确定</ui-button>
+        </div>
+      </template>
+    </ui-modal>
+    <ui-drawer v-model:open="drawerOpen" title="抽屉" width="320px">
+      <p class="modal-body">右侧滑出的 Drawer 面板，宽度可配（px / %）。</p>
+    </ui-drawer>
+  </section>
+
+  <!-- 数据/导航 -->
+  <section><h2>Tabs</h2>
+    <ui-tabs v-model="tabsVal" :tabs="tabsList"></ui-tabs>
+    <div class="tabs-pane">当前 Tab：<b>{{ tabsVal }}</b>（←→ 可切换，指示条弹簧滑动）</div>
+  </section>
+
+  <section><h2>Table + Pagination + useCrud</h2>
+    <ui-table :columns="crudCols" :items="crudItems" striped>
+      <template #cell-status="{ row }">
+        <ui-status-badge :status="row.status" :text="row.status"></ui-status-badge>
+      </template>
+      <template #cell-actions="{ row }">
+        <ui-button size="sm" variant="danger" @click="crudDel(row)">删除</ui-button>
+      </template>
+    </ui-table>
+    <div class="row">
+      <ui-button size="sm" variant="primary" icon="plus" @click="crudAdd">新增一行</ui-button>
+      <ui-pagination v-model="page" :total="100" :page-size="10"></ui-pagination>
+      <span class="hint">useCrud：增删查改 + 内建 Confirm 确认（删除有确认弹窗）</span>
+    </div>
+  </section>
+
+  <!-- 图标 -->
+  <section><h2>Icons（IconPark）</h2>
+    <div class="icon-row">
+      <ui-icon v-for="n in iconNames" :key="n" :name="n" :size="18" :title="n"></ui-icon>
+    </div>
+  </section>
+</div>
+
+<script src="app.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+# macOS
+.DS_Store
+
+# Hammerspoon 本地数据
+*.log
+hs_*.log
+
+# 编辑器
+*.swp
+
+# 本地数据目录（HSUtil/各 Spoon 运行时数据，不推 GitHub）
+data/
+
+# 头脑风暴视觉伴侣产物（浏览器原型/交互事件）
+.superpowers/
+
+# 旧版数据位置（已迁移到 ~/.clips/，这里清理残留引用）
+clipboard_history.sqlite3
+clipboard_history.sqlite3-*
+clips/
+.superpowers/

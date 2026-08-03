@@ -1,0 +1,31 @@
+/* ===== UiAvatar（ui/ui-avatar/style.css）===== */
+/* 依赖 styles/base.css 的 CSS 变量 */
+
+/* ── UiAvatar ── */
+.ui-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--accent-soft);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+  line-height: 1;
+  text-transform: uppercase;
+}
+.ui-avatar__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.ui-avatar__text {
+  line-height: 1;
+}
+
+/* hover 微缩放（纯 CSS，不占内联 transform） */
+.ui-avatar { transition: transform 0.15s var(--ease); }
+.ui-avatar:hover { transform: scale(1.08); }

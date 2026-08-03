@@ -1,0 +1,56 @@
+/* ===== UiPagination（ui/ui-pagination/style.css）===== */
+/* 依赖 styles/base.css 的 CSS 变量 */
+
+/* ── UiPagination ── */
+.ui-pagination {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  user-select: none;
+}
+.ui-pagination__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  height: 28px;
+  padding: 0 4px;
+  font-size: 12px;
+  font-family: var(--font);
+  color: var(--fg-2);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-c);
+  cursor: pointer;
+  outline: none;
+  transition: background 0.15s var(--ease), color 0.15s var(--ease), border-color 0.15s var(--ease);
+}
+.ui-pagination__btn:hover {
+  background: var(--bg-row-h);
+  color: var(--fg-1);
+}
+.ui-pagination__btn--active {
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-color: var(--accent-soft);
+  font-weight: 600;
+}
+.ui-pagination__btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.ui-pagination__ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  height: 28px;
+  color: var(--fg-3);
+  font-size: 12px;
+  letter-spacing: 1px;
+}
+
+/* 键盘焦点环 */
+.ui-pagination__btn:focus-visible { outline: 2px solid var(--accent-ring); outline-offset: 1px; }

@@ -1,0 +1,102 @@
+/* ===== HSUtil UI Demo 预览页（assets/styles/demo.css）=====
+   主题变量由占位符注入链自动引入（styles/theme.css），本文件只管演示页布局。 */
+
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  position: relative;            /* .fx-paths（glass-fx.js 追加到 body）定位参照 */
+  min-height: 100vh;
+  font-family: var(--font);
+  color: var(--fg-1);
+  background: linear-gradient(160deg, #10131A 0%, #16161C 55%, #12151D 100%);
+  -webkit-font-smoothing: antialiased;
+}
+
+[v-cloak] { display: none; }
+
+/* ── 页面容器：fx-layer 光尘铺满全页、内容层之上 ── */
+#app {
+  position: relative;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 40px 32px 80px;
+}
+
+#app h1 {
+  font-size: 22px;
+  font-weight: 650;
+  letter-spacing: 0.5px;
+  margin-bottom: 28px;
+}
+
+/* ── 演示块 ── */
+#app section {
+  margin-bottom: 36px;
+  padding: 20px 22px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.02);
+}
+
+#app section h2 {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--fg-2);
+  letter-spacing: 1px;
+  margin-bottom: 14px;
+}
+#app section h2::after {
+  content: '';
+  display: block;
+  width: 28px;
+  height: 2px;
+  margin-top: 6px;
+  border-radius: 1px;
+  background: var(--accent);
+}
+
+/* ── 行内工具条（带 icon 按钮 + 空态同排） ── */
+.row { display: flex; align-items: center; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+
+/* ── 图标网格：24 个 IconPark 图标格子展示 ── */
+.icon-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
+  gap: 8px;
+}
+/* ui-icon 的宽高由组件内联 style 控制，用 !important 撑成格子（仅演示页） */
+.icon-row .ui-icon {
+  width: 44px !important;
+  height: 44px !important;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--fg-2);
+  background: var(--bg-row);
+  transition: color 0.15s var(--ease), border-color 0.15s var(--ease), background 0.15s var(--ease);
+}
+.icon-row .ui-icon:hover {
+  color: var(--accent);
+  border-color: var(--border-h);
+  background: var(--bg-row-h);
+}
+
+.icon-hint {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--fg-3);
+}
+
+/* ── 纵向布局 / 提示 / 面板 ── */
+.col { display: flex; flex-direction: column; gap: 10px; }
+.wrap { flex-wrap: wrap; }
+.hint { font-size: 12px; color: var(--fg-3); }
+.modal-body { font-size: 13px; line-height: 1.8; color: var(--fg-2); }
+.tabs-pane {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border: 1px dashed var(--border-h);
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--fg-2);
+}

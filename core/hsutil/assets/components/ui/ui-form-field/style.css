@@ -1,0 +1,42 @@
+/* ===== UiFormField（ui/ui-form-field/style.css）===== */
+/* 依赖 styles/base.css 的 CSS 变量 */
+
+/* ── UiFormField ── */
+.ui-form-field {
+  position: relative;
+  padding: 4px 0 4px 10px;
+  border-left: 2px solid transparent;
+  transition: border-color 0.15s var(--ease);
+}
+.ui-form-field--focused {
+  border-left-color: var(--accent);
+}
+.ui-form-field__label {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--fg-2);
+  margin-bottom: 3px;
+  line-height: 1.4;
+}
+.ui-form-field__required {
+  color: var(--danger);
+  margin-left: 2px;
+}
+.ui-form-field__control {
+  /* control slot content */
+}
+.ui-form-field__hint {
+  font-size: 10px;
+  color: var(--fg-3);
+  margin-top: 2px;
+  line-height: 1.4;
+}
+
+/* 错误态 */
+.ui-form-field--error .ui-form-field__label { color: var(--danger); }
+.ui-form-field__error {
+  font-size: 10px;
+  color: var(--danger);
+  margin-top: 3px;
+}

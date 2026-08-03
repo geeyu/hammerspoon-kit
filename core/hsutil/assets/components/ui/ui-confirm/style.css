@@ -1,0 +1,11 @@
+/* ===== UiConfirm（ui/ui-confirm/style.css）===== */
+/* 依赖 styles/base.css 的 CSS 变量 */
+
+/* ── UiConfirm（基于 UiModal，仅额外 message 样式）── */
+.ui-confirm__message {
+  margin: 0;
+  font-size: 13px;
+  color: var(--fg-1);
+  line-height: 1.6;
+  white-space: pre-wrap;
+}

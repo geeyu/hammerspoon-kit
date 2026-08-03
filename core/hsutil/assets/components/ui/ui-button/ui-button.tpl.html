@@ -1,0 +1,12 @@
+<template id="tpl-ui-button">
+  <button
+    class="ui-btn" type="button"
+    :class="['ui-btn--' + variant, 'ui-btn--' + size, { 'ui-btn--block': block, 'ui-btn--loading': loading }]"
+    :disabled="disabled || loading"
+    @click="handleClick"
+  >
+    <span v-if="loading" class="ui-btn__spinner"></span>
+    <ui-icon v-if="icon" :name="icon" :size="14" class="ui-btn__icon"></ui-icon>
+    <slot />
+  </button>
+</template>

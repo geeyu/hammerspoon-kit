@@ -1,0 +1,20 @@
+<template id="tpl-ui-select">
+  <div class="ui-select" ref="root" :class="{ 'ui-select--open': open, 'ui-select--disabled': disabled }">
+    <button class="ui-select__btn" @click="toggleOpen" @keydown.stop="onKeydown" type="button" :disabled="disabled" :aria-expanded="open ? 'true' : 'false'" aria-haspopup="listbox">
+      <span class="ui-select__label">{{ currentLabel }}</span>
+      <ui-icon name="down" :size="12" class="ui-select__arrow"></ui-icon>
+    </button>
+    <div v-if="open" class="ui-select__dropdown" role="listbox">
+      <div
+        v-for="(opt, idx) in options"
+        :key="opt.value"
+        class="ui-select__option"
+        :class="{ 'ui-select__option--active': modelValue === opt.value, 'ui-select__option--focus': activeIdx === idx }"
+        role="option"
+        :aria-selected="modelValue === opt.value ? 'true' : 'false'"
+        @click="selectOption(opt)"
+        @mouseenter="activeIdx = idx"
+      >{{ opt.label }}</div>
+    </div>
+  </div>
+</template>

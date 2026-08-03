@@ -1,0 +1,68 @@
+/* ===== HSUtil UI 基础样式（styles/base.css）=====
+   依赖：styles/theme.css（经占位符注入链自动引入，提供全部 :root 变量）。
+   通用：进场动画、玻璃质感、spinner、kbd、滚动条、补充色值变量。 */
+
+/* ── 轻量进场动画 ── */
+@keyframes fade-in    { from { opacity: 0; } }
+@keyframes fade-up    { from { opacity: 0; transform: translateY(8px); } }
+@keyframes beat       { 0%, 100% { transform: scale(1); }
+                        30% { transform: scale(1.12); } 45% { transform: scale(0.98); }
+                        60% { transform: scale(1.06); } }
+@keyframes pulse-soft { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+
+.anim-fade-in { animation: fade-in 0.3s ease both; }
+.anim-beat    { animation: beat 2s ease-in-out infinite; }
+.anim-pulse   { animation: pulse-soft 1.6s ease-in-out infinite; }
+.card-enter   { animation: fade-up 0.28s var(--ease) both; }
+
+/* ── 面板玻璃质感（拉丝细闪 + 顶部受光）── */
+.glass-panel::before { /* 流光扫过 */
+  content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(115deg,
+    transparent 32%, rgba(255,255,255,0.025) 44%,
+    rgba(255,255,255,0.05) 50%,
+    rgba(255,255,255,0.025) 56%, transparent 68%);
+  background-size: 260% 100%; background-repeat: no-repeat;
+  animation: glass-sheen 9s ease-in-out infinite;
+}
+@keyframes glass-sheen {
+  0%, 100% { background-position: 130% 0; }
+  50%      { background-position: -30% 0; }
+}
+.glass-panel::after { /* 顶部反光 + 拉丝细纹 */
+  content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  border-radius: inherit;
+  background:
+    linear-gradient(155deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.012) 20%, transparent 40%),
+    repeating-linear-gradient(93deg, transparent 0 2px, rgba(255,255,255,0.012) 2px 3px, transparent 3px 6px),
+    repeating-linear-gradient(87deg, transparent 0 5px, rgba(255,255,255,0.008) 5px 6px, transparent 6px 11px);
+  background-size: 100% 100%, 100% 100%, 100% 100%;
+}
+@media (prefers-reduced-motion: reduce) {
+  .glass-panel::before { animation: none; }
+}
+
+/* ── 加载中 spinner ── */
+.spinner {
+  display: inline-block; width: 14px; height: 14px; margin-right: 10px;
+  border: 2px solid rgba(255,255,255,0.15); border-top-color: var(--accent);
+  border-radius: 50%; animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── 快捷键徽标 ── */
+.kbd {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 18px; height: 18px; padding: 0 5px; border-radius: 5px;
+  font-size: 10px; font-family: var(--mono); color: var(--fg-2);
+  background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+  box-shadow: 0 1px 0 rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.04);
+}
+
+/* ── 细滚动条 ── */
+.thin-scroll::-webkit-scrollbar { width: 5px; }
+.thin-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.10); border-radius: 3px; }
+.thin-scroll::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.16); }
+.thin-scroll::-webkit-scrollbar-track { background: transparent; }
+

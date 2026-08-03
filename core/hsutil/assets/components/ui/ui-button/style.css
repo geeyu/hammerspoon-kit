@@ -1,0 +1,121 @@
+/* ===== UiButton（ui/ui-button/style.css）===== */
+/* 依赖 styles/base.css 的 CSS 变量 */
+
+/* ── UiButton ── */
+.ui-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 3px 12px;
+  height: 26px;
+  font-size: 12px;
+  font-family: var(--font);
+  font-weight: 500;
+  line-height: 1;
+  color: var(--fg-1);
+  background: var(--bg-row);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-c);
+  cursor: pointer;
+  outline: none;
+  white-space: nowrap;
+  transition: background 0.15s var(--ease), border-color 0.15s var(--ease), color 0.15s var(--ease), transform 0.12s var(--ease);
+}
+.ui-btn:hover:not(:disabled):not(.ui-btn--loading) { transform: scale(1.04); }
+.ui-btn:hover {
+  background: var(--bg-row-h);
+  border-color: var(--border-h);
+}
+.ui-btn:active:not(:disabled) { transform: scale(0.97); }
+
+/* size */
+.ui-btn--sm { height: 22px; padding: 1px 8px; font-size: 11px; border-radius: var(--radius-c); }
+.ui-btn--md { height: 28px; padding: 4px 14px; font-size: 12px; }
+
+/* variant: primary */
+.ui-btn--primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--fg-invert);
+}
+.ui-btn--primary:hover {
+  background: var(--accent-h);
+  border-color: var(--accent-h);
+}
+
+/* variant: danger */
+.ui-btn--danger {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: var(--fg-invert);
+}
+.ui-btn--danger:hover {
+  background: var(--danger-h);
+  border-color: var(--danger-h);
+}
+
+/* variant: success */
+.ui-btn--success {
+  background: var(--success);
+  border-color: var(--success);
+  color: var(--fg-invert);
+}
+.ui-btn--success:hover {
+  background: var(--success-h);
+  border-color: var(--success-h);
+}
+
+/* variant: warning */
+.ui-btn--warning {
+  background: var(--warning);
+  border-color: var(--warning);
+  color: var(--fg-invert);
+}
+.ui-btn--warning:hover {
+  background: var(--warning-h);
+  border-color: var(--warning-h);
+}
+
+/* variant: ghost */
+.ui-btn--ghost {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--fg-2);
+}
+.ui-btn--ghost:hover {
+  background: var(--bg-row-h);
+  border-color: var(--border-h);
+  color: var(--fg-1);
+}
+
+/* variant: default (already base) */
+
+/* states */
+.ui-btn:disabled,
+.ui-btn--loading {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.ui-btn--block {
+  display: flex;
+  width: 100%;
+}
+
+.ui-btn__spinner {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  border: 2px solid rgba(255,255,255,0.15);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  flex-shrink: 0;
+}
+
+.ui-btn__icon { margin-right: 4px; }
+
+/* 键盘焦点环 */
+.ui-btn:focus-visible { outline: 2px solid var(--accent-ring); outline-offset: 1px; }

@@ -1,0 +1,13 @@
+/* ===== UiForm（ui/ui-form/style.css）===== */
+/* 依赖 styles/base.css 的 CSS 变量 */
+
+/* ── UiForm ── */
+.ui-form {
+  outline: none;
+}
+.ui-form__grid {
+  display: grid;
+  gap: 6px;
+}
+
+

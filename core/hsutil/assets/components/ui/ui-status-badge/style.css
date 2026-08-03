@@ -1,0 +1,28 @@
+/* ===== UiStatusBadge（ui/ui-status-badge/style.css）===== */
+/* 依赖 styles/base.css 的 CSS 变量 */
+
+/* ── UiStatusBadge ── */
+.ui-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--fg-2);
+  white-space: nowrap;
+}
+.ui-status-badge__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.ui-status-badge--success .ui-status-badge__dot { background: var(--success); }
+.ui-status-badge--warning .ui-status-badge__dot { background: var(--warning); }
+.ui-status-badge--danger  .ui-status-badge__dot { background: var(--danger); }
+.ui-status-badge--info    .ui-status-badge__dot { background: var(--info); }
+.ui-status-badge--offline .ui-status-badge__dot { background: var(--fg-3); }
+
+/* pulse 呼吸动画 */
+.ui-status-badge--pulse .ui-status-badge__dot {
+  animation: pulse-soft 1.6s ease-in-out infinite;
+}

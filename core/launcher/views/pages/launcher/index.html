@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>Launcher</title>
+<!-- 占位符：服务端展开注入 vue + theme.css + base.css（声明即可，勿手写 link/script）
+     glass：玻璃扫光 + 光尘粒子特效；toast：Tab 注入提示 -->
+<!-- hsutil:ui toast -->
+<!-- hsutil:fx glass -->
+<!-- 业务样式：页面私有（views/pages/launcher/style.css） -->
+<link rel="stylesheet" href="/launcher/view/pages/launcher/style.css">
+</head>
+<body>
+<div id="app" v-cloak>
+  <div class="ut-panel glass-panel" :class="{ 'detail-open': detailOpen }" tabindex="-1">
+    <!-- 搜索栏 -->
+    <div class="ut-inputbar">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/>
+      </svg>
+      <!-- 应用搜索注入 chip（Tab 注入；✕/退格/再 Tab 移除） -->
+      <div class="ut-chip" v-if="injectedApp">
+        <span v-if="injectedApp.icon" class="ut-chip-icon">{{ injectedApp.icon }}</span>
+        <span class="ut-chip-name">{{ injectedApp.name }}</span>
+        <span class="ut-chip-x" @click="removeInject" title="移除（Tab/退格/Esc）">✕</span>
+      </div>
+      <input ref="q" v-model="query" type="text"
+             placeholder="搜索应用、命令、插件…"
+             autocomplete="off" spellcheck="false"
+             @input="onInput" @keydown="onKey">
+      <span class="ut-count" v-if="items.length && !loading">{{ items.length }} 个结果</span>
+    </div>
+
+    <!-- 注入模式：应用搜索 iframe（替换结果区；embed=1 应用页隐藏自带输入框） -->
+    <iframe v-if="injectedApp" :src="injectSrc" class="ut-appframe" id="app-search-frame"
+            @load="onAppFrameLoad"></iframe>
+
+    <!-- 结果区 -->
+    <div class="ut-list" ref="list" v-if="!injectedApp">
+      <!-- 网格模式（空输入）：home = 快捷命令 / apps = 应用组 -->
+      <template v-if="!terms">
+        <div class="ut-grid">
+          <div class="ut-gcard"
+               v-for="(g, i) in gridItems" :key="g.row.id"
+               :class="{ selected: i === selected, config: g.row.type === 'cardPage' }"
+               @click="mode === 'home' ? openGridCard(g) : openAppsCard(g)" @mouseenter="selected = i">
+            <img v-if="g.row.image" class="ut-gicon" :src="g.row.image" alt="">
+            <span v-else-if="g.row.icon" class="ut-gicon ut-gicon-emoji">{{ g.row.icon }}</span>
+            <span v-else class="ut-gicon ut-gicon-fallback" :class="'if-' + (g.row.plugin || 'x')" :style="iconStyle(g.row)">{{ iconText(g.row) }}</span>
+            <div class="ut-gname">{{ shortName(g.row.text) }}</div>
+          </div>
+        </div>
+        <div class="ut-empty" v-if="gridItems.length === 0 && !loading">
+          <div class="ut-empty-icon">⌕</div>
+          <div class="ut-empty-text">{{ mode === 'home' ? '暂无快捷命令' : '暂无应用' }}</div>
+        </div>
+      </template>
+      <!-- 列表模式（有输入） -->
+      <template v-else>
+        <div class="ut-empty" v-if="items.length === 0 && !loading">
+          <div class="ut-empty-icon">⌕</div>
+          <div class="ut-empty-text">{{ terms ? '没有匹配「' + terms + '」的结果' : '输入开始搜索' }}</div>
+        </div>
+        <template v-for="(group, gi) in groups" :key="'g' + gi">
+          <div class="ut-section" v-if="group.section">{{ group.section }}</div>
+          <div class="ut-row"
+               v-for="g in group.rows" :key="g.row.id"
+               :class="{ selected: g.idx === selected }"
+               @click="pick(g.idx)" @mouseenter="!detailOpen && (selected = g.idx)">
+            <div class="ut-icon">
+              <img v-if="g.row.image" :src="g.row.image" alt="">
+              <span v-else-if="g.row.icon" class="ut-icon-emoji">{{ g.row.icon }}</span>
+              <span v-else class="ut-icon-fallback" :class="'if-' + (g.row.plugin || 'x')" :style="iconStyle(g.row)">{{ iconText(g.row) }}</span>
+            </div>
+            <div class="ut-body">
+              <div class="ut-title">{{ shortName(g.row.text) }}</div>
+              <div class="ut-sub" v-if="g.row.subText">{{ g.row.subText }}</div>
+            </div>
+            <span class="ut-tag" v-if="g.row.type">{{ shortType(g.row.type) }}</span>
+          </div>
+        </template>
+      </template>
+    </div>
+
+    <!-- 右侧 Detail Panel（Tab 触发） -->
+    <div class="ut-detail" :class="{ open: detailOpen }" v-if="detailTarget">
+      <div class="ut-d-header">
+        <div class="ut-icon">
+          <img v-if="detailTarget.image" :src="detailTarget.image" alt="">
+          <span v-else-if="detailTarget.icon" class="ut-icon-emoji">{{ detailTarget.icon }}</span>
+          <span v-else class="ut-icon-fallback" :class="'if-' + (detailTarget.plugin || 'x')" :style="iconStyle(detailTarget)">{{ iconText(detailTarget) }}</span>
+        </div>
+        <div class="ut-d-title">{{ shortName(detailTarget.text) }}</div>
+        <div class="ut-d-sub">{{ detailTarget.path || '' }}</div>
+      </div>
+      <div class="ut-d-list">
+        <div class="ut-d-action"
+             v-for="(a, i) in detailActions" :key="'da' + i"
+             :class="{ selected: i === detailIdx }"
+             @click="runAction(i)" @mouseenter="detailIdx = i">
+          <span class="ut-d-icon">{{ a.icon }}</span>
+          <span class="ut-d-name">{{ a.text }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 命令详情面板（快捷命令回车，55% 宽剪贴板式） -->
+    <div class="cmd-detail" :class="{ open: cmdDetailOpen }" v-if="cmdDetailTarget">
+      <div class="cmd-d-header">
+        <div class="ut-icon">
+          <img v-if="cmdDetailTarget.image" :src="cmdDetailTarget.image" alt="">
+          <span v-else-if="cmdDetailTarget.icon" class="ut-icon-emoji">{{ cmdDetailTarget.icon }}</span>
+          <span v-else class="ut-icon-fallback" :class="'if-' + (cmdDetailTarget.plugin || 'x')" :style="iconStyle(cmdDetailTarget)">{{ iconText(cmdDetailTarget) }}</span>
+        </div>
+        <div class="cmd-d-title">{{ shortName(cmdDetailTarget.text) }}</div>
+        <div class="cmd-d-sub">{{ cmdDetailTarget.subText || '' }}</div>
+      </div>
+      <div class="cmd-d-body">
+        <template v-if="cmdDetailFields.length">
+          <div class="cfg-field" v-for="(f, fi) in cmdDetailFields" :key="'cf' + fi"
+               :class="{ focused: fi === cmdDetailFocus }" @click="cmdDetailFocus = fi">
+            <div class="cfg-label">{{ f.label }}</div>
+            <div class="cfg-control">
+              <template v-if="f.type === 'select' || f.type === 'radio'">
+                <span class="cfg-value">{{ cfgDisplay(f) }}</span>
+                <span class="cfg-hint" v-if="f.options && f.options.length > 1">←→ 切换</span>
+              </template>
+              <template v-else-if="f.type === 'checkbox'">
+                <span class="cfg-check" :class="{ on: cmdDetailValues[f.key] }">✓</span>
+              </template>
+              <template v-else>
+                <input class="cfg-input" v-model="cmdDetailValues[f.key]" @keydown.stop />
+              </template>
+            </div>
+          </div>
+          <div class="cmd-d-action" :class="{ selected: cmdDetailFocus === cmdDetailFields.length }" @click="runCmdAction()">
+            <span class="cmd-d-icon">▶</span>
+            <span class="cmd-d-name">执行</span>
+          </div>
+        </template>
+        <template v-else>
+          <div class="cmd-d-action" v-for="(a, i) in cmdDetailActions" :key="'ca' + i"
+               :class="{ selected: i === cmdDetailIdx }"
+               @click="cmdDetailIdx = i; runCmdAction()" @mouseenter="cmdDetailIdx = i">
+            <span class="cmd-d-icon">{{ a.icon }}</span>
+            <div class="cmd-d-namewrap">
+              <div class="cmd-d-name">{{ a.text }}</div>
+              <div class="cmd-d-sub2">{{ a.sub }}</div>
+            </div>
+          </div>
+        </template>
+      </div>
+      <div class="cmd-d-meta" v-if="cmdDetailTarget.subText">来源：{{ cmdDetailTarget.subText }}</div>
+    </div>
+
+    <!-- 子页面（iframe，kind="page" 卡片打开任意 spoon 的 view，同源） -->
+    <iframe class="page-frame" v-show="pageOpen" :src="pageSrc" frameborder="0"></iframe>
+
+    <!-- 状态栏 -->
+    <div class="ut-status">
+      <template v-if="cmdDetailOpen">
+        <span class="ut-hint"><span class="ut-kbd">↑↓</span> 选动作</span>
+        <span class="ut-hint"><span class="ut-kbd">Enter</span> 执行</span>
+        <span class="ut-hint"><span class="ut-kbd">Esc</span> 返回</span>
+      </template>
+      <template v-else-if="detailOpen">
+        <span class="ut-hint"><span class="ut-kbd">↑↓</span> 选动作</span>
+        <span class="ut-hint"><span class="ut-kbd">Enter</span> 执行</span>
+        <span class="ut-hint"><span class="ut-kbd">Esc</span> 返回</span>
+      </template>
+      <template v-else-if="!terms && mode === 'apps'">
+        <span class="ut-hint"><span class="ut-kbd">↑↓←→</span> 选择</span>
+        <span class="ut-hint"><span class="ut-kbd">Tab</span> 操作</span>
+        <span class="ut-hint"><span class="ut-kbd">Enter</span> 打开</span>
+        <span class="ut-hint"><span class="ut-kbd">Esc</span> 返回</span>
+      </template>
+      <template v-else>
+        <span class="ut-hint"><span class="ut-kbd">↑↓←→</span> 选择</span>
+        <span class="ut-hint"><span class="ut-kbd">Tab</span> 操作</span>
+        <span class="ut-hint"><span class="ut-kbd">Enter</span> 执行</span>
+        <span class="ut-hint"><span class="ut-kbd">Esc</span> 关闭</span>
+      </template>
+    </div>
+  </div>
+</div>
+<!-- 加载顺序（defer 按文档序）：store → app
+     注意：占位符注入的 vue/glass-fx 均为 defer，业务脚本必须 defer -->
+<script src="store.js" defer></script>
+<script src="app.js" defer></script>
+</body>
+</html>

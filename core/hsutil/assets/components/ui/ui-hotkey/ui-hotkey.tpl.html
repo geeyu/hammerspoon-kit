@@ -1,0 +1,13 @@
+<template id="tpl-ui-hotkey">
+  <div class="ui-hotkey" ref="root">
+    <input type="text" readonly
+           :value="display"
+           :placeholder="capturing ? '按下组合键…' : '点击后按下组合键'"
+           :disabled="disabled"
+           :class="{ 'ui-hotkey--capturing': capturing }"
+           @focus="onFocus" @blur="onBlur" @keydown="onKeydown">
+    <span class="ui-hotkey__hint" v-if="capturing">监听中…</span>
+    <button class="ui-hotkey__clear" v-if="display && !capturing && !disabled"
+            @click="$emit('update:modelValue', '')" title="清除">✕</button>
+  </div>
+</template>

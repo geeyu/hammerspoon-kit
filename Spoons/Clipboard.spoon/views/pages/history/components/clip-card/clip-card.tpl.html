@@ -1,0 +1,36 @@
+<template id="tpl-clip-card">
+  <div class="card"
+       :class="['card--' + item.subKind, { selected: selected, 'card-enter': enter, 'card--starred': item.starred }]"
+       :style="enterDelay != null ? { animationDelay: enterDelay + 'ms' } : null"
+       @click="$emit('confirm')" @mouseenter="$emit('hover', $event)" @dblclick="$emit('confirm')">
+    <!-- 类型图标 -->
+    <div class="kind-icon">
+      <template v-if="item.subKind === 'image'">🖼</template>
+      <template v-else-if="item.subKind === 'link'">🔗</template>
+      <template v-else-if="item.subKind === 'code'">⌨️</template>
+      <template v-else>📝</template>
+    </div>
+    <!-- 卡片主体（中间：正文/图片/链接/代码） -->
+    <div class="card-body">
+      <!-- 图片 -->
+      <div class="card-content" v-if="item.kind === 'image'">
+        <div class="card-img"><img :src="item.imgUrl" loading="lazy"></div>
+      </div>
+      <!-- 文本/代码/链接 -->
+      <div class="card-content" v-else>
+        <code v-if="item.subKind === 'code'" v-highlight v-fade v-text="item.preview" class="card-text"></code>
+        <div v-else v-fade class="card-text">{{ item.preview }}</div>
+      </div>
+    </div>
+    <!-- 右侧小标记（星标/时间/次数） -->
+    <div class="card-meta">
+      <button class="meta-star" :class="{ on: item.starred }"
+              :title="item.starred ? '取消置顶' : '星标置顶'"
+              @click.stop="$emit('star')">★</button>
+      <span class="meta-time">{{ item.timeText }}</span>
+      <span class="meta-count" v-if="item.count > 0" :title="'已复制 ' + item.count + ' 次'">×{{ item.count }}</span>
+    </div>
+    <!-- 删除（绝对定位右下角，hover 显示） -->
+    <button class="meta-del" @click.stop="$emit('remove')" title="删除">✕</button>
+  </div>
+</template>

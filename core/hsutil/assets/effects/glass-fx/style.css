@@ -1,0 +1,28 @@
+/* ===== HSUtil UI 玻璃特效（effects/glass-fx.css）===== */
+/* 配合 effects/glass-fx.js 使用：initGlassFX 自动创建 SVG paths + 粒子；HSUI.cardSheen 卡片 hover 扫光 */
+
+/* ── 玻璃光尘层（配合 fx.js 使用：initGlassFX 自动创建 SVG paths + 粒子）── */
+.fx-paths { position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; }
+.fx-layer  { position: absolute; inset: 0; z-index: 999; pointer-events: none; overflow: hidden; border-radius: inherit; }
+.fx-orb {
+  position: absolute; top: 0; left: 0; border-radius: 50%;
+  background: radial-gradient(circle,
+    rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.45) 45%, transparent 72%);
+  box-shadow: 0 0 6px 1px rgba(255,255,255,0.35);
+  will-change: transform, opacity;
+}
+.fx-orb--bokeh { background: rgba(255,255,255,0.55); box-shadow: none; filter: blur(6px); }
+
+/* ── 卡片 hover 扫光（配合 fx.js HSUI.cardSheen 使用；目标元素需 position:relative + overflow:hidden）── */
+.card-sheen {
+  position: absolute;
+  top: 0; bottom: 0; left: 0;
+  width: 46%;
+  pointer-events: none;
+  background: linear-gradient(105deg,
+    transparent 8%, rgba(255,255,255,0.06) 42%,
+    rgba(255,255,255,0.12) 50%,
+    rgba(255,255,255,0.06) 58%, transparent 92%);
+  transform: translateX(-130%);
+  will-change: transform;
+}

@@ -1,0 +1,20 @@
+<template id="tpl-ui-tabs">
+  <div class="ui-tabs" role="tablist" @keydown="onKeydown">
+    <button
+      v-for="tab in tabs"
+      :key="tab.value"
+      class="ui-tabs__tab"
+      role="tab"
+      :tabindex="modelValue === tab.value ? 0 : -1"
+      :aria-selected="modelValue === tab.value ? 'true' : 'false'"
+      :aria-selected="modelValue === tab.value ? 'true' : 'false'"
+      :class="{ 'ui-tabs__tab--active': modelValue === tab.value }"
+      @click="select(tab.value)"
+      type="button"
+    >
+      <ui-icon v-if="tab.icon" :name="tab.icon" :size="13" class="ui-tabs__icon"></ui-icon>
+      <span class="ui-tabs__label">{{ tab.label }}</span>
+    </button>
+    <span ref="indicator" class="ui-tabs__indicator"></span>
+  </div>
+</template>

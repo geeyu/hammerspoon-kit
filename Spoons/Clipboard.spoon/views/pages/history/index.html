@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>剪贴板历史</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="/clipboard/view/vendor/atom-one-dark.min.css">
+<!-- 占位符：服务端展开注入 vue + theme.css + base.css + 组件（声明即可，勿手写 link/script）
+     toast/confirm：删除确认、操作反馈用；glass：玻璃光尘特效 -->
+<!-- hsutil:ui toast,confirm -->
+<!-- hsutil:fx glass -->
+<!-- 业务样式：全局 → 页面私有组件（每组件一文件夹） -->
+<link rel="stylesheet" href="/clipboard/view/styles/app.css">
+<link rel="stylesheet" href="/clipboard/view/pages/history/components/clip-card/style.css">
+<link rel="stylesheet" href="/clipboard/view/pages/history/components/detail-panel/style.css">
+</head>
+<body>
+<div id="app" v-cloak>
+ <div class="panel-shell glass-panel">
+  <!-- 搜索栏（Tab 注入 embed 模式隐藏：输入由 launcher 转发） -->
+  <div class="searchbar" v-if="!isEmbed">
+    <span class="icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/>
+      </svg>
+    </span>
+    <input id="q" ref="q" v-model="query" type="text"
+           placeholder="搜索剪贴板历史…" autocomplete="off" spellcheck="false"
+           @input="onQuery">
+    <span class="badge">{{ total }} 条</span>
+    <!-- 设置入口 → settings 页（webview 内整页导航） -->
+    <a class="settings-btn" href="/clipboard/view/pages/settings/index.html" title="设置">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+    </a>
+  </div>
+
+  <!-- 卡片列表 -->
+  <div class="card-list thin-scroll" ref="list">
+    <!-- 空状态 -->
+    <div class="empty-state anim-fade-in" v-if="items.length === 0 && !loading">
+      <div class="empty-icon anim-beat">📋</div>
+      <div class="empty-text">
+        <template v-if="term">未找到匹配「{{ term }}」的内容</template>
+        <template v-else>暂无剪贴板历史<br>复制任意内容即可在此查看</template>
+      </div>
+    </div>
+
+    <!-- 加载中 -->
+    <div class="loading-state anim-pulse" v-else-if="items.length === 0 && loading">
+      <span class="spinner"></span> 加载中…
+    </div>
+
+    <!-- 卡片（页面私有组件 clip-card）
+         注意：自定义元素不能用自闭合写法（<clip-card /> 会吞掉后续兄弟节点），必须显式闭合 -->
+    <clip-card v-for="(it, i) in items" :key="it.id"
+               :item="it" :selected="i === selected"
+               :enter="animateCards" :enter-delay="animateCards ? Math.min(i, 6) * 8 : null"
+               @confirm="confirmItem(i)" @hover="onHover($event, i)"
+               @remove="remove(i)" @star="toggleStar(it, i)"></clip-card>
+
+    <!-- 加载更多 -->
+    <div class="load-more" v-if="hasMore">
+      <span class="spinner"></span> 滚动加载更多…
+    </div>
+  </div>
+
+  <!-- 详情面板（页面私有组件 detail-panel，右箭头呼出；必须显式闭合，见上） -->
+  <detail-panel :item="current" :open="detailOpen" @close="detailOpen = false"></detail-panel>
+
+  <!-- 底部状态栏 -->
+  <!-- 底部状态栏（Tab 注入 embed 模式隐藏：快捷键提示由 launcher 承担，避免双状态栏） -->
+  <div class="statusbar" v-if="!isEmbed">
+    <span class="hint"><span class="kbd">↑</span><span class="kbd">↓</span> 选择</span>
+    <span class="hint"><span class="kbd">→</span> 详情</span>
+    <span class="hint"><span class="kbd">Enter</span> 粘贴</span>
+    <span class="hint"><span class="kbd">Esc</span> 关闭</span>
+  </div>
+
+  <div class="fx-layer" aria-hidden="true"></div>
+ </div><!-- /panel-shell -->
+</div>
+
+<!-- 业务组件模板就近内联（源文件在各组件目录下） -->
+<template id="tpl-clip-card">
+  <div class="card"
+       :class="['card--' + item.subKind, { selected: selected, 'card-enter': enter, 'card--starred': item.starred }]"
+       :style="enterDelay != null ? { animationDelay: enterDelay + 'ms' } : null"
+       @click="$emit('confirm')" @mouseenter="$emit('hover', $event)" @dblclick="$emit('confirm')">
+    <!-- 类型图标 -->
+    <div class="kind-icon">
+      <template v-if="item.subKind === 'image'">🖼</template>
+      <template v-else-if="item.subKind === 'link'">🔗</template>
+      <template v-else-if="item.subKind === 'code'">⌨️</template>
+      <template v-else>📝</template>
+    </div>
+    <!-- 卡片主体（中间：正文/图片/链接/代码） -->
+    <div class="card-body">
+      <!-- 图片 -->
+      <div class="card-content" v-if="item.kind === 'image'">
+        <div class="card-img"><img :src="item.imgUrl" loading="lazy"></div>
+      </div>
+      <!-- 文本/代码/链接 -->
+      <div class="card-content" v-else>
+        <code v-if="item.subKind === 'code'" v-highlight v-fade v-text="item.preview" class="card-text"></code>
+        <div v-else v-fade class="card-text">{{ item.preview }}</div>
+      </div>
+    </div>
+    <!-- 右侧小标记（星标/时间/次数） -->
+    <div class="card-meta">
+      <button class="meta-star" :class="{ on: item.starred }"
+              :title="item.starred ? '取消置顶' : '星标置顶'"
+              @click.stop="$emit('star')">★</button>
+      <span class="meta-time">{{ item.timeText }}</span>
+      <span class="meta-count" v-if="item.count > 0" :title="'已复制 ' + item.count + ' 次'">×{{ item.count }}</span>
+    </div>
+    <!-- 删除（绝对定位右下角，hover 显示） -->
+    <button class="meta-del" @click.stop="$emit('remove')" title="删除">✕</button>
+  </div>
+</template>
+
+<template id="tpl-detail-panel">
+  <div class="detail-overlay" :class="{ open: open }" v-if="item">
+    <div class="detail-header">
+      <span class="label">内容详情</span>
+      <button class="close-btn" @click="$emit('close')" title="关闭 (←)">✕</button>
+    </div>
+    <div class="detail-body thin-scroll">
+      <div class="detail-img" v-if="item.kind === 'image'">
+        <img :src="item.imgUrl">
+      </div>
+      <code v-else-if="item.subKind === 'code'" v-highlight v-text="item.text"
+            class="detail-text is-code"></code>
+      <div v-else class="detail-text" :class="{ 'is-link': item.subKind === 'link' }">{{ item.text }}</div>
+    </div>
+    <div class="detail-meta">创建于 {{ item.timeText }} · ID {{ item.id }}</div>
+  </div>
+</template>
+
+<!-- highlight 无占位符（按需自引），代码高亮用。
+     注意：占位符注入的 vue/anime/glass-fx 均为 defer，业务脚本必须 defer
+     （否则解析到即执行，Vue 还未加载 → ReferenceError: Vue is not defined）
+     加载顺序（defer 按文档序）：utils/format → store → 组件 → app -->
+<script src="/clipboard/view/utils/format.js" defer></script>
+<script src="store.js" defer></script>
+<script src="/clipboard/view/pages/history/components/clip-card/index.js" defer></script>
+<script src="/clipboard/view/pages/history/components/detail-panel/index.js" defer></script>
+<script src="/hsutil/assets/vendor/highlight.min.js" defer></script>
+<script src="app.js" defer></script>
+</body>
+</html>
