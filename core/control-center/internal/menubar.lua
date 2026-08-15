@@ -153,6 +153,7 @@ function menubar.buildMenu()
         menu[#menu + 1] = { title = "-" }
     end
     menu[#menu + 1] = { title = "重载 Hammerspoon", fn = function() hs.reload() end }
+<<<<<<< HEAD
     -- 注:HS 1.1.1 已移除 hs.exit(),直接调用会报 "attempt to call a nil value"。
     -- 兼容:有 hs.exit 则用之(旧版本/单测 mock),否则经 application:kill 退出。
     menu[#menu + 1] = { title = "退出 Hammerspoon", fn = function()
@@ -163,6 +164,9 @@ function menubar.buildMenu()
             if app then app:kill() end
         end
     end }
+=======
+    menu[#menu + 1] = { title = "退出 Hammerspoon", fn = function() hs.exit() end }
+>>>>>>> gittree-wf-wf-control-center-4
     return menu
 end
 

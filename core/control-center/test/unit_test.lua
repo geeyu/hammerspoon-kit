@@ -1,4 +1,7 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> gittree-wf-wf-control-center-4
 -- ControlCenter 纯 Lua 单元测试(lua5.4/lua5.5 运行,mock 掉 hs.* 与 core.hsutil)
 -- 运行:  lua core/control-center/test/unit_test.lua
 -- 覆盖:
@@ -9,6 +12,7 @@
 --      返回 shim 注入时机(导航完成检测)与内容 / teardown 停止轮询
 --   C. menubar:菜单结构(聚合页/各 Spoon 入口/重载/退出)、每次打开重新扫描、
 --      扫描异常降级、点击入口打开面板配置页(含真实兄弟模块集成)
+<<<<<<< HEAD
 --   D. api:路由注册(providers/open/close + 静态挂载)、参数校验 400、pcall 容错 500、
 --      未注册路径 404(与 /launcher、/stayawake 命名空间无冲突)
 -- =========================================================
@@ -28,6 +32,10 @@
 -- 测试框架
 -- =========================================================
 >>>>>>> gittree-wf-wf-control-center-3
+=======
+-- =========================================================
+
+>>>>>>> gittree-wf-wf-control-center-4
 local results = { pass = 0, fail = 0 }
 local function check(name, cond, detail)
     if cond then
@@ -39,6 +47,9 @@ local function check(name, cond, detail)
 end
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> gittree-wf-wf-control-center-4
 -- 文件系统 mock(共享):A 段与 C 段集成测试均消费 _mockFS 全局
 local function makeFSMock()
     return {
@@ -46,6 +57,7 @@ local function makeFSMock()
         -- dirUserdata 是 for 循环的 state;迭代器校验 state 参数,缺 state(如被
         -- pcall 丢掉)时报错,与真实 HS 行为一致("directory metatable expected")。
         -- 未知目录直接报错(与真实 HS 一致),验证模块的 pcall 单目录容错。
+<<<<<<< HEAD
 =======
 -- 按名取提供者（扫描顺序依赖 hs.fs.dir，按名断言最稳）
 local function findProv(list, name)
@@ -129,6 +141,8 @@ hs = {
         -- pcall 丢掉）时报错，与真实 HS 行为一致（"directory metatable expected"）。
         -- 未知目录直接报错（与真实 HS 一致），验证模块的 pcall 单目录容错。
 >>>>>>> gittree-wf-wf-control-center-3
+=======
+>>>>>>> gittree-wf-wf-control-center-4
         dir = function(path)
             if _mockFS.dirs[path] == nil then
                 error("no such file or directory: " .. tostring(path))
@@ -149,6 +163,9 @@ hs = {
             return nil
         end,
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> gittree-wf-wf-control-center-4
     }
 end
 
@@ -177,6 +194,7 @@ hs = {
     logger = { new = function() return makeLogger() end },
     configdir = "",
     fs = makeFSMock(),
+<<<<<<< HEAD
 }
 
 -- mock core.hsutil(sources.lua require 到的部分:log + path)
@@ -413,6 +431,19 @@ package.loaded["core.hsutil"] = {
 
 -- 定位本文件目录（source 形如 core/control-center/test/unit_test.lua）
 >>>>>>> gittree-wf-wf-control-center-3
+=======
+}
+
+-- mock core.hsutil(sources.lua require 到的部分:log + path)
+package.preload["core.hsutil"] = function()
+    return {
+        log = { new = function() return makeLogger() end },
+        path = { join = function(a, b) return a .. "/" .. b end },
+    }
+end
+
+-- 定位本文件目录(source 形如 core/control-center/test/unit_test.lua)
+>>>>>>> gittree-wf-wf-control-center-4
 local ROOT = (debug.getinfo(1, "S").source:sub(2):match("^(.-)[/\\]test[/\\]") or "")
 if ROOT == "" then ROOT = "core/control-center/" end
 if ROOT:sub(-1) ~= "/" then ROOT = ROOT .. "/" end
@@ -420,10 +451,14 @@ local sources = dofile(ROOT .. "internal/sources.lua")
 
 -- =========================================================
 <<<<<<< HEAD
+<<<<<<< HEAD
 -- 工具:构造真实临时目录结构(dofile 需要真实文件;_mockFS 供 mock fs 消费)
 =======
 -- 工具：构造真实临时目录结构（dofile 需要真实文件；_mockFS 供 mock fs 消费）
 >>>>>>> gittree-wf-wf-control-center-3
+=======
+-- 工具:构造真实临时目录结构(dofile 需要真实文件;_mockFS 供 mock fs 消费)
+>>>>>>> gittree-wf-wf-control-center-4
 -- =========================================================
 local function mkdir(p)
     os.execute('mkdir -p "' .. p .. '"')
@@ -434,10 +469,14 @@ local function writeFile(p, content)
     f:close()
 end
 <<<<<<< HEAD
+<<<<<<< HEAD
 -- 注册一个提供者:真实目录 + 文件 + _mockFS 目录表/文件表
 =======
 -- 注册一个提供者：真实目录 + 文件 + _mockFS 目录表/文件表
 >>>>>>> gittree-wf-wf-control-center-3
+=======
+-- 注册一个提供者:真实目录 + 文件 + _mockFS 目录表/文件表
+>>>>>>> gittree-wf-wf-control-center-4
 local function addProvider(fsRoot, relDir, manifestLua)
     local dir = fsRoot .. "/" .. relDir
     mkdir(dir)
@@ -450,6 +489,7 @@ end
 
 -- =========================================================
 <<<<<<< HEAD
+<<<<<<< HEAD
 -- A.1 真实仓库布局镜像:5 个 Spoon + core/{hsutil,launcher/template}
 --    (与 launcher 实际合并结果一致:5 个提供者;template 在 core/*/ 二层,
 --      与 launcher 一样不会被一级扫描发现,且其 cards 为空,无可见贡献)
@@ -458,6 +498,11 @@ end
 --    （与 launcher 实际合并结果一致：5 个提供者；template 在 core/*/ 二层，
 --      与 launcher 一样不会被一级扫描发现，且其 cards 为空，无可见贡献）
 >>>>>>> gittree-wf-wf-control-center-3
+=======
+-- A.1 真实仓库布局镜像:5 个 Spoon + core/{hsutil,launcher/template}
+--    (与 launcher 实际合并结果一致:5 个提供者;template 在 core/*/ 二层,
+--      与 launcher 一样不会被一级扫描发现,且其 cards 为空,无可见贡献)
+>>>>>>> gittree-wf-wf-control-center-4
 -- =========================================================
 local tmpRoot = os.tmpname()
 os.remove(tmpRoot)
@@ -465,10 +510,14 @@ mkdir(tmpRoot .. "/Spoons")
 mkdir(tmpRoot .. "/core/hsutil")
 mkdir(tmpRoot .. "/core/launcher/template")
 <<<<<<< HEAD
+<<<<<<< HEAD
 -- 5 个 Spoon(manifest 内容与仓库真实文件一致)
 =======
 -- 5 个 Spoon（manifest 内容与仓库真实文件一致）
 >>>>>>> gittree-wf-wf-control-center-3
+=======
+-- 5 个 Spoon(manifest 内容与仓库真实文件一致)
+>>>>>>> gittree-wf-wf-control-center-4
 addProvider(tmpRoot, "Spoons/AppToggle.spoon", [[
 return {
     name = "apptoggle",
@@ -525,10 +574,14 @@ return {
 }
 ]])
 <<<<<<< HEAD
+<<<<<<< HEAD
 -- 干扰项:点文件、无 manifest 的目录、core 二层 template(不应被发现)
 =======
 -- 干扰项：点文件、无 manifest 的目录、core 二层 template（不应被发现）
 >>>>>>> gittree-wf-wf-control-center-3
+=======
+-- 干扰项:点文件、无 manifest 的目录、core 二层 template(不应被发现)
+>>>>>>> gittree-wf-wf-control-center-4
 writeFile(tmpRoot .. "/Spoons/.DS_Store", "")
 _mockFS.files[tmpRoot .. "/Spoons/.DS_Store"] = true
 _mockFS.dirs[tmpRoot .. "/Spoons/NotASpoon"] = {}
@@ -537,10 +590,14 @@ _mockFS.dirs[tmpRoot .. "/core/launcher"] = { "template" }
 _mockFS.dirs[tmpRoot .. "/core/launcher/template"] = {}
 addProvider(tmpRoot, "core/launcher/template", [[
 <<<<<<< HEAD
+<<<<<<< HEAD
 -- 模板:cards 全注释(空贡献),且位于 core/*/ 二层不会被一级扫描发现
 =======
 -- 模板：cards 全注释（空贡献），且位于 core/*/ 二层不会被一级扫描发现
 >>>>>>> gittree-wf-wf-control-center-3
+=======
+-- 模板:cards 全注释(空贡献),且位于 core/*/ 二层不会被一级扫描发现
+>>>>>>> gittree-wf-wf-control-center-4
 return {
     name = "myspoon",
     cards = {},
@@ -551,10 +608,14 @@ _mockFS.dirs[tmpRoot .. "/Spoons"] = { "AppToggle.spoon", "BingDaily.spoon", "Cl
 _mockFS.dirs[tmpRoot .. "/core"] = { "hsutil", "launcher" }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 -- 默认扫描(hs.configdir 指向 tmpRoot,走 scan() 无参默认目录)
 =======
 -- 默认扫描（hs.configdir 指向 tmpRoot，走 scan() 无参默认目录）
 >>>>>>> gittree-wf-wf-control-center-3
+=======
+-- 默认扫描(hs.configdir 指向 tmpRoot,走 scan() 无参默认目录)
+>>>>>>> gittree-wf-wf-control-center-4
 hs.configdir = tmpRoot
 local listA = sources.scan()
 
@@ -565,10 +626,14 @@ check("A2 提供者名齐全", findProv(listA, "apptoggle") ~= nil and findProv(
 check("A3 core/launcher/template 未被扫描（二层，与 launcher 一致）", findProv(listA, "myspoon") == nil)
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 -- AppToggle:卡片 + 页面 URL 简写推断
 =======
 -- AppToggle：卡片 + 页面 URL 简写推断
 >>>>>>> gittree-wf-wf-control-center-3
+=======
+-- AppToggle:卡片 + 页面 URL 简写推断
+>>>>>>> gittree-wf-wf-control-center-4
 local at = findProv(listA, "apptoggle")
 check("A4 apptoggle 卡片数=1", at and #at.cards == 1, at and tostring(#at.cards))
 if at and at.cards[1] then
@@ -582,10 +647,14 @@ check("A7 apptoggle pages 配置页推断", at and #at.pages == 1
 check("A8 apptoggle 无 searchUrl（可选字段缺省）", at and at.pages[1].searchUrl == nil)
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 -- Clipboard:search 页推断
 =======
 -- Clipboard：search 页推断
 >>>>>>> gittree-wf-wf-control-center-3
+=======
+-- Clipboard:search 页推断
+>>>>>>> gittree-wf-wf-control-center-4
 local cb = findProv(listA, "clipboard")
 check("A9 clipboard 卡片 url 推断", cb and cb.cards[1] and cb.cards[1].url == "/clipboard/view/pages/settings/index.html",
     cb and cb.cards[1] and tostring(cb.cards[1].url))
@@ -612,10 +681,14 @@ check("A16 重扫结果仍 5 个", #listA2 == 5, tostring(#listA2))
 
 -- =========================================================
 <<<<<<< HEAD
+<<<<<<< HEAD
 -- A.2 边界:scan(dirs) 显式目录 + 异常容错
 =======
 -- B. 边界：scan(dirs) 显式目录 + 异常容错
 >>>>>>> gittree-wf-wf-control-center-3
+=======
+-- A.2 边界:scan(dirs) 显式目录 + 异常容错
+>>>>>>> gittree-wf-wf-control-center-4
 -- =========================================================
 local tmpRoot2 = os.tmpname()
 os.remove(tmpRoot2)
@@ -624,10 +697,14 @@ mkdir(tmpRoot2 .. "/core/hsutil")
 mkdir(tmpRoot2 .. "/core/dupe")
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 -- 无 name 字段:回退目录名;openurl 完整 URL 原样透传
 =======
 -- 无 name 字段：回退目录名；openurl 完整 URL 原样透传
 >>>>>>> gittree-wf-wf-control-center-3
+=======
+-- 无 name 字段:回退目录名;openurl 完整 URL 原样透传
+>>>>>>> gittree-wf-wf-control-center-4
 addProvider(tmpRoot2, "Spoons/NoName.spoon", [[
 return {
     cards = {
@@ -636,10 +713,14 @@ return {
 }
 ]])
 <<<<<<< HEAD
+<<<<<<< HEAD
 -- config_pages 老字段:仅老字段也可出页面
 =======
 -- config_pages 老字段：仅老字段也可出页面
 >>>>>>> gittree-wf-wf-control-center-3
+=======
+-- config_pages 老字段:仅老字段也可出页面
+>>>>>>> gittree-wf-wf-control-center-4
 addProvider(tmpRoot2, "Spoons/ConfigPages.spoon", [[
 return {
     name = "configpages",
@@ -649,10 +730,14 @@ return {
 }
 ]])
 <<<<<<< HEAD
+<<<<<<< HEAD
 -- pages 与 config_pages 同名:新字段优先,老字段跳过
 =======
 -- pages 与 config_pages 同名：新字段优先，老字段跳过
 >>>>>>> gittree-wf-wf-control-center-3
+=======
+-- pages 与 config_pages 同名:新字段优先,老字段跳过
+>>>>>>> gittree-wf-wf-control-center-4
 addProvider(tmpRoot2, "Spoons/BothPages.spoon", [[
 return {
     name = "bothpages",
@@ -665,6 +750,7 @@ return {
 }
 ]])
 <<<<<<< HEAD
+<<<<<<< HEAD
 -- 非法 manifest:非 table / 加载抛错 → 跳过不崩溃
 addProvider(tmpRoot2, "Spoons/ZBad.spoon", "return 42")
 addProvider(tmpRoot2, "Spoons/ZBroken.spoon", 'error("boom")')
@@ -675,6 +761,12 @@ addProvider(tmpRoot2, "Spoons/ZBad.spoon", "return 42")
 addProvider(tmpRoot2, "Spoons/ZBroken.spoon", 'error("boom")')
 -- 同名 provider 去重覆盖：core 后扫，覆盖 Spoons 同名提供者
 >>>>>>> gittree-wf-wf-control-center-3
+=======
+-- 非法 manifest:非 table / 加载抛错 → 跳过不崩溃
+addProvider(tmpRoot2, "Spoons/ZBad.spoon", "return 42")
+addProvider(tmpRoot2, "Spoons/ZBroken.spoon", 'error("boom")')
+-- 同名 provider 去重覆盖:core 后扫,覆盖 Spoons 同名提供者
+>>>>>>> gittree-wf-wf-control-center-4
 addProvider(tmpRoot2, "Spoons/DupeA.spoon", [[
 return {
     name = "dupeme",
@@ -692,10 +784,14 @@ return {
 }
 ]])
 <<<<<<< HEAD
+<<<<<<< HEAD
 -- 干扰项:点文件、无 manifest 目录
 =======
 -- 干扰项：点文件、无 manifest 目录
 >>>>>>> gittree-wf-wf-control-center-3
+=======
+-- 干扰项:点文件、无 manifest 目录
+>>>>>>> gittree-wf-wf-control-center-4
 writeFile(tmpRoot2 .. "/Spoons/.DS_Store", "")
 _mockFS.files[tmpRoot2 .. "/Spoons/.DS_Store"] = true
 _mockFS.dirs[tmpRoot2 .. "/Spoons/Empty.spoon"] = {}
@@ -703,6 +799,7 @@ _mockFS.dirs[tmpRoot2 .. "/core/hsutil"] = {}
 _mockFS.dirs[tmpRoot2 .. "/Spoons"] = { "NoName.spoon", "ConfigPages.spoon", "BothPages.spoon", "ZBad.spoon", "ZBroken.spoon", "DupeA.spoon", ".DS_Store", "Empty.spoon" }
 _mockFS.dirs[tmpRoot2 .. "/core"] = { "dupe", "hsutil" }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 -- 显式传目录(含一个不存在的目录,验证 pcall 单目录容错)
 local listB = sources.scan({ tmpRoot2 .. "/Spoons", tmpRoot2 .. "/Nope", tmpRoot2 .. "/core" })
@@ -712,6 +809,11 @@ local listB = sources.scan({ tmpRoot2 .. "/Spoons", tmpRoot2 .. "/Nope", tmpRoot
 local listB = sources.scan({ tmpRoot2 .. "/Spoons", tmpRoot2 .. "/Nope", tmpRoot2 .. "/core" })
 -- 4 个提供者：NoName.spoon/configpages/bothpages/dupeme（ZBad/ZBroken/Empty/点文件被跳过）
 >>>>>>> gittree-wf-wf-control-center-3
+=======
+-- 显式传目录(含一个不存在的目录,验证 pcall 单目录容错)
+local listB = sources.scan({ tmpRoot2 .. "/Spoons", tmpRoot2 .. "/Nope", tmpRoot2 .. "/core" })
+-- 4 个提供者:NoName.spoon/configpages/bothpages/dupeme(ZBad/ZBroken/Empty/点文件被跳过)
+>>>>>>> gittree-wf-wf-control-center-4
 check("B1 显式目录扫描无错误且结果齐全（不存在的目录被 pcall 容错）", #listB == 4, tostring(#listB))
 check("B2 无 name 回退目录名", findProv(listB, "NoName.spoon") ~= nil)
 local nn = findProv(listB, "NoName.spoon")
@@ -730,10 +832,14 @@ check("B7 非法 manifest（非 table）被跳过", findProv(listB, "ZBad.spoon"
 check("B8 加载抛错的 manifest 被跳过", findProv(listB, "ZBroken.spoon") == nil)
 check("B9 点文件/无 manifest 目录不产生提供者", findProv(listB, ".DS_Store") == nil and findProv(listB, "Empty.spoon") == nil)
 <<<<<<< HEAD
+<<<<<<< HEAD
 -- 同名覆盖:core/dupe 后扫覆盖 Spoons/DupeA.spoon
 =======
 -- 同名覆盖：core/dupe 后扫覆盖 Spoons/DupeA.spoon
 >>>>>>> gittree-wf-wf-control-center-3
+=======
+-- 同名覆盖:core/dupe 后扫覆盖 Spoons/DupeA.spoon
+>>>>>>> gittree-wf-wf-control-center-4
 local dm = findProv(listB, "dupeme")
 check("B10 同名 provider 去重为 1 个", dm ~= nil)
 local dmCount = 0
@@ -745,10 +851,14 @@ check("B12 后扫描者覆盖（卡片=后扫描卡片）", dm and #dm.cards == 
 
 -- =========================================================
 <<<<<<< HEAD
+<<<<<<< HEAD
 -- A.3 只读零侵入:manifest 文件未被改写,源表未被污染
 =======
 -- C. 只读零侵入：manifest 文件未被改写，源表未被污染
 >>>>>>> gittree-wf-wf-control-center-3
+=======
+-- A.3 只读零侵入:manifest 文件未被改写,源表未被污染
+>>>>>>> gittree-wf-wf-control-center-4
 -- =========================================================
 local f = io.open(tmpRoot .. "/Spoons/AppToggle.spoon/launcher-commands.lua", "r")
 local contentA = f:read("*a"); f:close()
@@ -760,6 +870,9 @@ check("C2 原 manifest 表未被修改（url 推断生成新表）",
 
 -- =========================================================
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> gittree-wf-wf-control-center-4
 -- B. panel 配置面板单例(31 用例)
 -- =========================================================
 package.loaded["core.hsutil"] = nil
@@ -843,10 +956,13 @@ package.preload["core.hsutil"] = function()
 end
 
 -- 每个用例重新 dofile panel.lua(模块级单例状态随 chunk 重置)
+<<<<<<< HEAD
 =======
 -- D. panel.lua：配置面板单例 + 返回 shim
 -- =========================================================
 >>>>>>> gittree-wf-wf-control-center-3
+=======
+>>>>>>> gittree-wf-wf-control-center-4
 local PANEL_PATH = ROOT .. "internal/panel.lua"
 local function newPanel()
     resetMocks()
@@ -991,6 +1107,7 @@ do
     -- 重新 open 重建单例
     local ok = panel.open(P1)
     check("D31 teardown 后可重建", ok == true and #M.created == 2)
+<<<<<<< HEAD
 end
 
 -- =========================================================
@@ -1851,6 +1968,346 @@ failHide = false
 local _, cOther = dispatch("GET", "/launcher/api/query")
 check("E23 未注册路径（/launcher/api/query）→ 404", cOther == 404, tostring(cOther))
 >>>>>>> gittree-wf-wf-control-center-3
+=======
+end
+
+-- =========================================================
+-- C. menubar 菜单栏(26 用例)
+-- =========================================================
+package.loaded["core.hsutil"] = nil
+
+-- Mock 状态:菜单栏创建 / 菜单构建 / reload / exit / webview(集成用)
+local barCalls = { created = {}, titles = {}, tooltips = {}, removes = 0 }
+local hsCalls = { reloads = 0, exits = 0 }
+local fakeBar = nil
+
+-- 集成用 webview mock 状态(点击入口 → 真实 panel.open → HSUtil.webview.new)
+local W = { created = {}, view = nil, timerCb = nil, loading = false }
+
+local function resetBarCalls()
+    barCalls.created = {}
+    barCalls.titles = {}
+    barCalls.tooltips = {}
+    barCalls.removes = 0
+    hsCalls.reloads = 0
+    hsCalls.exits = 0
+    fakeBar = nil
+    W.created = {}
+    W.view = nil
+    W.timerCb = nil
+    W.loading = false
+end
+
+local function newFakeView2(opts)
+    local raw = {
+        _url = nil,
+        loading = function() return W.loading end,
+        url = function(self, v)
+            if v ~= nil then self._url = v; return self end
+            return self._url
+        end,
+        evaluateJavaScript = function() end,
+    }
+    local v = {
+        _raw = nil,
+        _visible = false,
+        show = function(self)
+            if not self._raw then self._raw = raw; raw._url = opts.url end
+            self._visible = true
+            return true
+        end,
+        hide = function(self) self._visible = false end,
+        visible = function(self) return self._visible end,
+        teardown = function(self) self._raw = nil; self._visible = false end,
+        raw = function(self) return self._raw end,
+    }
+    return v
+end
+
+hs = {
+    logger = { new = function() return makeLogger() end },
+    configdir = "",
+    fs = makeFSMock(),
+    screen = { mainScreen = function() return { frame = function() return { x = 0, y = 0, w = 1440, h = 900 } end } end },
+    timer = {
+        doEvery = function(_, cb)
+            W.timerCb = cb
+            return { stop = function() end }
+        end,
+    },
+    menubar = {
+        new = function(globalFlag)
+            barCalls.created[#barCalls.created + 1] = globalFlag
+            local b = { _menu = nil }
+            b.setTitle = function(_, t) barCalls.titles[#barCalls.titles + 1] = t end
+            b.setTooltip = function(_, t) barCalls.tooltips[#barCalls.tooltips + 1] = t end
+            b.setMenu = function(_, menuFn) b._menu = menuFn end
+            b.remove = function() barCalls.removes = barCalls.removes + 1 end
+            fakeBar = b
+            return b
+        end,
+    },
+    reload = function() hsCalls.reloads = hsCalls.reloads + 1 end,
+    exit = function() hsCalls.exits = hsCalls.exits + 1 end,
+}
+
+package.preload["core.hsutil"] = function()
+    return {
+        log = { new = function() return makeLogger() end },
+        path = { join = function(a, b) return a .. "/" .. b end },
+        webview = {
+            new = function(opts)
+                W.created[#W.created + 1] = opts
+                W.view = newFakeView2(opts)
+                return W.view
+            end,
+        },
+        json = { encode = function(v) return '"' .. tostring(v):gsub('"', '\\"') .. '"' end },
+    }
+end
+
+local MENUBAR_PATH = ROOT .. "internal/menubar.lua"
+local function newMenubar()
+    resetBarCalls()
+    return dofile(MENUBAR_PATH)
+end
+
+-- 按标题取菜单项
+local function findItem(menu, title)
+    for _, it in ipairs(menu) do
+        if it.title == title then return it end
+    end
+    return nil
+end
+
+-- 假数据源:scan 可抛错(模拟扫描失败);get 返回缓存
+local function makeFakeSources(list, failScan)
+    return {
+        scan = function()
+            if failScan then error("scan boom") end
+            return list
+        end,
+        get = function() return list end,
+    }
+end
+-- 假面板:记录 open/showAggregate 调用(menubar 以点号调用,无 self)
+local function makeFakePanel()
+    local calls = { open = {}, aggregates = 0 }
+    return {
+        calls = calls,
+        open = function(url) calls.open[#calls.open + 1] = url; return true end,
+        showAggregate = function() calls.aggregates = calls.aggregates + 1; return true end,
+    }
+end
+
+-- 真实仓库布局镜像的 5 个提供者(与 A 段一致,带推断后的 URL)
+local function realProviders()
+    return {
+        { name = "apptoggle", icon = "🔄", cards = {}, pages = { { name = "应用显隐", icon = "🔄", configUrl = "/apptoggle/view/pages/apps/index.html" } } },
+        { name = "bingdaily", icon = "🖼️", cards = {}, pages = { { name = "Bing 壁纸", icon = "🖼️", configUrl = "/bingdaily/view/pages/settings/index.html" } } },
+        { name = "clipboard", icon = "📋", cards = {}, pages = { { name = "剪贴板", icon = "📋", configUrl = "/clipboard/view/pages/settings/index.html" } } },
+        { name = "quantumwindow", icon = "🪟", cards = {}, pages = { { name = "窗口管理", icon = "🪟", configUrl = "/quantumwindow/view/pages/settings/index.html" } } },
+        { name = "stayawake", icon = "🌙", cards = {}, pages = { { name = "防睡眠", icon = "🌙", configUrl = "/stayawake/view/pages/control/index.html" } } },
+    }
+end
+
+-- C.1 启动:创建常驻菜单栏(setTitle emoji + setMenu 传函数)
+do
+    local m = newMenubar()
+    m.setup({ sources = makeFakeSources({}), panel = makeFakePanel() })
+    m.start()
+    check("E1 menubar.new(true) 全局菜单栏", #barCalls.created == 1 and barCalls.created[1] == true)
+    check("E2 菜单栏标题为 emoji 🛠", #barCalls.titles == 1 and barCalls.titles[1] == "🛠")
+    check("E3 setMenu 传函数(每次打开菜单重建)", fakeBar ~= nil and type(fakeBar._menu) == "function")
+end
+
+-- C.2 降级:扫描抛错且无缓存 → 菜单保留固定三项,不抛错
+do
+    local m = newMenubar()
+    local fake = makeFakeSources({}, true)
+    fake.get = function() error("no cache") end
+    m.setup({ sources = fake, panel = makeFakePanel() })
+    local menu = m.buildMenu()
+    check("E4 扫描失败不抛错(菜单可构建)", type(menu) == "table")
+    check("E5 降级保留「打开控制中心」", findItem(menu, "打开控制中心") ~= nil)
+    check("E6 降级保留「重载 Hammerspoon」", findItem(menu, "重载 Hammerspoon") ~= nil)
+    check("E7 降级保留「退出 Hammerspoon」", findItem(menu, "退出 Hammerspoon") ~= nil)
+    check("E8 降级结构:4 项,分隔线位于 2", #menu == 4 and menu[2].title == "-",
+        tostring(#menu))
+end
+
+-- C.3 降级:扫描结果为空表 → 同上固定三项
+do
+    local m = newMenubar()
+    m.setup({ sources = makeFakeSources({}), panel = makeFakePanel() })
+    local menu = m.buildMenu()
+    check("E9 空结果保留固定三项", findItem(menu, "打开控制中心") ~= nil
+        and findItem(menu, "重载 Hammerspoon") ~= nil and findItem(menu, "退出 Hammerspoon") ~= nil)
+    check("E10 空结果无 provider 项(仅 4 项)", #menu == 4, tostring(#menu))
+end
+
+-- C.4 完整结构:聚合页 + 各 Spoon 入口(子菜单/单项/禁用)+ 重载/退出
+do
+    local m = newMenubar()
+    local panel = makeFakePanel()
+    m.setup({ sources = makeFakeSources({
+        { name = "apptoggle", icon = "🔄", cards = {}, pages = { { name = "应用显隐", icon = "🔄", configUrl = "/apptoggle/view/pages/apps/index.html" } } },
+        { name = "stayawake", icon = "🌙", cards = {}, pages = { { name = "防睡眠", icon = "🌙", configUrl = "/stayawake/view/pages/control/index.html" } } },
+        { name = "nopages", icon = "⚙️", cards = { { key = "设置", kind = "page", icon = "🎛️", url = "/nopages/view/pages/settings/index.html" } }, pages = {} },
+        { name = "nothing", icon = "🔒" },
+        { name = "plain", cards = {} },
+    }), panel = panel })
+    local menu = m.buildMenu()
+    -- 固定骨架:①聚合页 ②分隔线 ... ④分隔线 ⑤重载 ⑥退出
+    check("E11 首项为「打开控制中心」", menu[1] and menu[1].title == "打开控制中心")
+    check("E12 分隔线在 2/8", menu[2].title == "-" and menu[8].title == "-", tostring(menu[8] and menu[8].title))
+    check("E13 末两项为重载/退出", menu[9].title == "重载 Hammerspoon" and menu[10].title == "退出 Hammerspoon")
+    -- 有 pages → 子菜单
+    local at = findItem(menu, "🔄 apptoggle")
+    check("E14 pages provider 建子菜单", at ~= nil and type(at.menu) == "table" and #at.menu == 1)
+    check("E15 子菜单项带 name+icon", at and at.menu[1].title == "🔄 应用显隐")
+    -- 点击子菜单项 → panel.open(configUrl)
+    at.menu[1].fn()
+    check("E16 点击子菜单项打开配置页 URL", #panel.calls.open == 1
+        and panel.calls.open[1] == "/apptoggle/view/pages/apps/index.html", panel.calls.open[1] or "nil")
+    -- 无 pages 但有 page 卡 → 单项
+    local np = findItem(menu, "🎛️ 设置")
+    check("E17 无 pages 有 page 卡建单项", np ~= nil and type(np.fn) == "function")
+    np.fn()
+    check("E18 单项点击打开卡片 url", #panel.calls.open == 2
+        and panel.calls.open[2] == "/nopages/view/pages/settings/index.html", panel.calls.open[2] or "nil")
+    -- 两者皆无 → 禁用项
+    check("E19 无 pages 无 page 卡显示禁用项", findItem(menu, "🔒 nothing") ~= nil
+        and findItem(menu, "🔒 nothing").disabled == true)
+    check("E20 空 cards 也显示禁用项(无 icon 前缀)", findItem(menu, "plain") ~= nil
+        and findItem(menu, "plain").disabled == true)
+    -- 点击聚合页/重载/退出
+    menu[1].fn()
+    check("E21 点击「打开控制中心」→ showAggregate", panel.calls.aggregates == 1)
+    menu[9].fn()
+    check("E22 点击「重载 Hammerspoon」→ hs.reload", hsCalls.reloads == 1)
+    menu[10].fn()
+    check("E23 点击「退出 Hammerspoon」→ hs.exit", hsCalls.exits == 1)
+end
+
+-- C.5 pages 全为搜索页(无 configUrl)→ 降级禁用项
+do
+    local m = newMenubar()
+    m.setup({ sources = makeFakeSources({
+        { name = "searchonly", pages = { { name = "搜索", searchUrl = "/searchonly/view/pages/search/index.html" } } },
+    }), panel = makeFakePanel() })
+    local menu = m.buildMenu()
+    local so = findItem(menu, "searchonly")
+    check("E24 仅搜索页的 provider 显示禁用项", so ~= nil and so.disabled == true)
+end
+
+-- C.6 多个 page 卡:各建单项
+do
+    local m = newMenubar()
+    local panel = makeFakePanel()
+    m.setup({ sources = makeFakeSources({
+        { name = "multipage", cards = {
+            { key = "页一", kind = "page", url = "/multipage/view/pages/one/index.html" },
+            { key = "页二", kind = "page", icon = "②", url = "/multipage/view/pages/two/index.html" },
+        } },
+    }), panel = panel })
+    local menu = m.buildMenu()
+    local it1 = findItem(menu, "页一")
+    local it2 = findItem(menu, "② 页二")
+    check("E25 多个 page 卡各建单项", it1 ~= nil and it2 ~= nil)
+    it1.fn(); it2.fn()
+    check("E26 各单项打开对应卡片 url", #panel.calls.open == 2
+        and panel.calls.open[1] == "/multipage/view/pages/one/index.html"
+        and panel.calls.open[2] == "/multipage/view/pages/two/index.html")
+end
+
+-- C.7 数据新鲜:每次构建(打开菜单)都重新扫描
+do
+    local m = newMenubar()
+    local src = makeFakeSources({})
+    local scans = 0
+    local origScan = src.scan
+    src.scan = function() scans = scans + 1; return origScan() end
+    m.setup({ sources = src, panel = makeFakePanel() })
+    m.start()
+    check("E27 setMenu 函数每次调用都重新扫描(1)", scans == 0)
+    fakeBar._menu()
+    check("E28 打开菜单触发重扫(2)", scans == 1, tostring(scans))
+    fakeBar._menu()
+    check("E29 再次打开再次重扫(3)", scans == 2, tostring(scans))
+end
+
+-- C.8 扫描失败 → 回退缓存(缓存仍展示,固定项保留)
+do
+    local m = newMenubar()
+    local fake = makeFakeSources({ { name = "cached" } }, true)  -- scan 抛错,get 有缓存
+    m.setup({ sources = fake, panel = makeFakePanel() })
+    local menu = m.buildMenu()
+    check("E30 扫描失败回退缓存展示 provider", findItem(menu, "cached") ~= nil
+        and findItem(menu, "cached").disabled == true)
+    check("E31 回退缓存时固定三项仍保留", findItem(menu, "打开控制中心") ~= nil
+        and findItem(menu, "重载 Hammerspoon") ~= nil and findItem(menu, "退出 Hammerspoon") ~= nil)
+end
+
+-- C.9 setup 注入 aggregateUrl → 内部 panel.setup 被调用(聚合页可达)
+do
+    local m = newMenubar()
+    local panel = { setups = {} }
+    panel.open = function() return true end
+    panel.showAggregate = function() return true end
+    panel.setup = function(opts) panel.setups[#panel.setups + 1] = opts end
+    m.setup({ sources = makeFakeSources({}), panel = panel, aggregateUrl = "http://127.0.0.1:8821/cc/view/pages/aggregate/index.html" })
+    check("E32 aggregateUrl 透传给内部 panel.setup", #panel.setups == 1
+        and panel.setups[1].aggregateUrl == "http://127.0.0.1:8821/cc/view/pages/aggregate/index.html")
+end
+
+-- C.10 幂等:重复 start 不重建;stop 移除后可重建
+do
+    local m = newMenubar()
+    m.setup({ sources = makeFakeSources({}), panel = makeFakePanel() })
+    m.start()
+    m.start()
+    check("E33 重复 start 幂等(不重建)", #barCalls.created == 1, tostring(#barCalls.created))
+    m.stop()
+    check("E34 stop 移除菜单栏", barCalls.removes == 1)
+    m.start()
+    check("E35 stop 后可重建", #barCalls.created == 2, tostring(#barCalls.created))
+end
+
+-- C.11 自定义标题
+do
+    local m = newMenubar()
+    m.setup({ sources = makeFakeSources({}), panel = makeFakePanel(), title = "⚙️" })
+    m.start()
+    check("E36 setup 可自定义标题", #barCalls.titles == 1 and barCalls.titles[1] == "⚙️")
+end
+
+-- C.12 集成:不注入依赖,menubar 经 dofile 加载真实 sources/panel,
+--     真实扫描(5-Spoon 布局)→ 5 个子菜单;点击配置入口 → 真实 panel.open 建 webview
+do
+    local m = newMenubar()  -- 未 setup,走默认兄弟模块加载
+    hs.configdir = tmpRoot  -- A 段的 5-Spoon 真实布局(_mockFS 仍就位)
+    local menu = m.buildMenu()
+    check("E37 真实扫描出 5 个 provider 子菜单", findItem(menu, "apptoggle") ~= nil
+        and findItem(menu, "stayawake") ~= nil and findItem(menu, "clipboard") ~= nil
+        and findItem(menu, "quantumwindow") ~= nil and findItem(menu, "bingdaily") ~= nil)
+    check("E38 菜单总项数=10(2 固定+5 provider+2 分隔+重载/退出)", #menu == 10, tostring(#menu))
+    -- 每个 provider 子菜单 1 个配置页(真实 manifest 无 provider 级 icon,子菜单标题纯名字)
+    local bd = findItem(menu, "bingdaily")
+    check("E39 子菜单含配置页(icon+name)", bd and bd.menu and #bd.menu == 1 and bd.menu[1].title == "🖼️ Bing 壁纸")
+    -- 点击配置页 → 真实 panel.open → 惰性创建 webview(首载 url=配置页)
+    bd.menu[1].fn()
+    check("E40 点击配置入口经 panel 打开配置页 URL", #W.created == 1
+        and W.created[1].url == "/bingdaily/view/pages/settings/index.html",
+        W.created[1] and W.created[1].url or "nil")
+    -- 再点另一个 provider 的配置页 → setUrl 切换(同一 webview)
+    local sa = findItem(menu, "stayawake")
+    sa.menu[1].fn()
+    check("E41 切换配置页走 setUrl(同一 webview 单例)", #W.created == 1
+        and W.view:raw() ~= nil and W.view:raw():url() == "/stayawake/view/pages/control/index.html",
+        W.view and W.view:raw() and W.view:raw():url() or "nil")
+end
+>>>>>>> gittree-wf-wf-control-center-4
 
 -- =========================================================
 -- 汇总
