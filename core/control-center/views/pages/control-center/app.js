@@ -1,7 +1,8 @@
 /**
  * 控制中心 — Vue3 前端 UI 层（聚合配置页）
- * 数据层在 store.js（provide/inject）：GET /providers + POST /open。
- * 本文件只做 UI：功能块格子渲染、图标/摘要装饰、加载/空/失败三态。
+ * 数据层在 store.js（provide/inject）：GET /providers + iframe 内打开配置页。
+ * 本文件只做 UI：功能块格子渲染、图标/摘要装饰、加载/空/失败三态、
+ * closePage 桥（iframe 内配置页的返回按钮调 parent.closePage()）。
  */
 const { createApp, onMounted, inject } = Vue;
 
@@ -81,6 +82,12 @@ createApp({
 
     onMounted(() => {
       store.load();
+      // iframe 桥：配置页在 iframe 内打开，其返回按钮调 window.parent.closePage()
+      // （launcher 子页面协议）——本页是 parent，提供实现：隐藏 iframe 回首页。
+      // 兼容旧别名 closeStayAwake（StayAwake 老页面）。
+      window.closePage = () => store.closePage();
+      window.closeStayAwake = () => store.closePage();
+      window.__ccPanelShim = true;
     });
 
     return {
@@ -88,6 +95,7 @@ createApp({
       loading: state.loading,
       error: state.error,
       opening: state.opening,
+      activeUrl: state.activeUrl,
       openProvider: store.openProvider,
       reload,
       providerIcon,

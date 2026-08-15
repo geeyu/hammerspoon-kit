@@ -8,7 +8,7 @@ const BASE = "/control-center/api";
 function apiUrl(p) { return BASE + p; }
 function hsFetch(p, opts) {
   opts = opts || {};
-  return fetch(apiUrl(p), opts).then(function (r) {
+  return fetch(apiUrl(p), opts).then((r) => {
     if (!r.ok) throw new Error('HTTP ' + r.status);
     return r.json();
   });
@@ -28,6 +28,7 @@ const ControlCenterStore = {
       loading: Vue.ref(false),  // 列表加载中
       error: Vue.ref(''),       // 加载失败信息（'' = 无错）
       opening: Vue.ref(''),     // 正在打开配置面板的提供者名（防重复点击）
+      activeUrl: Vue.ref(''),   // 当前打开的配置页 URL（iframe 模式；'' = 首页）
     };
 
     // 过期响应守卫（install 闭包：任何新请求的序号必然大于全部在途旧请求）
@@ -74,11 +75,11 @@ const ControlCenterStore = {
         state.loading.value = true;
         state.error.value = '';
         const mySeq = ++_seq;
-        actions.fetchProviders().then(function (data) {
+        actions.fetchProviders().then((data) => {
           if (mySeq !== _seq) return;   // 丢弃过期的并发响应
           state.providers.value = data.providers || [];
           state.loading.value = false;
-        }).catch(function (err) {
+        }).catch((err) => {
           if (mySeq !== _seq) return;
           state.loading.value = false;
           state.error.value = '无法连接控制中心服务';
@@ -86,7 +87,8 @@ const ControlCenterStore = {
         });
       },
 
-      // 点击卡片：POST /open 打开该提供者的首个配置页（失败 toast 提示，不打断页面）
+      // 点击卡片：iframe 内打开该提供者的首个配置页（聚合页常驻，
+      // 返回 = 隐藏 iframe 立即回首页，零延迟不重载）
       openProvider(p) {
         if (!p || state.opening.value) return;   // 打开中防重复点击
         const url = actions.providerUrl(p);
@@ -95,13 +97,13 @@ const ControlCenterStore = {
           return;
         }
         state.opening.value = p.name;
-        actions.openUrl(url).then(function () {
-          state.opening.value = '';
-        }).catch(function (err) {
-          state.opening.value = '';
-          console.error('打开配置面板失败', err);
-          toast('打开「' + p.name + '」失败');
-        });
+        state.activeUrl.value = url;
+        state.opening.value = '';
+      },
+
+      // 返回首页（配置页内调 parent.closePage() → 这里）
+      closePage() {
+        state.activeUrl.value = '';
       },
     };
 

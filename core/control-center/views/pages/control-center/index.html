@@ -16,71 +16,87 @@
   <body>
     <div id="app" v-cloak>
       <div class="page-panel">
-        <!-- 顶部标题栏 -->
-        <div class="cc-head">
-          <div class="cc-title-row">
-            <div class="page-title">🛠 控制中心</div>
-            <span class="cc-count" v-if="!loading && !error && providers.length"
-              >{{ providers.length }} 个组件</span
-            >
-          </div>
-          <div class="cc-sub">点击功能块进入对应配置</div>
-        </div>
+        <!-- 配置页 iframe（覆盖聚合页，返回时隐藏即回首页，零延迟） -->
+        <iframe
+          v-if="activeUrl"
+          class="cc-frame"
+          :src="activeUrl"
+          frameborder="0"
+        ></iframe>
 
-        <!-- 加载态 -->
-        <div class="ctrl-body thin-scroll" v-if="loading">
-          <div class="cc-center">
-            <ui-loading text="正在加载组件…"></ui-loading>
+        <!-- 聚合首页（iframe 打开时隐藏） -->
+        <div class="cc-home" v-show="!activeUrl">
+          <!-- 顶部标题栏 -->
+          <div class="cc-head">
+            <div class="cc-title-row">
+              <div class="page-title">🛠 控制中心</div>
+              <span
+                class="cc-count"
+                v-if="!loading && !error && providers.length"
+                >{{ providers.length }} 个组件</span
+              >
+            </div>
+            <div class="cc-sub">点击功能块进入对应配置</div>
           </div>
-        </div>
 
-        <!-- 空态 -->
-        <div class="ctrl-body thin-scroll" v-else-if="!error && providers.length === 0">
-          <div class="cc-center">
-            <ui-empty
-              icon="inbox"
-              text="暂无可用组件"
-              hint="未在 Spoons/*.spoon 与 core/*/ 中发现配置入口"
-            ></ui-empty>
+          <!-- 加载态 -->
+          <div class="ctrl-body thin-scroll" v-if="loading">
+            <div class="cc-center">
+              <ui-loading text="正在加载组件…"></ui-loading>
+            </div>
           </div>
-        </div>
 
-        <!-- 失败态 -->
-        <div class="ctrl-body thin-scroll" v-else-if="error">
-          <div class="cc-center">
-            <ui-empty icon="attention" text="加载失败" :hint="error"></ui-empty>
-            <ui-button variant="ghost" size="sm" icon="refresh" @click="reload"
-              >重试</ui-button
-            >
+          <!-- 空态 -->
+          <div
+            class="ctrl-body thin-scroll"
+            v-else-if="!error && providers.length === 0"
+          >
+            <div class="cc-center">
+              <ui-empty
+                icon="inbox"
+                text="暂无可用组件"
+                hint="未在 Spoons/*.spoon 与 core/*/ 中发现配置入口"
+              ></ui-empty>
+            </div>
           </div>
-        </div>
 
-        <!-- 功能块网格：双列大格子，每格 = 图标 + 名称 + 描述 + 入口 -->
-        <div class="ctrl-body thin-scroll" v-else>
-          <div class="cc-grid">
-            <div
-              class="cc-cell"
-              v-for="p in providers"
-              :key="p.name"
-              :class="{ opening: opening === p.name }"
-              @click="openProvider(p)"
-            >
-              <!-- 图标（emoji 或首字母徽标） -->
-              <div class="cc-cell-icon">
-                <span v-if="providerIcon(p)" class="cc-icon-emoji"
-                  >{{ providerIcon(p) }}</span
-                >
-                <span v-else class="cc-icon-badge" :style="iconStyle(p)"
-                  >{{ iconText(p) }}</span
-                >
-              </div>
-              <!-- 文字区：名称 + 描述 + 入口提示 -->
-              <div class="cc-cell-body">
-                <div class="cc-cell-name">{{ displayName(p) }}</div>
-                <div class="cc-cell-desc">{{ cardSummary(p) }}</div>
-                <div class="cc-cell-action">
-                  <span class="cc-cell-link">打开配置</span>
-                  <span class="cc-cell-arrow">→</span>
+          <!-- 失败态 -->
+          <div class="ctrl-body thin-scroll" v-else-if="error">
+            <div class="cc-center">
+              <ui-empty icon="attention" text="加载失败" :hint="error"></ui-empty>
+              <ui-button variant="ghost" size="sm" icon="refresh" @click="reload"
+                >重试</ui-button
+              >
+            </div>
+          </div>
+
+          <!-- 功能块网格：双列大格子，每格 = 图标 + 名称 + 描述 + 入口 -->
+          <div class="ctrl-body thin-scroll" v-else>
+            <div class="cc-grid">
+              <div
+                class="cc-cell"
+                v-for="p in providers"
+                :key="p.name"
+                :class="{ opening: opening === p.name }"
+                @click="openProvider(p)"
+              >
+                <!-- 图标（emoji 或首字母徽标） -->
+                <div class="cc-cell-icon">
+                  <span v-if="providerIcon(p)" class="cc-icon-emoji"
+                    >{{ providerIcon(p) }}</span
+                  >
+                  <span v-else class="cc-icon-badge" :style="iconStyle(p)"
+                    >{{ iconText(p) }}</span
+                  >
+                </div>
+                <!-- 文字区：名称 + 描述 + 入口提示 -->
+                <div class="cc-cell-body">
+                  <div class="cc-cell-name">{{ displayName(p) }}</div>
+                  <div class="cc-cell-desc">{{ cardSummary(p) }}</div>
+                  <div class="cc-cell-action">
+                    <span class="cc-cell-link">打开配置</span>
+                    <span class="cc-cell-arrow">→</span>
+                  </div>
                 </div>
               </div>
             </div>

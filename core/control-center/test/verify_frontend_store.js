@@ -63,39 +63,31 @@ setTimeout(() => {
   setTimeout(() => {
     check('load 失败置 error', actions.state.error.value !== '');
 
-    // ---- openProvider(): POST /open 且 url 正确 ----
+    // ---- openProvider(): iframe 模式——设置 activeUrl 不发 POST ----
     calls.length = 0;
-    mockFetch((url, opts) => {
-      const body = JSON.parse(opts.body);
-      return Promise.resolve({ ok: true, json: () => Promise.resolve({ ok: true, ...body }) });
-    });
     const p5 = { name: 'f', pages: [{ name: 'cfg', configUrl: '/f/view/pages/cfg/index.html' }], cards: [] };
     actions.openProvider(p5);
-    setTimeout(() => {
-      check('open POST 路径', calls.length === 1 && calls[0].url === '/control-center/api/open');
-      check('open POST 方法', calls[0].opts.method === 'POST');
-      check('open url 正确', JSON.parse(calls[0].opts.body).url === '/f/view/pages/cfg/index.html');
-      check('open 清空 opening', actions.state.opening.value === '');
+    check('open 设 activeUrl(iframe)', actions.state.activeUrl.value === '/f/view/pages/cfg/index.html');
+    check('open 不发请求', calls.length === 0);
+    check('open 清空 opening', actions.state.opening.value === '');
 
-      // ---- openProvider(): 无可打开 url → toast，不发请求 ----
-      const toasts = [];
-      sandbox.window.UiToast = { show: (m) => toasts.push(m) };
-      calls.length = 0;
-      actions.openProvider({ name: 'g', pages: [], cards: [] });
-      check('无 url 不发请求', calls.length === 0);
-      check('无 url toast 提示', toasts.length === 1);
+    // ---- closePage(): 清空 activeUrl 回首页 ----
+    actions.closePage();
+    check('closePage 回首页', actions.state.activeUrl.value === '');
 
-      // ---- openProvider(): 失败 → toast ----
-      calls.length = 0;
-      mockFetch(() => Promise.reject(new Error('500')));
-      actions.openProvider({ name: 'h', pages: [{ name: 'c', configUrl: '/h/c' }] });
-      setTimeout(() => {
-        check('open 失败 toast', toasts.length === 2);
-        check('open 失败清 opening', actions.state.opening.value === '');
+    // ---- openProvider(): 无可打开 url → toast，不发请求 ----
+    const toasts = [];
+    sandbox.window.UiToast = { show: (m) => toasts.push(m) };
+    calls.length = 0;
+    actions.openProvider({ name: 'g', pages: [], cards: [] });
+    check('无 url 不发请求', calls.length === 0);
+    check('无 url toast 提示', toasts.length === 1);
 
-        console.log('== store.js 功能验证: ' + pass + ' PASS / ' + fail + ' FAIL ==');
-        process.exit(fail === 0 ? 0 : 1);
-      }, 20);
-    }, 20);
+    // ---- 重复打开不同页：activeUrl 切换 ----
+    actions.openProvider({ name: 'h', pages: [{ name: 'c', configUrl: '/h/c' }] });
+    check('切换配置页', actions.state.activeUrl.value === '/h/c');
+
+    console.log('== store.js 功能验证: ' + pass + ' PASS / ' + fail + ' FAIL ==');
+    process.exit(fail === 0 ? 0 : 1);
   }, 20);
-}, 20);
+});

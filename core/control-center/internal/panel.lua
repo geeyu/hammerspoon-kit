@@ -121,12 +121,16 @@ local function startShimPolling()
         if not okUrl or cur == nil or cur == "" or cur == shimmedUrl then return end
         local okLoad, loading = pcall(function() return wv:loading() end)
         if not okLoad or loading then return end
-        -- 新文档加载完成(didFinishNavigation 等价时机),注入 shim
+        -- 新文档加载完成(didFinishNavigation 等价时机)
         shimmedUrl = cur
+        -- 聚合页不注入 shim:聚合页自己定义 window.closePage(iframe 桥),
+        -- 注入会覆盖它导致 iframe 内配置页返回失效
+        if aggregateUrl and cur == aggregateUrl then return end
         -- 注:不能用 HSUtil.json.encode —— hs.json.encode 只接受 table,直接传字符串会抛错
         -- ("incorrect type 'string' for argument 1 (expected table)")导致注入永远失败;
         -- %q 生成 JS 兼容的字符串字面量(URL 无引号/反斜杠,与 JSON 编码等价)。
         local js = string.format(SHIM_JS_TMPL, string.format("%q", aggregateUrl or cur))
+        -- 注入 shim
         local ok = pcall(function()
             wv:evaluateJavaScript(js)
         end)
