@@ -115,13 +115,19 @@ local function startShimPolling()
         -- 新文档加载完成(didFinishNavigation 等价时机),注入 shim
         shimmedUrl = cur
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> gittree-wf-wf-control-center-8
         -- 注:不能用 HSUtil.json.encode —— hs.json.encode 只接受 table,直接传字符串会抛错
         -- ("incorrect type 'string' for argument 1 (expected table)")导致注入永远失败;
         -- %q 生成 JS 兼容的字符串字面量(URL 无引号/反斜杠,与 JSON 编码等价)。
         local js = string.format(SHIM_JS_TMPL, string.format("%q", aggregateUrl or cur))
+<<<<<<< HEAD
 =======
         local js = string.format(SHIM_JS_TMPL, HSUtil.json.encode(aggregateUrl or cur))
 >>>>>>> gittree-wf-wf-control-center-3
+=======
+>>>>>>> gittree-wf-wf-control-center-8
         local ok = pcall(function()
             wv:evaluateJavaScript(js)
         end)
