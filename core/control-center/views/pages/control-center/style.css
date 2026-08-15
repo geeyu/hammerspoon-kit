@@ -8,14 +8,14 @@
 /* 业务保留:禁选中(点格子不误选文本)+ 防回弹滚动;高度链/字体/前景色由 page.css 提供 */
 html,
 body {
-  background: transparent;
-  overflow: hidden;
-  -webkit-user-select: none;
-  user-select: none;
+ background: transparent;
+ overflow: hidden;
+ -webkit-user-select: none;
+ user-select: none;
 }
 
 [v-cloak] {
-  display: none;
+ display: none;
 }
 
 /* 格子体系依赖 border-box(padding+border 不撑破 1fr 网格列);page.css 不做全局 reset */
@@ -23,173 +23,173 @@ body {
 .cc-cell,
 .cc-cell-icon,
 .cc-cell-body {
-  box-sizing: border-box;
+ box-sizing: border-box;
 }
 
 /* ── 两行式页头(业务:单行 .page-head 不覆盖此布局,标题复用共享 .page-title)── */
 .cc-head {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 3px;
-  padding: 16px 20px 12px;
-  border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
+ display: flex;
+ flex-direction: column;
+ justify-content: center;
+ gap: 3px;
+ padding: 16px 20px 12px;
+ border-bottom: 1px solid var(--border);
+ flex-shrink: 0;
 }
 .cc-title-row {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
+ display: flex;
+ align-items: baseline;
+ gap: 10px;
 }
 .cc-count {
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--accent);
-  background: var(--bg-row-h); /* 原 rgba(127,127,127,.12),收敛到 --bg-row 系 */
-  padding: 2px 9px;
-  border-radius: 999px;
+ font-size: 11px;
+ font-weight: 500;
+ color: var(--accent);
+ background: var(--bg-row-h); /* 原 rgba(127,127,127,.12),收敛到 --bg-row 系 */
+ padding: 2px 9px;
+ border-radius: 999px;
 }
 .cc-sub {
-  font-size: 11.5px;
-  color: var(--fg-3);
+ font-size: 11.5px;
+ color: var(--fg-3);
 }
 
 /* ── 业务扩展:滚动区上下留白(布局/滚动由 .ctrl-body + .thin-scroll 提供)── */
 .ctrl-body {
-  padding: 6px 0;
+ padding: 6px 0;
 }
 
 /* ── 加载/空/失败三态:内容区居中 ── */
 .cc-center {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  color: var(--fg-2);
+ height: 100%;
+ display: flex;
+ flex-direction: column;
+ align-items: center;
+ justify-content: center;
+ gap: 12px;
+ color: var(--fg-2);
 }
 
 /* ══ 功能块格子网格 ══
    双列布局:每格 = 图标 + 文字区(名称/描述/入口)。
    格子系统:圆角边框卡片,悬停抬升 + 边框高亮,打开时按压动效。 */
 .cc-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr; /* 双列,大格子 */
-  gap: 12px;
-  padding: 16px 18px 20px;
+ display: grid;
+ grid-template-columns: 1fr 1fr; /* 双列,大格子 */
+ gap: 12px;
+ padding: 16px 18px 20px;
 }
 
 .cc-cell {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 18px 16px;
-  border-radius: 14px;
-  background: var(--bg-row); /* 原 rgba(127,127,127,.06),收敛到 --bg-row 系 */
-  border: 1px solid var(--border); /* 原 rgba(255,255,255,.08) */
-  cursor: default;
-  transition:
-    transform 0.1s ease,
-    border-color 0.1s ease,
-    background 0.1s ease,
-    box-shadow 0.1s ease;
-  min-height: 96px;
+ display: flex;
+ align-items: center;
+ gap: 14px;
+ padding: 18px 16px;
+ border-radius: 14px;
+ background: var(--bg-row); /* 原 rgba(127,127,127,.06),收敛到 --bg-row 系 */
+ border: 1px solid var(--border); /* 原 rgba(255,255,255,.08) */
+ cursor: default;
+ transition:
+  transform 0.1s ease,
+  border-color 0.1s ease,
+  background 0.1s ease,
+  box-shadow 0.1s ease;
+ min-height: 96px;
 }
 .cc-cell:hover {
-  background: var(--bg-row-h); /* 原 rgba(127,127,127,.1),收敛到 --bg-row 系 */
-  border-color: var(--border-h); /* 原 rgba(255,255,255,.16) */
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-overlay); /* 原 0 4px 14px rgba(0,0,0,.25) */
+ background: var(--bg-row-h); /* 原 rgba(127,127,127,.1),收敛到 --bg-row 系 */
+ border-color: var(--border-h); /* 原 rgba(255,255,255,.16) */
+ transform: translateY(-1px);
+ box-shadow: var(--shadow-overlay); /* 原 0 4px 14px rgba(0,0,0,.25) */
 }
 .cc-cell.opening {
-  opacity: 0.55;
-  transform: scale(0.98);
+ opacity: 0.55;
+ transform: scale(0.98);
 }
 
 /* 图标:emoji 大图标 或 首字母徽标(圆角方块) */
 .cc-cell-icon {
-  flex-shrink: 0;
-  width: 52px;
-  height: 52px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 13px;
-  background: var(--bg-row-h); /* 原 rgba(127,127,127,.12),收敛到 --bg-row 系 */
+ flex-shrink: 0;
+ width: 52px;
+ height: 52px;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ border-radius: 13px;
+ background: var(--bg-row-h); /* 原 rgba(127,127,127,.12),收敛到 --bg-row 系 */
 }
 .cc-icon-emoji {
-  font-size: 28px;
-  line-height: 1;
+ font-size: 28px;
+ line-height: 1;
 }
 .cc-icon-badge {
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--fg-invert); /* 原 #fff */
-  line-height: 1;
+ font-size: 20px;
+ font-weight: 700;
+ color: var(--fg-invert); /* 原 #fff */
+ line-height: 1;
 }
 
 /* 文字区 */
 .cc-cell-body {
-  min-width: 0; /* 允许 flex 收缩,描述截断 */
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  flex: 1;
+ min-width: 0; /* 允许 flex 收缩,描述截断 */
+ display: flex;
+ flex-direction: column;
+ gap: 4px;
+ flex: 1;
 }
 .cc-cell-name {
-  font-size: 14.5px;
-  font-weight: 600;
-  color: var(--fg-1);
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+ font-size: 14.5px;
+ font-weight: 600;
+ color: var(--fg-1);
+ overflow: hidden;
+ white-space: nowrap;
+ text-overflow: ellipsis;
 }
 .cc-cell-desc {
-  font-size: 11.5px;
-  line-height: 1.45;
-  color: var(--fg-3);
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  word-break: break-all;
+ font-size: 11.5px;
+ line-height: 1.45;
+ color: var(--fg-3);
+ overflow: hidden;
+ display: -webkit-box;
+ -webkit-line-clamp: 2;
+ -webkit-box-orient: vertical;
+ word-break: break-all;
 }
 
 /* 入口行:链接 + 箭头,hover 时随卡片高亮 */
 .cc-cell-action {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  margin-top: 2px;
+ display: flex;
+ align-items: center;
+ gap: 5px;
+ margin-top: 2px;
 }
 .cc-cell-link {
-  font-size: 11.5px;
-  font-weight: 500;
-  color: var(--accent);
+ font-size: 11.5px;
+ font-weight: 500;
+ color: var(--accent);
 }
 .cc-cell-arrow {
-  font-size: 12px;
-  color: var(--accent);
-  transition: transform 0.12s ease;
+ font-size: 12px;
+ color: var(--accent);
+ transition: transform 0.12s ease;
 }
 .cc-cell:hover .cc-cell-arrow {
-  transform: translateX(3px);
+ transform: translateX(3px);
 }
 
 /* ── 配置页 iframe：铺满面板、透明背景（圆角由面板壳裁切）── */
 .cc-frame {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  border: 0;
-  background: transparent;
-  border-radius: inherit;   /* 与面板壳同圆角（overflow hidden 裁切） */
+ position: absolute;
+ inset: 0;
+ width: 100%;
+ height: 100%;
+ border: 0;
+ background: transparent;
+ border-radius: inherit; /* 与面板壳同圆角（overflow hidden 裁切） */
 }
 .cc-home {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  min-height: 0;
+ display: flex;
+ flex-direction: column;
+ height: 100%;
+ min-height: 0;
 }

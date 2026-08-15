@@ -5,6 +5,11 @@
 const BASE = "/bingdaily/api";
 function hsFetch(p, opts) {
   opts = opts || {};
+  // POST 无 body 时显式带 Content-Length: 0（hs.httpserver 对无 Content-Length
+  // 的 POST 会直接 400 “Method expects request body”）
+  if (opts.method === "POST" && !opts.body) {
+    opts.headers = Object.assign({ "Content-Length": "0" }, opts.headers || {});
+  }
   return fetch(BASE + p, opts).then((r) => {
     if (!r.ok)
       return r.json().then((d) => {

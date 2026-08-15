@@ -63,8 +63,16 @@
           <!-- 失败态 -->
           <div class="ctrl-body thin-scroll" v-else-if="error">
             <div class="cc-center">
-              <ui-empty icon="attention" text="加载失败" :hint="error"></ui-empty>
-              <ui-button variant="ghost" size="sm" icon="refresh" @click="reload"
+              <ui-empty
+                icon="attention"
+                text="加载失败"
+                :hint="error"
+              ></ui-empty>
+              <ui-button
+                variant="ghost"
+                size="sm"
+                icon="refresh"
+                @click="reload"
                 >重试</ui-button
               >
             </div>

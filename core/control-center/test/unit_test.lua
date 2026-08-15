@@ -777,13 +777,13 @@ do
     check("E11 首项为「打开控制中心」", menu[1] and menu[1].title == "打开控制中心")
     check("E12 分隔线在 2/8", menu[2].title == "-" and menu[8].title == "-", tostring(menu[8] and menu[8].title))
     check("E13 末两项为重载/退出", menu[9].title == "重载 Hammerspoon" and menu[10].title == "退出 Hammerspoon")
-    -- 有 pages → 子菜单
-    local at = findItem(menu, "🔄 apptoggle")
-    check("E14 pages provider 建子菜单", at ~= nil and type(at.menu) == "table" and #at.menu == 1)
-    check("E15 子菜单项带 name+icon", at and at.menu[1].title == "🔄 应用显隐")
-    -- 点击子菜单项 → panel.open(configUrl)
-    at.menu[1].fn()
-    check("E16 点击子菜单项打开配置页 URL", #panel.calls.open == 1
+    -- 有 pages 且仅 1 个配置页 → 单项直达(不套子菜单),标题用中文名
+    local at = findItem(menu, "🔄 应用显隐")
+    check("E14 单配置页建单项(不套子菜单)", at ~= nil and type(at.fn) == "function")
+    check("E15 单项标题带 icon+中文名", at ~= nil and at.title == "🔄 应用显隐")
+    -- 点击单项 → panel.open(configUrl)
+    at.fn()
+    check("E16 点击单项打开配置页 URL", #panel.calls.open == 1
         and panel.calls.open[1] == "/apptoggle/view/pages/apps/index.html", panel.calls.open[1] or "nil")
     -- 无 pages 但有 page 卡 → 单项
     local np = findItem(menu, "🎛️ 设置")
@@ -812,7 +812,7 @@ do
         { name = "searchonly", pages = { { name = "搜索", searchUrl = "/searchonly/view/pages/search/index.html" } } },
     }), panel = makeFakePanel() })
     local menu = m.buildMenu()
-    local so = findItem(menu, "searchonly")
+    local so = findItem(menu, "搜索")
     check("E24 仅搜索页的 provider 显示禁用项", so ~= nil and so.disabled == true)
 end
 
@@ -903,21 +903,21 @@ do
     local m = newMenubar()  -- 未 setup,走默认兄弟模块加载
     hs.configdir = tmpRoot  -- A 段的 5-Spoon 真实布局(_mockFS 仍就位)
     local menu = m.buildMenu()
-    check("E37 真实扫描出 5 个 provider 子菜单", findItem(menu, "apptoggle") ~= nil
-        and findItem(menu, "stayawake") ~= nil and findItem(menu, "clipboard") ~= nil
-        and findItem(menu, "quantumwindow") ~= nil and findItem(menu, "bingdaily") ~= nil)
+    check("E37 真实扫描出 5 个 provider 入口", findItem(menu, "应用显隐") ~= nil
+        and findItem(menu, "防睡眠") ~= nil and findItem(menu, "剪贴板") ~= nil
+        and findItem(menu, "窗口管理") ~= nil and findItem(menu, "Bing 壁纸") ~= nil)
     check("E38 菜单总项数=10(2 固定+5 provider+2 分隔+重载/退出)", #menu == 10, tostring(#menu))
-    -- 每个 provider 子菜单 1 个配置页(真实 manifest 无 provider 级 icon,子菜单标题纯名字)
-    local bd = findItem(menu, "bingdaily")
-    check("E39 子菜单含配置页(icon+name)", bd and bd.menu and #bd.menu == 1 and bd.menu[1].title == "🖼️ Bing 壁纸")
-    -- 点击配置页 → 真实 panel.open → 惰性创建 webview(首载 url=配置页,相对路径已补全完整 URL)
-    bd.menu[1].fn()
+    -- 单配置页 → 单项直达(标题 = 卡片中文名)
+    local bd = findItem(menu, "Bing 壁纸")
+    check("E39 单项标题中文名", bd ~= nil and type(bd.fn) == "function")
+    -- 点击 → 真实 panel.open → 惰性创建 webview(首载 url=配置页,相对路径已补全完整 URL)
+    bd.fn()
     check("E40 点击配置入口经 panel 打开配置页 URL(相对→完整)", #W.created == 1
         and W.created[1].url == "http://127.0.0.1:8821/bingdaily/view/pages/settings/index.html",
         W.created[1] and W.created[1].url or "nil")
     -- 再点另一个 provider 的配置页 → setUrl 切换(同一 webview)
-    local sa = findItem(menu, "stayawake")
-    sa.menu[1].fn()
+    local sa = findItem(menu, "防睡眠")
+    sa.fn()
     check("E41 切换配置页走 setUrl(同一 webview 单例)", #W.created == 1
         and W.view:raw() ~= nil and W.view:raw():url() == "http://127.0.0.1:8821/stayawake/view/pages/control/index.html",
         W.view and W.view:raw() and W.view:raw():url() or "nil")

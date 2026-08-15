@@ -18,6 +18,7 @@ const AppToggleStore = {
       editorOpen: Vue.ref(false),
       editor: Vue.ref(null), // 编辑中的草稿
       saving: Vue.ref(false),
+      runningApps: Vue.ref([]), // 运行中的应用（添加时下拉选择）
     };
 
     // 后端应用行 → 编辑器草稿
@@ -31,6 +32,7 @@ const AppToggleStore = {
         fullscreen_fallback: a ? a.fullscreen_fallback : true,
         restore_focus: a ? a.restore_focus : true,
         move_to_mouse_screen: a ? a.move_to_mouse_screen : true,
+        selectedApp: "", // 新增时下拉选中值（bundle_id）
       };
     }
 
@@ -49,6 +51,35 @@ const AppToggleStore = {
       openEditor(a) {
         state.editor.value = toDraft(a);
         state.editorOpen.value = true;
+        // 新增时拉取运行中的应用列表（编辑时不需要）
+        if (!a) actions.loadRunningApps();
+      },
+
+      // 运行中的应用 → 下拉选项（{label: '名称 (BundleID)', value: bundle_id}）
+      loadRunningApps() {
+        return hsFetch("/running-apps")
+          .then((d) => {
+            state.runningApps.value = (d.apps || []).map((app) => ({
+              label: app.name + "  (" + app.bundle_id + ")",
+              value: app.bundle_id,
+              name: app.name,
+              bundle_id: app.bundle_id,
+            }));
+          })
+          .catch((e) => console.error("加载运行应用失败", e));
+      },
+
+      // 下拉选择应用：自动填名称 + Bundle ID
+      onSelectApp() {
+        const ed = state.editor.value;
+        if (!ed || !ed.selectedApp) return;
+        const found = state.runningApps.value.find(
+          (a) => a.value === ed.selectedApp,
+        );
+        if (found) {
+          ed.name = found.name;
+          ed.bundle_id = found.bundle_id;
+        }
       },
 
       // hotkeyStr 形如 "ctrl+alt+t" → {mods: ['ctrl','alt'], key: 't'}

@@ -70,16 +70,25 @@ end
 -- ============================================================
 
 --- 构建一个提供者的菜单项列表(0..n 项)
---- 规则:有 pages → 子菜单列出各配置页(name+icon,点击 panel.open(configUrl)),
----       仅 searchUrl 的页不是配置页不列出,全无配置页时降级禁用项;
----       无 pages 且 kind="page" 卡片 → 每卡单项(打开该卡 url);两者皆无 → 禁用项。
+--- 显示名:卡片中文名(cards[1].key)优先 → pages[1].name → 内部 name 兑底。
+--- 规则:有 pages 且仅 1 个配置页 → 单项直达(不套子菜单);多个配置页 → 子菜单;
+---       无 pages 且 kind="page" 卡片 → 每卡单项;两者皆无 → 禁用项。
 --- @param p table provider { name, icon?, cards?, pages? }
 --- @return table 菜单项列表(可能为 {禁用项} 或空)
 local function providerItems(p)
+    -- 显示名:卡片中文名优先(如「防睡眠」),不用内部英文名
+    local display = tostring(p.name or "?")
+    if type(p.cards) == "table" and #p.cards > 0 and type(p.cards[1].key) == "string"
+        and p.cards[1].key ~= "" then
+        display = p.cards[1].key
+    elseif type(p.pages) == "table" and #p.pages > 0 and type(p.pages[1].name) == "string"
+        and p.pages[1].name ~= "" then
+        display = p.pages[1].name
+    end
     local icon = (type(p.icon) == "string" and p.icon ~= "") and (p.icon .. " ") or ""
-    local title = icon .. tostring(p.name or "?")
+    local title = icon .. display
 
-    -- ① 有 pages:子菜单列出各配置页
+    -- ① 有 pages:收集配置页
     if type(p.pages) == "table" and #p.pages > 0 then
         local sub = {}
         for _, pg in ipairs(p.pages) do
@@ -91,7 +100,11 @@ local function providerItems(p)
                 }
             end
         end
-        if #sub > 0 then
+        if #sub == 1 then
+            -- 单个配置页:直接展示「组件名 → 配置」单项,不套子菜单(少一级点击)
+            return { { title = title, fn = sub[1].fn } }
+        end
+        if #sub > 1 then
             return { { title = title, menu = sub } }
         end
         -- pages 全是搜索页(无配置页):降级为禁用项
@@ -113,7 +126,7 @@ local function providerItems(p)
     end
     if #items > 0 then return items end
 
-    -- ③ 两者皆无:禁用项(provider 名)
+    -- ③ 两者皆无:禁用项(provider 显示名)
     return { { title = title, disabled = true } }
 end
 

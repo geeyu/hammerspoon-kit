@@ -183,6 +183,29 @@ function manager.list()
     return out
 end
 
+--- 运行中的应用列表（添加应用时下拉选择用；排除已绑定的）
+--- @return table [{name, bundle_id}]
+function manager.runningApps()
+    local out = {}
+    local bound = {}
+    for _, a in ipairs(store.listApps()) do bound[a.bundle_id] = true end
+    -- hs.application.runningApplications(): {name, bundleID, ...}（pcall 容错）
+    local ok, apps = pcall(function() return hs.application.runningApplications() end)
+    if ok and type(apps) == "table" then
+        for _, app in ipairs(apps) do
+            local name = app and app:name() or nil
+            local bid = app and app:bundleID() or nil
+            if type(name) == "string" and name ~= "" and type(bid) == "string" and bid ~= ""
+                and not bound[bid] then
+                out[#out + 1] = { name = name, bundle_id = bid }
+            end
+        end
+    end
+    -- 按名称排序
+    table.sort(out, function(a, b) return a.name < b.name end)
+    return out
+end
+
 --- 测试：触发该应用的显隐逻辑（与热键相同）
 function manager.press(bundleID)
     toggle.pressByBundle(bundleID)

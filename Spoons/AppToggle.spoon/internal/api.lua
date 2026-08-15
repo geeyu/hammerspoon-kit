@@ -82,6 +82,15 @@ function api.setup(cfg_, manager_, viewsDir)
         res:json({ apps = apps })
     end)
 
+    -- 运行中的应用列表（添加应用时下拉选择；排除已绑定）
+    app:get("/" .. cfg.pkg .. "/api/running-apps", function(req, res)
+        local ok, list = pcall(function() return manager.runningApps() end)
+        if not ok or type(list) ~= "table" then
+            return res:status(500):json({ err = "获取运行应用失败" })
+        end
+        res:json({ apps = list })
+    end)
+
     -- 新增/更新应用（upsert by bundle_id）
     app:post("/" .. cfg.pkg .. "/api/apps", function(req, res)
         local body = req:json() or {}

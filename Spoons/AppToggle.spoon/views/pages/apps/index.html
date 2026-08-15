@@ -5,7 +5,7 @@
     <title>应用显隐管理</title>
     <link rel="icon" href="data:," />
     <!-- 占位符：服务端展开注入 vue + theme.css + base.css + 组件（声明即可，勿手写 link/script） -->
-    <!-- hsutil:ui select,switch,button,toast,input,hotkey,drawer,empty -->
+    <!-- hsutil:ui select,switch,button,toast,input,hotkey,modal,empty -->
     <link rel="stylesheet" href="/apptoggle/view/pages/apps/style.css" />
   </head>
   <body>
@@ -117,13 +117,27 @@
         </div>
       </div>
 
-      <!-- 编辑抽屉：新增/修改应用 -->
-      <ui-drawer
+      <!-- 编辑弹窗：新增/修改应用 -->
+      <ui-modal
         :open="editorOpen"
         title="编辑应用"
+        width="520px"
         @update:open="editorOpen = $event"
       >
         <div class="editor-body" v-if="editor">
+          <!-- 新增时：从运行中的应用选择（自动填名称+Bundle ID）；编辑时只读 -->
+          <div class="form-row" v-if="!editor.id">
+            <label>选择应用</label>
+            <ui-select
+              v-model="editor.selectedApp"
+              :options="appOptions"
+              placeholder="从运行中的应用选择…"
+              @change="onSelectApp"
+            ></ui-select>
+            <div class="form-hint">
+              从正在运行的应用中选择；下方名称/Bundle ID 自动填入，可再手动修改
+            </div>
+          </div>
           <div class="form-row">
             <label>名称</label>
             <ui-input v-model="editor.name" placeholder="如 Ghostty" />
@@ -190,7 +204,7 @@
             >
           </div>
         </template>
-      </ui-drawer>
+      </ui-modal>
     </div>
 
     <script src="store.js" defer></script>

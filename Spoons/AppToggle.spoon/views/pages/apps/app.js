@@ -1,6 +1,6 @@
 /**
  * 应用显隐管理页 — Vue3 UI 层
- * 列表 + 编辑抽屉（ui-drawer + ui-hotkey remote 录制）。
+ * 列表 + 编辑弹窗（ui-modal + 运行应用下拉选择 + ui-hotkey remote 录制）。
  */
 const { createApp, onMounted, inject } = Vue;
 
@@ -20,6 +20,10 @@ createApp({
 
     function onHotkey(val) {
       store.onHotkey(val);
+    }
+
+    function onSelectApp() {
+      store.onSelectApp();
     }
 
     function saveEditor() {
@@ -64,9 +68,11 @@ createApp({
       editorOpen: state.editorOpen,
       editor: state.editor,
       saving: state.saving,
+      appOptions: state.runningApps,
       noWindowOptions,
       openEditor,
       onHotkey,
+      onSelectApp,
       saveEditor,
       remove,
       press,
