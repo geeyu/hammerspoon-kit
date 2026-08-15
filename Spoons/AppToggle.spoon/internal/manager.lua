@@ -13,7 +13,10 @@ local cfg, store, toggle
 function manager.setup(cfg_, store_)
     cfg = cfg_
     store = store_
-    local internal = (debug.getinfo(1, "S").source:match("(.*[/\\])") or "")
+    -- 剥 debug.getinfo source 的 @ 前缀（返回值形如 @/path/manager.lua，
+    -- 不剥则 dofile("@/path/toggle.lua") 找不到文件）
+    local src = debug.getinfo(1, "S").source:gsub("^@", "")
+    local internal = (src:match("(.*[/\\])") or "")
     toggle = dofile(internal .. "toggle.lua")
     toggle.setup({
         loadLayouts = function(bundleID)
