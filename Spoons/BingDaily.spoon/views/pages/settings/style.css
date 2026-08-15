@@ -1,206 +1,59 @@
 /* ===== Bing 壁纸设置页（views/pages/settings/style.css）=====
-   对齐防睡眠 control 页：上下锁定（页头/底部操作固定）+ 中间滚动 + 按钮右对齐。 */
+   业务样式：仅保留页面私有规则。共享布局类（.page-panel/.page-head/.page-title/
+   .ctrl-body/.setting-row 系/.status-card 系/.action-card 系/.page-actions）统一
+   来自 hsutil styles/page.css，细滚动条（.thin-scroll）来自 base.css
+   （注入链 theme → base → page → 组件 css → 页面私有），此处不重复定义。 */
 
-* {
- box-sizing: border-box;
- margin: 0;
- padding: 0;
-}
+/* Vue 挂载前隐藏，防闪现 */
+[v-cloak] { display: none; }
 
+/* 页面级约束（业务）：玻璃光尘特效需要背景透明，整页锁定禁止选中/滚动 */
 html,
 body {
- height: 100%;
- font-family: var(--font);
- background: transparent;
- color: var(--fg-1);
- overflow: hidden;
- -webkit-user-select: none;
- user-select: none;
- -webkit-font-smoothing: antialiased;
+  background: transparent;
+  overflow: hidden;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
-[v-cloak] {
- display: none;
-}
-#app {
- height: 100%;
-}
-
-.settings-panel {
- height: 100%;
- display: flex;
- flex-direction: column;
- background: var(--bg-deep);
- font-family: var(--font);
- overflow: hidden; /* 滚动交给 .ctrl-body */
- position: relative;
-}
-
-.page-head {
- display: flex;
- align-items: center;
- justify-content: space-between;
- padding: 18px 22px 14px;
- border-bottom: 1px solid var(--border);
- flex-shrink: 0;
-}
-.page-title {
- font-size: 16px;
- font-weight: 600;
- color: var(--fg-1);
-}
-
-/* 滚动内容区（对齐防睡眠 .ctrl-body） */
-.ctrl-body {
- flex: 1;
- min-height: 0;
- overflow-y: auto;
-}
-.thin-scroll::-webkit-scrollbar {
- width: 6px;
-}
-.thin-scroll::-webkit-scrollbar-thumb {
- background: rgba(255, 255, 255, 0.1);
- border-radius: 3px;
-}
-.thin-scroll::-webkit-scrollbar-track {
- background: transparent;
-}
-
-/* 状态卡（对齐防睡眠） */
-.status-card {
- display: flex;
- align-items: center;
- gap: 12px;
- margin: 14px 22px 4px;
- padding: 14px 16px;
- background: var(--bg-panel);
- border: 1px solid rgba(255, 255, 255, 0.08);
- border-radius: var(--radius-c);
-}
-.status-dot {
- width: 10px;
- height: 10px;
- flex: none;
- border-radius: 50%;
- background: var(--fg-3);
-}
-.status-card.on .status-dot {
- background: #4ade80;
- box-shadow: 0 0 8px #4ade80;
-}
-.status-body {
- min-width: 0;
-}
-.status-main {
- font-size: 14px;
- font-weight: 600;
- color: var(--fg-1);
-}
-.status-line {
- font-size: 11.5px;
- color: var(--fg-3);
- margin-top: 3px;
- overflow: hidden;
- text-overflow: ellipsis;
- white-space: nowrap;
-}
-
-/* 一键执行卡 */
-.action-card {
- margin: 14px 22px 4px;
- padding: 14px 16px;
- background: var(--bg-panel);
- border: 1px solid rgba(255, 255, 255, 0.08);
- border-radius: var(--radius-c);
-}
-.action-title {
- font-size: 13.5px;
- font-weight: 600;
- color: var(--fg-1);
- margin-bottom: 12px;
-}
-.action-row {
- display: flex;
- gap: 10px;
- flex-wrap: wrap;
-}
-
-/* 下载历史卡 */
+/* ── 下载历史卡（业务）── */
 .history-card {
- margin: 14px 22px 4px;
- padding: 14px 16px;
- background: var(--bg-panel);
- border: 1px solid rgba(255, 255, 255, 0.08);
- border-radius: var(--radius-c);
+  margin: 14px 22px 4px;
+  padding: 14px 16px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-c);
 }
 .history-row {
- display: flex;
- align-items: center;
- justify-content: space-between;
- gap: 12px;
- padding: 7px 0;
- border-top: 1px solid rgba(255, 255, 255, 0.05);
- font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 0;
+  border-top: 1px solid var(--border-weak);
+  font-size: 12px;
 }
 .history-row:first-of-type {
- border-top: none;
+  border-top: none;
 }
 .history-name {
- flex: 1;
- min-width: 0;
- overflow: hidden;
- text-overflow: ellipsis;
- white-space: nowrap;
- color: var(--fg-2);
- font-family: ui-monospace, Menlo, monospace;
- font-size: 11.5px;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--fg-2);
+  font-family: var(--mono);
+  font-size: 11.5px;
 }
 .history-meta {
- color: var(--fg-3);
- flex-shrink: 0;
- font-size: 11.5px;
+  color: var(--fg-3);
+  flex-shrink: 0;
+  font-size: 11.5px;
 }
 
-/* 设置行（对齐防睡眠） */
-.setting-row {
- display: flex;
- align-items: center;
- gap: 20px;
- padding: 15px 22px;
- border-bottom: 1px solid var(--border);
-}
-.setting-label {
- flex: 1;
- min-width: 0;
-}
-.setting-name {
- font-size: 13.5px;
- font-weight: 600;
- color: var(--fg-1);
-}
-.setting-desc {
- font-size: 11.5px;
- color: var(--fg-3);
- margin-top: 3px;
- line-height: 1.5;
-}
-.setting-control {
- width: 200px;
- flex-shrink: 0;
-}
-
-/* 底部操作（对齐防睡眠：固定 + 按钮右对齐） */
-.page-actions {
- display: flex;
- justify-content: flex-end;
- align-items: center;
- gap: 10px;
- padding: 18px 22px;
- border-top: 1px solid var(--border);
- flex-shrink: 0;
-}
+/* ── 保存状态提示（业务）── */
 .save-state {
- font-size: 12px;
- color: var(--accent);
+  font-size: 12px;
+  color: var(--accent);
 }
