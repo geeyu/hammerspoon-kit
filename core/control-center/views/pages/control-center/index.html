@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <title>控制中心</title>
-    <!-- 占位符：服务端展开注入 vue + theme.css + base.css + 组件（声明即可，勿手写 link/script）
+    <!-- 占位符：服务端展开注入 vue + theme.css + base.css + page.css + 组件（声明即可，勿手写 link/script）
      glass：玻璃光尘背景；toast：操作失败提示；empty/loading：空态/加载态；button：失败重试 -->
     <!-- hsutil:ui button,toast,empty,loading -->
     <!-- hsutil:fx glass -->
@@ -15,11 +15,11 @@
   </head>
   <body>
     <div id="app" v-cloak>
-      <div class="cc-panel">
+      <div class="page-panel">
         <!-- 顶部标题栏 -->
         <div class="cc-head">
           <div class="cc-title-row">
-            <div class="cc-title">🛠 控制中心</div>
+            <div class="page-title">🛠 控制中心</div>
             <span class="cc-count" v-if="!loading && !error && providers.length"
               >{{ providers.length }} 个组件</span
             >
@@ -28,14 +28,14 @@
         </div>
 
         <!-- 加载态 -->
-        <div class="cc-body" v-if="loading">
+        <div class="ctrl-body thin-scroll" v-if="loading">
           <div class="cc-center">
             <ui-loading text="正在加载组件…"></ui-loading>
           </div>
         </div>
 
         <!-- 空态 -->
-        <div class="cc-body" v-else-if="!error && providers.length === 0">
+        <div class="ctrl-body thin-scroll" v-else-if="!error && providers.length === 0">
           <div class="cc-center">
             <ui-empty
               icon="inbox"
@@ -46,7 +46,7 @@
         </div>
 
         <!-- 失败态 -->
-        <div class="cc-body" v-else-if="error">
+        <div class="ctrl-body thin-scroll" v-else-if="error">
           <div class="cc-center">
             <ui-empty icon="attention" text="加载失败" :hint="error"></ui-empty>
             <ui-button variant="ghost" size="sm" icon="refresh" @click="reload"
@@ -56,7 +56,7 @@
         </div>
 
         <!-- 功能块网格：双列大格子，每格 = 图标 + 名称 + 描述 + 入口 -->
-        <div class="cc-body" v-else>
+        <div class="ctrl-body thin-scroll" v-else>
           <div class="cc-grid">
             <div
               class="cc-cell"
