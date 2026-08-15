@@ -18,8 +18,10 @@
   font-size: 12px;
   font-family: var(--font);
   color: var(--fg-1);
-  background: var(--bg-row);
-  border: 1px solid var(--border);
+  background: var(--glass-bg-soft);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  backdrop-filter: var(--glass-blur-sm);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-c);
   cursor: pointer;
   outline: none;
@@ -28,11 +30,12 @@
 }
 .ui-select__btn:hover {
   border-color: var(--border-h);
-  background: var(--bg-row-h);
+  background: var(--glass-bg-hover);
 }
 .ui-select--open .ui-select__btn {
   border-color: var(--accent);
-  box-shadow: 0 0 0 2px var(--accent-soft);
+  background: var(--glass-bg-soft);
+  box-shadow: 0 0 0 2px var(--accent-soft), 0 2px 8px rgba(0,0,0,0.25);
 }
 .ui-select--disabled .ui-select__btn {
   opacity: 0.45;
@@ -57,24 +60,28 @@
   left: 0;
   right: 0;
   z-index: 100;
-  background: var(--bg-panel);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-c);
+  /* 毛玻璃弹层：半透明底 + 背景模糊 + 受光描边 */
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-top-color: var(--glass-highlight);
+  border-radius: var(--radius-r);
   box-shadow: var(--shadow-overlay);
   overflow: hidden;
   max-height: 180px;
   overflow-y: auto;
 }
 .ui-select__option {
-  padding: 4px 10px;
+  padding: 5px 10px;
   font-size: 12px;
   color: var(--fg-1);
   cursor: pointer;
   white-space: nowrap;
-  transition: background 0.1s var(--ease);
+  transition: background 0.1s var(--ease), color 0.1s var(--ease);
 }
 .ui-select__option:hover {
-  background: var(--bg-row-h);
+  background: var(--glass-bg-hover);
 }
 .ui-select__option--active {
   color: var(--accent);
@@ -83,7 +90,7 @@
 
 /* 键盘高亮（↑↓ 导航） */
 .ui-select__option--focus {
-  background: var(--bg-row-h);
+  background: var(--accent-soft);
 }
 
 /* 键盘焦点环 */

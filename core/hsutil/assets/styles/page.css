@@ -14,13 +14,23 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* ── 面板壳：flex column、100% 高度、深色底、滚动收敛到 .ctrl-body ── */
+/* ── 面板壳：毛玻璃深色底 + 顶部受光，flex column、100% 高度、滚动收敛到 .ctrl-body ── */
 .page-panel {
   width: 100%; height: 100%;
   display: flex; flex-direction: column;
-  background: var(--bg-deep);
+  /* 毛玻璃面板：半透明深色 + 背景模糊。webview 窗口透明时透出桌面壁纸；
+     浏览器全幅视口下 backdrop-filter 无内容可糊，回退为近实色（视觉等价） */
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  /* 顶部受光边缘（Apple 风玻璃描边） */
+  border: 1px solid var(--glass-border);
+  border-top-color: var(--glass-highlight);
+  border-radius: var(--radius-p);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.35);
   overflow: hidden;            /* 滚动交给 .ctrl-body */
   position: relative;          /* .glass-panel ::before/::after 定位参照 */
+  box-sizing: border-box;
 }
 
 /* ── 页头：标题 + 右侧操作（返回/保存），顶底固定 ── */

@@ -8,40 +8,48 @@
   justify-content: center;
   gap: 5px;
   padding: 3px 12px;
-  height: 26px;
+  height: 28px;   /* 26→28：与输入类控件统一 */
   font-size: 12px;
   font-family: var(--font);
   font-weight: 500;
   line-height: 1;
   color: var(--fg-1);
-  background: var(--bg-row);
-  border: 1px solid var(--border);
+  background: var(--glass-bg-soft);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  backdrop-filter: var(--glass-blur-sm);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-c);
   cursor: pointer;
   outline: none;
   white-space: nowrap;
-  transition: background 0.15s var(--ease), border-color 0.15s var(--ease), color 0.15s var(--ease), transform 0.12s var(--ease);
+  box-sizing: border-box;
+  transition: background 0.15s var(--ease), border-color 0.15s var(--ease), color 0.15s var(--ease), transform 0.12s var(--ease), box-shadow 0.15s var(--ease);
 }
-.ui-btn:hover:not(:disabled):not(.ui-btn--loading) { transform: scale(1.04); }
+.ui-btn:hover:not(:disabled):not(.ui-btn--loading) {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+}
 .ui-btn:hover {
-  background: var(--bg-row-h);
+  background: var(--glass-bg-hover);
   border-color: var(--border-h);
 }
-.ui-btn:active:not(:disabled) { transform: scale(0.97); }
+.ui-btn:active:not(:disabled) { transform: scale(0.97); box-shadow: none; }
 
 /* size */
-.ui-btn--sm { height: 22px; padding: 1px 8px; font-size: 11px; border-radius: var(--radius-c); }
+.ui-btn--sm { height: 24px; padding: 1px 10px; font-size: 11px; border-radius: var(--radius-c); }
 .ui-btn--md { height: 28px; padding: 4px 14px; font-size: 12px; }
 
-/* variant: primary */
+/* variant: primary（实色 + 柔光） */
 .ui-btn--primary {
   background: var(--accent);
   border-color: var(--accent);
   color: var(--fg-invert);
+  box-shadow: 0 2px 8px var(--accent-soft);
 }
 .ui-btn--primary:hover {
   background: var(--accent-h);
   border-color: var(--accent-h);
+  box-shadow: 0 3px 12px var(--accent-soft);
 }
 
 /* variant: danger */
@@ -77,14 +85,14 @@
   border-color: var(--warning-h);
 }
 
-/* variant: ghost */
+/* variant: ghost（玻璃描边） */
 .ui-btn--ghost {
   background: transparent;
-  border-color: var(--border);
+  border-color: var(--glass-border);
   color: var(--fg-2);
 }
 .ui-btn--ghost:hover {
-  background: var(--bg-row-h);
+  background: var(--glass-bg-hover);
   border-color: var(--border-h);
   color: var(--fg-1);
 }

@@ -4,23 +4,34 @@
 /* ── UiInput ── */
 .ui-input {
   display: block;
-  min-width: 100px;   /* 不自带宽度：由使用方控制（.setting-control 200px / 抽屉内自适应），
+  min-width: 100px; /* 不自带宽度：由使用方控制（.setting-control 200px / 抽屉内自适应），
                          与 ui-select/ui-datetime 同策略——width:100% 会撑破父级定宽 */
   height: 28px;
   padding: 0 8px;
   font-size: 12px;
   font-family: var(--font);
   color: var(--fg-1);
-  background: var(--bg-row);
-  border: 1px solid var(--border);
+  /* 玻璃控件底：半透明 + 轻模糊，透出面板底色 */
+  background: var(--glass-bg-soft);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  backdrop-filter: var(--glass-blur-sm);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-c);
   outline: none;
   box-sizing: border-box;
-  transition: border-color 0.15s var(--ease), box-shadow 0.15s var(--ease);
+  transition:
+    border-color 0.15s var(--ease),
+    background 0.15s var(--ease),
+    box-shadow 0.15s var(--ease);
+}
+.ui-input:hover {
+  border-color: var(--border-h);
+  background: var(--glass-bg-hover);
 }
 .ui-input:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 2px var(--accent-soft);
+  background: var(--glass-bg-soft);
+  box-shadow: 0 0 0 2px var(--accent-soft), 0 2px 8px rgba(0,0,0,0.25);
 }
 .ui-input:disabled {
   opacity: 0.45;
@@ -37,7 +48,10 @@
 }
 
 /* 键盘焦点环 */
-.ui-input:focus-visible { outline: 2px solid var(--accent-ring); outline-offset: 1px; }
+.ui-input:focus-visible {
+  outline: 2px solid var(--accent-ring);
+  outline-offset: 1px;
+}
 
 /* 错误态（ui-form 校验失败时经 class 注入） */
 .ui-input--error {

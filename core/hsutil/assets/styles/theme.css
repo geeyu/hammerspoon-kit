@@ -10,6 +10,15 @@
   --bg-row-h:   rgba(255,255,255,0.05);
   --bg-row-sel: rgba(74,139,245,0.08);
 
+  /* ── 毛玻璃体系（面板/弹层/控件玻璃底）── */
+  --glass-bg:       rgba(22, 22, 28, 0.72);   /* 玻璃面板底（半透明深色） */
+  --glass-bg-soft:  rgba(255, 255, 255, 0.04); /* 玻璃控件底（输入/按钮） */
+  --glass-bg-hover: rgba(255, 255, 255, 0.08); /* 玻璃控件悬停 */
+  --glass-blur:     blur(20px) saturate(140%);  /* 标准模糊（面板/弹层） */
+  --glass-blur-sm:  blur(12px) saturate(140%);  /* 轻模糊（控件） */
+  --glass-border:   rgba(255, 255, 255, 0.09);  /* 玻璃描边 */
+  --glass-highlight: rgba(255, 255, 255, 0.10); /* 顶部受光（Apple 风） */
+
   /* ── 文字 ── */
   --fg-1:  #E8E8EC;
   --fg-2:  #8A8A94;

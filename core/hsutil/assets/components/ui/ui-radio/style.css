@@ -34,19 +34,22 @@
   pointer-events: none;
 }
 .ui-radio__dot {
-  width: 14px;
-  height: 14px;
+  width: 15px;
+  height: 15px;
   border-radius: 50%;
   border: 2px solid var(--border);
   background: transparent;
-  transition: border-color 0.15s var(--ease), background 0.15s var(--ease);
+  transition: border-color 0.15s var(--ease), background 0.15s var(--ease), box-shadow 0.15s var(--ease);
   flex-shrink: 0;
   box-sizing: border-box;
+}
+.ui-radio__item:hover .ui-radio__dot {
+  border-color: var(--border-h);
 }
 .ui-radio__item--active .ui-radio__dot {
   border-color: var(--accent);
   background: var(--accent);
-  box-shadow: inset 0 0 0 2px var(--bg-panel);
+  box-shadow: inset 0 0 0 2px var(--bg-panel), 0 0 8px var(--accent-soft);  /* 内圈 + 柔光 */
 }
 .ui-radio__label {
   line-height: 1.4;

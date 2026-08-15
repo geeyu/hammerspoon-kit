@@ -1,92 +1,133 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
-<head>
-<meta charset="utf-8">
-<title>防睡眠</title>
-<link rel="icon" href="data:,">
-<!-- 占位符：服务端展开注入 vue + theme.css + base.css + 组件（声明即可，勿手写 link/script）
+  <head>
+    <meta charset="utf-8" />
+    <title>防睡眠</title>
+    <link rel="icon" href="data:," />
+    <!-- 占位符：服务端展开注入 vue + theme.css + base.css + 组件（声明即可，勿手写 link/script）
      select/radio/datetime/button/toast：设置行式控件 + 操作反馈 -->
-<!-- hsutil:ui select,radio,datetime,button,toast -->
-<!-- 业务样式：页面私有（views/pages/control/style.css） -->
-<link rel="stylesheet" href="/stayawake/view/pages/control/style.css">
-</head>
-<body>
-<div id="app" v-cloak>
-  <div class="page-panel">
-    <!-- 页头：标题 + 返回 -->
-    <div class="page-head">
-      <div class="page-title">☕ 防睡眠</div>
-      <ui-button variant="ghost" size="sm" @click="goBack">← 返回</ui-button>
-    </div>
+    <!-- hsutil:ui select,radio,datetime,button,toast -->
+    <!-- 业务样式：页面私有（views/pages/control/style.css） -->
+    <link rel="stylesheet" href="/stayawake/view/pages/control/style.css" />
+  </head>
+  <body>
+    <div id="app" v-cloak>
+      <div class="page-panel">
+        <!-- 页头：标题 + 返回 -->
+        <div class="page-head">
+          <div class="page-title">☕ 防睡眠</div>
+          <ui-button variant="ghost" size="sm" @click="goBack"
+            >← 返回</ui-button
+          >
+        </div>
 
-    <!-- 中间滚动区：状态卡 + 配置行（顶/底固定） -->
-    <div class="ctrl-body">
-    <!-- 当前状态（独立卡片，只读） -->
-    <div class="status-card" :class="{ on: active }">
-      <span class="status-dot"></span>
-      <div class="status-body">
-        <div class="status-main">{{ statusText }}</div>
-        <div class="status-line">模式：{{ modeText }}</div>
-        <div class="status-line" v-if="active">终止时间：{{ endsAtText }}</div>
+        <!-- 中间滚动区：状态卡 + 配置行（顶/底固定） -->
+        <div class="ctrl-body">
+          <!-- 当前状态（独立卡片，只读） -->
+          <div class="status-card" :class="{ on: active }">
+            <span class="status-dot"></span>
+            <div class="status-body">
+              <div class="status-main">{{ statusText }}</div>
+              <div class="status-line">模式：{{ modeText }}</div>
+              <div class="status-line" v-if="active">
+                终止时间：{{ endsAtText }}
+              </div>
+            </div>
+          </div>
+
+          <!-- 防睡眠模式 -->
+          <div class="setting-row">
+            <div class="setting-label">
+              <div class="setting-name">防睡眠模式</div>
+              <div class="setting-desc">
+                允许息屏：仅防系统睡眠；屏幕常亮：同时防止显示器休眠
+              </div>
+            </div>
+            <ui-radio-group
+              v-model="modeVal"
+              :options="modeOptions"
+              direction="row"
+              class="setting-control-radio"
+            ></ui-radio-group>
+          </div>
+
+          <!-- 保持时长（小时） -->
+          <div class="setting-row">
+            <div class="setting-label">
+              <div class="setting-name">保持时长（小时）</div>
+              <div class="setting-desc">1 ~ 24 小时，先选择再点「启动」</div>
+            </div>
+            <ui-select
+              v-model="hourVal"
+              :options="hourOptions"
+              placeholder="选择小时"
+              class="setting-control"
+            ></ui-select>
+          </div>
+
+          <!-- 保持时长（分钟） -->
+          <div class="setting-row">
+            <div class="setting-label">
+              <div class="setting-name">保持时长（分钟）</div>
+              <div class="setting-desc">5 ~ 90 分钟，先选择再点「启动」</div>
+            </div>
+            <ui-select
+              v-model="minuteVal"
+              :options="minuteOptions"
+              placeholder="选择分钟"
+              class="setting-control"
+            ></ui-select>
+          </div>
+
+          <!-- 永久保持清醒 -->
+          <div class="setting-row">
+            <div class="setting-label">
+              <div class="setting-name">永久保持清醒</div>
+              <div class="setting-desc">一直保持，直到手动停止</div>
+            </div>
+            <ui-select
+              v-model="foreverVal"
+              :options="foreverOptions"
+              placeholder="选择永久"
+              class="setting-control"
+            ></ui-select>
+          </div>
+
+          <!-- 直到时间点（选完即选中，点底部「启动」生效） -->
+          <div class="setting-row">
+            <div class="setting-label">
+              <div class="setting-name">直到时间点</div>
+              <div class="setting-desc">
+                从日历选择日期时间，点底部「启动」生效
+              </div>
+            </div>
+            <ui-datetime
+              v-model="untilVal"
+              class="setting-control"
+            ></ui-datetime>
+          </div>
+        </div>
+        <!-- /ctrl-body -->
+
+        <!-- 底部操作：动态启动/重置/停止（激活中修改配置 → 黄色重置） -->
+        <div class="page-actions">
+          <ui-button v-if="!active" variant="success" @click="startSelected"
+            >▶ 启动</ui-button
+          >
+          <ui-button
+            v-else-if="configDirty"
+            variant="warning"
+            @click="startSelected"
+            >⟳ 重置</ui-button
+          >
+          <ui-button v-else variant="danger" @click="closeAll"
+            >■ 停止</ui-button
+          >
+        </div>
       </div>
     </div>
-
-    <!-- 防睡眠模式 -->
-    <div class="setting-row">
-      <div class="setting-label">
-        <div class="setting-name">防睡眠模式</div>
-        <div class="setting-desc">允许息屏：仅防系统睡眠；屏幕常亮：同时防止显示器休眠</div>
-      </div>
-      <ui-radio-group v-model="modeVal" :options="modeOptions" direction="row" class="setting-control-radio"></ui-radio-group>
-    </div>
-
-    <!-- 保持时长（小时） -->
-    <div class="setting-row">
-      <div class="setting-label">
-        <div class="setting-name">保持时长（小时）</div>
-        <div class="setting-desc">1 ~ 24 小时，先选择再点「启动」</div>
-      </div>
-      <ui-select v-model="hourVal" :options="hourOptions" placeholder="选择小时" class="setting-control"></ui-select>
-    </div>
-
-    <!-- 保持时长（分钟） -->
-    <div class="setting-row">
-      <div class="setting-label">
-        <div class="setting-name">保持时长（分钟）</div>
-        <div class="setting-desc">5 ~ 90 分钟，先选择再点「启动」</div>
-      </div>
-      <ui-select v-model="minuteVal" :options="minuteOptions" placeholder="选择分钟" class="setting-control"></ui-select>
-    </div>
-
-    <!-- 永久保持清醒 -->
-    <div class="setting-row">
-      <div class="setting-label">
-        <div class="setting-name">永久保持清醒</div>
-        <div class="setting-desc">一直保持，直到手动停止</div>
-      </div>
-      <ui-select v-model="foreverVal" :options="foreverOptions" placeholder="选择永久" class="setting-control"></ui-select>
-    </div>
-
-    <!-- 直到时间点（选完即选中，点底部「启动」生效） -->
-    <div class="setting-row">
-      <div class="setting-label">
-        <div class="setting-name">直到时间点</div>
-        <div class="setting-desc">从日历选择日期时间，点底部「启动」生效</div>
-      </div>
-      <ui-datetime v-model="untilVal" class="setting-control"></ui-datetime>
-    </div>
-    </div><!-- /ctrl-body -->
-
-    <!-- 底部操作：动态启动/重置/停止（激活中修改配置 → 黄色重置） -->
-    <div class="page-actions">
-      <ui-button v-if="!active" variant="success" @click="startSelected">▶ 启动</ui-button>
-      <ui-button v-else-if="configDirty" variant="warning" @click="startSelected">⟳ 重置</ui-button>
-      <ui-button v-else variant="danger" @click="closeAll">■ 停止</ui-button>
-    </div>
-  </div>
-</div>
-<!-- 加载顺序（defer 按文档序）：store → app -->
-<script src="store.js" defer></script>
-<script src="app.js" defer></script>
-</body>
+    <!-- 加载顺序（defer 按文档序）：store → app -->
+    <script src="store.js" defer></script>
+    <script src="app.js" defer></script>
+  </body>
 </html>
