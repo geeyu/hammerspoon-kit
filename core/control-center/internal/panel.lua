@@ -131,14 +131,22 @@ end
 -- 对外 API
 -- ============================================================
 
+--- 相对路径 → 完整 URL（sources.lua 推断的 configUrl 是 /xxx/view/pages/... 相对路径，
+--- wv:url() 只接受完整 URL——相对路径会导致 WebKit 101 "URL can't be shown"）
+local function absolutize(url)
+    if not url then return nil end
+    if url:match("^https?://") or url:match("^file://") then return url end
+    return HSUtil.http.BASE .. url
+end
+
 --- ControlCenter.panel.open(url)
 --- 打开配置面板(单例):
 ---   * 未创建 —— 惰性创建并 show,url 作为首载 URL(由 HSUtil.webview 首次 show 加载)
 ---   * 已创建且 url 与当前加载页不同 —— view:raw():url(url) setUrl 切换后 show
 ---   * 已创建且 url 相同 —— 仅 show
---- url 缺省时回退聚合页 URL(setup 注入)
+--- url 缺省时回退聚合页 URL(setup 注入);相对路径自动补全为完整 URL
 function panel.open(url)
-    url = url or aggregateUrl
+    url = absolutize(url or aggregateUrl)
     if not url then
         logger.w("panel.open 缺少 url(未 setup aggregateUrl?),忽略")
         return false

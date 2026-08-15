@@ -83,6 +83,7 @@ package.preload["core.hsutil"] = function()
     return {
         log = { new = function() return makeLogger() end },
         path = { join = function(a, b) return a .. "/" .. b end },
+        http = { BASE = "http://127.0.0.1:8821" },
     }
 end
 
@@ -425,6 +426,7 @@ hs = mockHS
 package.preload["core.hsutil"] = function()
     return {
         log = { new = function() return makeLogger() end },
+        http = { BASE = "http://127.0.0.1:8821" },
         webview = {
             new = function(opts)
                 M.created[#M.created + 1] = opts
@@ -667,6 +669,7 @@ package.preload["core.hsutil"] = function()
     return {
         log = { new = function() return makeLogger() end },
         path = { join = function(a, b) return a .. "/" .. b end },
+        http = { BASE = "http://127.0.0.1:8821" },
         webview = {
             new = function(opts)
                 W.created[#W.created + 1] = opts
@@ -907,16 +910,16 @@ do
     -- 每个 provider 子菜单 1 个配置页(真实 manifest 无 provider 级 icon,子菜单标题纯名字)
     local bd = findItem(menu, "bingdaily")
     check("E39 子菜单含配置页(icon+name)", bd and bd.menu and #bd.menu == 1 and bd.menu[1].title == "🖼️ Bing 壁纸")
-    -- 点击配置页 → 真实 panel.open → 惰性创建 webview(首载 url=配置页)
+    -- 点击配置页 → 真实 panel.open → 惰性创建 webview(首载 url=配置页,相对路径已补全完整 URL)
     bd.menu[1].fn()
-    check("E40 点击配置入口经 panel 打开配置页 URL", #W.created == 1
-        and W.created[1].url == "/bingdaily/view/pages/settings/index.html",
+    check("E40 点击配置入口经 panel 打开配置页 URL(相对→完整)", #W.created == 1
+        and W.created[1].url == "http://127.0.0.1:8821/bingdaily/view/pages/settings/index.html",
         W.created[1] and W.created[1].url or "nil")
     -- 再点另一个 provider 的配置页 → setUrl 切换(同一 webview)
     local sa = findItem(menu, "stayawake")
     sa.menu[1].fn()
     check("E41 切换配置页走 setUrl(同一 webview 单例)", #W.created == 1
-        and W.view:raw() ~= nil and W.view:raw():url() == "/stayawake/view/pages/control/index.html",
+        and W.view:raw() ~= nil and W.view:raw():url() == "http://127.0.0.1:8821/stayawake/view/pages/control/index.html",
         W.view and W.view:raw() and W.view:raw():url() or "nil")
 end
 
