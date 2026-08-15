@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>控制中心</title>
+<!-- 占位符：服务端展开注入 vue + theme.css + base.css + 组件（声明即可，勿手写 link/script）
+     glass：玻璃扫光 + 光尘粒子特效；toast：操作失败提示；
+     empty/loading：空态/加载态；button：失败重试 -->
+<!-- hsutil:ui button,toast,empty,loading -->
+<!-- hsutil:fx glass -->
+<!-- 业务样式：页面私有（views/pages/control-center/style.css） -->
+<link rel="stylesheet" href="/control-center/view/pages/control-center/style.css">
+</head>
+<body>
+<div id="app" v-cloak>
+  <div class="cc-panel glass-panel">
+    <!-- 顶部标题栏 -->
+    <div class="cc-head">
+      <div class="cc-title">🛠 控制中心</div>
+      <div class="cc-sub">组件配置入口</div>
+    </div>
+
+    <!-- 加载态 -->
+    <div class="cc-body" v-if="loading">
+      <div class="cc-center">
+        <ui-loading text="正在加载组件…"></ui-loading>
+      </div>
+    </div>
+
+    <!-- 空态：扫描结果为空（Spoons/*.spoon 与 core/*/ 均无配置入口） -->
+    <div class="cc-body" v-else-if="!error && providers.length === 0">
+      <div class="cc-center">
+        <ui-empty icon="inbox" text="暂无可用组件"
+                  hint="未在 Spoons/*.spoon 与 core/*/ 中发现配置入口"></ui-empty>
+      </div>
+    </div>
+
+    <!-- 失败态：providers 接口不可达/异常，可重试 -->
+    <div class="cc-body" v-else-if="error">
+      <div class="cc-center">
+        <ui-empty icon="attention" text="加载失败" :hint="error"></ui-empty>
+        <ui-button variant="ghost" size="sm" icon="refresh" @click="reload">重试</ui-button>
+      </div>
+    </div>
+
+    <!-- 卡片网格：一个 provider 一张卡（icon + name + cards 描述摘要），点击打开首个配置页 -->
+    <div class="cc-body" v-else>
+      <div class="ut-grid">
+        <div class="ut-gcard cc-card"
+             v-for="p in providers" :key="p.name"
+             :class="{ opening: opening === p.name }"
+             @click="openProvider(p)">
+          <span v-if="providerIcon(p)" class="ut-gicon ut-gicon-emoji">{{ providerIcon(p) }}</span>
+          <span v-else class="ut-gicon ut-gicon-fallback" :style="iconStyle(p)">{{ iconText(p) }}</span>
+          <div class="ut-gname cc-name">{{ p.name }}</div>
+          <div class="cc-desc">{{ cardSummary(p) }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 加载顺序（defer 按文档序）：store → app
+     注意：占位符注入的 vue/glass-fx 均为 defer，业务脚本必须 defer -->
+<script src="store.js" defer></script>
+<script src="app.js" defer></script>
+</body>
+</html>
