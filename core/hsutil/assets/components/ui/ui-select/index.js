@@ -2,24 +2,36 @@ var UiSelect = Vue.defineComponent({
   name: 'UiSelect',
   props: {
     modelValue: { default: '' },
-    options: { type: Array, default: function() { return []; } },
+    options: { type: Array, default: () => [] },
     placeholder: { type: String, default: 'Select...' },
-    disabled: { type: Boolean, default: false }
+    disabled: { type: Boolean, default: false },
+    filterable: { type: Boolean, default: false }   // 下拉内搜索过滤
   },
   template: '#tpl-ui-select',
   emits: ['update:modelValue', 'change'],
-  setup: function(props, refs) {
+  setup: (props, refs) => {
     var emit = refs.emit;
     var open = Vue.ref(false);
     var root = Vue.ref(null);
     var activeIdx = Vue.ref(-1);   // 下拉键盘高亮位（-1 = 无）
+    var filter = Vue.ref('');      // 过滤关键字
 
-    var currentLabel = Vue.computed(function() {
+    var currentLabel = Vue.computed(() => {
       var opts = props.options || [];
       for (var i = 0; i < opts.length; i++) {
         if (opts[i].value === props.modelValue) return opts[i].label;
       }
       return props.placeholder;
+    });
+
+    // 过滤后的选项（filterable 时按 label/value 匹配）
+    var filteredOptions = Vue.computed(() => {
+      var opts = props.options || [];
+      if (!props.filterable) return opts;
+      var kw = (filter.value || '').trim().toLowerCase();
+      if (!kw) return opts;
+      return opts.filter((o) => (String(o.label || '').toLowerCase().indexOf(kw) !== -1)
+          || (String(o.value || '').toLowerCase().indexOf(kw) !== -1));
     });
 
     function currentIndex() {
@@ -32,9 +44,17 @@ var UiSelect = Vue.defineComponent({
 
     function openPanel() {
       open.value = true;
+      filter.value = '';   // 每次打开重置过滤
       activeIdx.value = currentIndex();   // 高亮当前值
+      // 打开后聚焦过滤输入框（filterable）
+      if (props.filterable) {
+        Vue.nextTick(() => {
+          var input = root.value && root.value.querySelector('.ui-select__filter input');
+          if (input && input.focus) input.focus();
+        });
+      }
       if (window.anime) {
-        Vue.nextTick(function () {
+        Vue.nextTick(() => {
           var panel = root.value && root.value.querySelector('.ui-select__dropdown');
           if (panel) {
             anime({ targets: panel, translateY: [-6, 0], opacity: [0, 1], duration: 220, ease: anime.spring({ stiffness: 320, damping: 22 }) });
@@ -60,7 +80,7 @@ var UiSelect = Vue.defineComponent({
     }
 
     function onKeydown(e) {
-      var opts = props.options || [];
+      var opts = filteredOptions.value;   // 键盘导航基于过滤结果
       var key = e.key;
 
       if (key === 'ArrowDown' || key === 'ArrowUp') {
@@ -105,9 +125,9 @@ var UiSelect = Vue.defineComponent({
     }
 
     // 键盘高亮项滚动进视口（下拉 max-height 180px）
-    Vue.watch(activeIdx, function (idx) {
+    Vue.watch(activeIdx, (idx) => {
       if (idx < 0 || !open.value) return;
-      Vue.nextTick(function () {
+      Vue.nextTick(() => {
         var box = root.value;
         if (!box) return;
         var opts = box.querySelectorAll('.ui-select__option');
@@ -122,14 +142,16 @@ var UiSelect = Vue.defineComponent({
       if (root.value && root.value.contains(e.target)) return;
       open.value = false;
     }
-    Vue.onMounted(function () { document.addEventListener('click', onDocClick); });
-    Vue.onBeforeUnmount(function () { document.removeEventListener('click', onDocClick); });
+    Vue.onMounted(() => { document.addEventListener('click', onDocClick); });
+    Vue.onBeforeUnmount(() => { document.removeEventListener('click', onDocClick); });
 
     return {
       open: open,
       root: root,
       activeIdx: activeIdx,
+      filter: filter,
       currentLabel: currentLabel,
+      filteredOptions: filteredOptions,
       toggleOpen: toggleOpen,
       selectOption: selectOption,
       onKeydown: onKeydown

@@ -22,12 +22,8 @@ createApp({
       store.onHotkey(val);
     }
 
-    function onSelectApp() {
-      store.onSelectApp();
-    }
-
-    function pickApp(a) {
-      store.pickApp(a);
+    function onSelectApp(bundleId) {
+      store.onSelectApp(bundleId);
     }
 
     function saveEditor() {
@@ -65,6 +61,8 @@ createApp({
 
     onMounted(() => {
       store.load().catch(() => {});
+      // 预加载运行中的应用列表：打开添加弹窗零等待（不阻塞动画）
+      store.loadRunningApps();
     });
 
     return {
@@ -72,13 +70,11 @@ createApp({
       editorOpen: state.editorOpen,
       editor: state.editor,
       saving: state.saving,
-      appSearch: state.appSearch,
-      filteredApps: store.filteredApps,
+      appOptions: state.runningApps,
       noWindowOptions,
       openEditor,
       onHotkey,
       onSelectApp,
-      pickApp,
       saveEditor,
       remove,
       press,

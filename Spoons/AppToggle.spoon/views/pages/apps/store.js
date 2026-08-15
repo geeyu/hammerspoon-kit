@@ -18,21 +18,8 @@ const AppToggleStore = {
       editorOpen: Vue.ref(false),
       editor: Vue.ref(null), // 编辑中的草稿
       saving: Vue.ref(false),
-      runningApps: Vue.ref([]), // 运行中的应用（添加时搜索选择）
-      appSearch: Vue.ref(""), // 应用搜索关键字
+      runningApps: Vue.ref([]), // 运行中的应用（添加时下拉选择）
     };
-
-    // 过滤后的应用列表（按名称/BundleID 搜索）
-    function filteredApps() {
-      const kw = state.appSearch.value.trim().toLowerCase();
-      const list = state.runningApps.value;
-      if (!kw) return list;
-      return list.filter(
-        (a) =>
-          (a.name || "").toLowerCase().includes(kw) ||
-          (a.bundle_id || "").toLowerCase().includes(kw),
-      );
-    }
 
     // 后端应用行 → 编辑器草稿
     function toDraft(a) {
@@ -45,6 +32,7 @@ const AppToggleStore = {
         fullscreen_fallback: a ? a.fullscreen_fallback : true,
         restore_focus: a ? a.restore_focus : true,
         move_to_mouse_screen: a ? a.move_to_mouse_screen : true,
+        selectedApp: "", // 新增时下拉选中值（bundle_id）
       };
     }
 
@@ -62,17 +50,17 @@ const AppToggleStore = {
 
       openEditor(a) {
         state.editor.value = toDraft(a);
-        state.editorOpen.value = true;
-        // 新增时拉取运行中的应用列表（编辑时不需要）
-        if (!a) actions.loadRunningApps();
+        state.editorOpen.value = true;   // 先开弹窗（不阻塞动画）；列表已预加载
       },
 
       // 运行中的应用（{name, bundle_id}；后端已用 .app 目录名=中文名）
+      // 页面加载时预加载（app.js onMounted），打开弹窗直接用缓存，零等待
       loadRunningApps() {
         return hsFetch("/running-apps")
           .then((d) => {
             state.runningApps.value = (d.apps || []).map((app) => ({
               value: app.bundle_id,
+              label: app.name + "  (" + app.bundle_id + ")",
               name: app.name,
               bundle_id: app.bundle_id,
             }));
@@ -80,23 +68,12 @@ const AppToggleStore = {
           .catch((e) => console.error("加载运行应用失败", e));
       },
 
-      // 点击搜索结果：自动填名称 + Bundle ID，清空搜索
-      pickApp(a) {
-        const ed = state.editor.value;
-        if (!ed || !a) return;
-        ed.name = a.name;
-        ed.bundle_id = a.bundle_id;
-        state.appSearch.value = "";
-      },
-
-      filteredApps,
-
       // 下拉选择应用：自动填名称 + Bundle ID
-      onSelectApp() {
+      onSelectApp(bundleId) {
         const ed = state.editor.value;
-        if (!ed || !ed.selectedApp) return;
+        if (!ed || !bundleId) return;
         const found = state.runningApps.value.find(
-          (a) => a.value === ed.selectedApp,
+          (a) => a.value === bundleId,
         );
         if (found) {
           ed.name = found.name;

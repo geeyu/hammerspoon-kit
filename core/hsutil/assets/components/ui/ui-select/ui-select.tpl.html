@@ -5,8 +5,19 @@
       <ui-icon name="down" :size="12" class="ui-select__arrow"></ui-icon>
     </button>
     <div v-if="open" class="ui-select__dropdown" role="listbox">
+      <!-- 过滤输入框（filterable 时显示）：下拉内筛选，点击不冒泡关闭 -->
+      <div v-if="filterable" class="ui-select__filter" @click.stop>
+        <ui-icon name="search" :size="12" class="ui-select__filter-icon"></ui-icon>
+        <input
+          v-model="filter"
+          class="ui-select__filter-input"
+          type="text"
+          placeholder="筛选…"
+          @keydown.stop="onKeydown"
+        />
+      </div>
       <div
-        v-for="(opt, idx) in options"
+        v-for="(opt, idx) in filteredOptions"
         :key="opt.value"
         class="ui-select__option"
         :class="{ 'ui-select__option--active': modelValue === opt.value, 'ui-select__option--focus': activeIdx === idx }"
@@ -15,6 +26,7 @@
         @click="selectOption(opt)"
         @mouseenter="activeIdx = idx"
       >{{ opt.label }}</div>
+      <div v-if="filterable && filteredOptions.length === 0" class="ui-select__empty">无匹配选项</div>
     </div>
   </div>
 </template>

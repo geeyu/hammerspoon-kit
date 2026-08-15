@@ -193,8 +193,16 @@ end
 --- 运行中的应用列表（添加应用时下拉选择用；排除已绑定）
 --- 显示名优先用 .app 目录名（中文应用名如「知音楼」「微信」），
 --- 兑底用 hs name()（英文）；只列有窗口的应用（过滤系统后台进程）
+--- 性能：allWindows() 每应用一次 XPC 调用（几十个应用串行 = 秒级），
+--- 加 30s 缓存——页面预加载一次即可，打开弹窗零等待
 --- @return table [{name, bundle_id}]
+local runningAppsCache = { at = 0, list = nil }
+local RUNNING_CACHE_TTL = 30   -- 秒
 function manager.runningApps()
+    -- 缓存命中：TTL 内直接返回
+    if runningAppsCache.list and (os.time() - runningAppsCache.at) < RUNNING_CACHE_TTL then
+        return runningAppsCache.list
+    end
     local out = {}
     local bound = {}
     for _, a in ipairs(store.listApps()) do bound[a.bundle_id] = true end
@@ -226,6 +234,7 @@ function manager.runningApps()
     end
     -- 按名称排序
     table.sort(out, function(a, b) return a.name < b.name end)
+    runningAppsCache = { at = os.time(), list = out }
     return out
 end
 

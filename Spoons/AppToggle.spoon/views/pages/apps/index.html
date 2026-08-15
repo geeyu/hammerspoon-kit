@@ -125,31 +125,18 @@
         @update:open="editorOpen = $event"
       >
         <div class="editor-body" v-if="editor">
-          <!-- 新增时：从运行中的应用选择（支持搜索；自动填名称+Bundle ID） -->
+          <!-- 新增时：从运行中的应用下拉选择（支持筛选；自动填名称+Bundle ID） -->
           <div class="form-row" v-if="!editor.id">
             <label>选择应用</label>
-            <div class="app-picker">
-              <ui-input
-                v-model="appSearch"
-                placeholder="搜索应用（如 微信/Ghostty）…"
-              />
-              <div class="app-picker-list thin-scroll" v-if="appSearch">
-                <div
-                  class="app-picker-item"
-                  v-for="a in filteredApps"
-                  :key="a.value"
-                  @click="pickApp(a)"
-                >
-                  <span class="app-picker-name">{{ a.name }}</span>
-                  <span class="app-picker-bid">{{ a.bundle_id }}</span>
-                </div>
-                <div class="app-picker-empty" v-if="filteredApps.length === 0">
-                  无匹配应用
-                </div>
-              </div>
-            </div>
+            <ui-select
+              v-model="editor.selectedApp"
+              :options="appOptions"
+              placeholder="从运行中的应用选择…"
+              filterable
+              @change="onSelectApp"
+            ></ui-select>
             <div class="form-hint">
-              输入关键字搜索；点击选择后名称/Bundle ID 自动填入，可再手动修改
+              下拉内输入关键字可筛选；选中后名称/Bundle ID 自动填入，可再手动修改
             </div>
           </div>
           <div class="form-row">
