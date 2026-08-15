@@ -101,7 +101,9 @@ function View:_ensure()
     wv:darkMode(true)
     wv:transparent(true)      -- 圆角玻璃露出桌面
     wv:allowTextEntry(true)
-    wv:shadow(true)
+    -- shadow(false):原生窗口阴影会在透明边缘画一圈发黑,
+    -- 面板自身的受光描边+微光已提供质感,关掉原生阴影让边缘纯透明
+    wv:shadow(false)
     wv:level(self._level)
 
     wv:navigationCallback(function(action, _, _, err)

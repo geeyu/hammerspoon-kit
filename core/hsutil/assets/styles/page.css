@@ -22,9 +22,10 @@ body {
   background: transparent !important;
 }
 
-/* ── 外圈透明边距（对齐 Clipboard 主体 #app padding:14px 的设计）── */
+/* ── 外圈透明边距：最小化（仅保证圆角不被窗口边缘裁切），
+     圆角外透出桌面壁纸；避免大边距露黑 */
 #app {
-  padding: 14px;
+  padding: 4px;
   box-sizing: border-box;
   background: transparent !important;
 }
@@ -46,16 +47,15 @@ body {
      低饱和保持干净（对齐 Clipboard 主体） */
   -webkit-backdrop-filter: blur(64px) saturate(120%) brightness(0.72);
   backdrop-filter: blur(64px) saturate(120%) brightness(0.72);
-  /* 发光边缘：1px 受光描边 + accent 微光 + 深阴影（悬浮立体感）；
-     外圈 14px 透明边距让圆角自然露出壁纸 */
+  /* 发光边缘：1px 受光描边 + 轻 accent 微光；
+     不用深色大阴影（0 0 48px 黑晕会让透明边缘发黑），
+     悬浮感由顶部受光 + 微光描边提供 */
   border: 1px solid rgba(255, 255, 255, 0.09);
   border-top-color: rgba(255, 255, 255, 0.16); /* 顶部受光边缘（Apple 风） */
   border-radius: var(--radius-p);
   box-shadow:
     0 0 0 1px rgba(74, 139, 245, 0.06),
-    0 0 24px rgba(74, 139, 245, 0.1),
-    0 0 48px rgba(0, 0, 0, 0.45),
-    0 12px 40px rgba(0, 0, 0, 0.35),
+    0 0 12px rgba(74, 139, 245, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 0.08); /* 内顶部受光（立体感） */
   overflow: hidden; /* 滚动交给 .ctrl-body */
   position: relative; /* .glass-panel ::before/::after 定位参照 */
