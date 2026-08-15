@@ -50,7 +50,7 @@ const AppToggleStore = {
 
       openEditor(a) {
         state.editor.value = toDraft(a);
-        state.editorOpen.value = true;   // 先开弹窗（不阻塞动画）；列表已预加载
+        state.editorOpen.value = true; // 先开弹窗（不阻塞动画）；列表已预加载
       },
 
       // 运行中的应用（{name, bundle_id}；后端已用 .app 目录名=中文名）
@@ -72,9 +72,7 @@ const AppToggleStore = {
       onSelectApp(bundleId) {
         const ed = state.editor.value;
         if (!ed || !bundleId) return;
-        const found = state.runningApps.value.find(
-          (a) => a.value === bundleId,
-        );
+        const found = state.runningApps.value.find((a) => a.value === bundleId);
         if (found) {
           ed.name = found.name;
           ed.bundle_id = found.bundle_id;

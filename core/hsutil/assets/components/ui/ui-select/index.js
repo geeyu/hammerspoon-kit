@@ -1,20 +1,20 @@
 var UiSelect = Vue.defineComponent({
-  name: 'UiSelect',
+  name: "UiSelect",
   props: {
-    modelValue: { default: '' },
+    modelValue: { default: "" },
     options: { type: Array, default: () => [] },
-    placeholder: { type: String, default: 'Select...' },
+    placeholder: { type: String, default: "Select..." },
     disabled: { type: Boolean, default: false },
-    filterable: { type: Boolean, default: false }   // 下拉内搜索过滤
+    filterable: { type: Boolean, default: false }, // 下拉内搜索过滤
   },
-  template: '#tpl-ui-select',
-  emits: ['update:modelValue', 'change'],
+  template: "#tpl-ui-select",
+  emits: ["update:modelValue", "change"],
   setup: (props, refs) => {
     var emit = refs.emit;
     var open = Vue.ref(false);
     var root = Vue.ref(null);
-    var activeIdx = Vue.ref(-1);   // 下拉键盘高亮位（-1 = 无）
-    var filter = Vue.ref('');      // 过滤关键字
+    var activeIdx = Vue.ref(-1); // 下拉键盘高亮位（-1 = 无）
+    var filter = Vue.ref(""); // 过滤关键字
 
     var currentLabel = Vue.computed(() => {
       var opts = props.options || [];
@@ -28,10 +28,17 @@ var UiSelect = Vue.defineComponent({
     var filteredOptions = Vue.computed(() => {
       var opts = props.options || [];
       if (!props.filterable) return opts;
-      var kw = (filter.value || '').trim().toLowerCase();
+      var kw = (filter.value || "").trim().toLowerCase();
       if (!kw) return opts;
-      return opts.filter((o) => (String(o.label || '').toLowerCase().indexOf(kw) !== -1)
-          || (String(o.value || '').toLowerCase().indexOf(kw) !== -1));
+      return opts.filter(
+        (o) =>
+          String(o.label || "")
+            .toLowerCase()
+            .indexOf(kw) !== -1 ||
+          String(o.value || "")
+            .toLowerCase()
+            .indexOf(kw) !== -1,
+      );
     });
 
     function currentIndex() {
@@ -44,20 +51,28 @@ var UiSelect = Vue.defineComponent({
 
     function openPanel() {
       open.value = true;
-      filter.value = '';   // 每次打开重置过滤
-      activeIdx.value = currentIndex();   // 高亮当前值
+      filter.value = ""; // 每次打开重置过滤
+      activeIdx.value = currentIndex(); // 高亮当前值
       // 打开后聚焦过滤输入框（filterable）
       if (props.filterable) {
         Vue.nextTick(() => {
-          var input = root.value && root.value.querySelector('.ui-select__filter input');
+          var input =
+            root.value && root.value.querySelector(".ui-select__filter input");
           if (input && input.focus) input.focus();
         });
       }
       if (window.anime) {
         Vue.nextTick(() => {
-          var panel = root.value && root.value.querySelector('.ui-select__dropdown');
+          var panel =
+            root.value && root.value.querySelector(".ui-select__dropdown");
           if (panel) {
-            anime({ targets: panel, translateY: [-6, 0], opacity: [0, 1], duration: 220, ease: anime.spring({ stiffness: 320, damping: 22 }) });
+            anime({
+              targets: panel,
+              translateY: [-6, 0],
+              opacity: [0, 1],
+              duration: 220,
+              ease: anime.spring({ stiffness: 320, damping: 22 }),
+            });
           }
         });
       }
@@ -74,52 +89,61 @@ var UiSelect = Vue.defineComponent({
 
     function selectOption(opt) {
       if (props.disabled) return;
-      emit('update:modelValue', opt.value);
-      emit('change', opt.value);
+      emit("update:modelValue", opt.value);
+      emit("change", opt.value);
       open.value = false;
     }
 
     function onKeydown(e) {
-      var opts = filteredOptions.value;   // 键盘导航基于过滤结果
+      var opts = filteredOptions.value; // 键盘导航基于过滤结果
       var key = e.key;
 
-      if (key === 'ArrowDown' || key === 'ArrowUp') {
+      if (key === "ArrowDown" || key === "ArrowUp") {
         e.preventDefault();
         if (!opts.length) return;
-        if (!open.value) { openPanel(); return; }   // 未打开：先展开
-        var dir = key === 'ArrowDown' ? 1 : -1;
+        if (!open.value) {
+          openPanel();
+          return;
+        } // 未打开：先展开
+        var dir = key === "ArrowDown" ? 1 : -1;
         var base = activeIdx.value >= 0 ? activeIdx.value : currentIndex();
         if (base < 0) base = dir > 0 ? -1 : 0;
         var next = base + dir;
         if (next < 0) next = opts.length - 1;
         if (next >= opts.length) next = 0;
         activeIdx.value = next;
-      } else if (key === 'Enter') {
+      } else if (key === "Enter") {
         if (open.value && activeIdx.value >= 0 && opts[activeIdx.value]) {
           e.preventDefault();
           selectOption(opts[activeIdx.value]);
         }
-      } else if (key === 'Home') {
-        if (open.value && opts.length) { e.preventDefault(); activeIdx.value = 0; }
-      } else if (key === 'End') {
-        if (open.value && opts.length) { e.preventDefault(); activeIdx.value = opts.length - 1; }
-      } else if (key === 'ArrowLeft' || key === 'ArrowRight') {
+      } else if (key === "Home") {
+        if (open.value && opts.length) {
+          e.preventDefault();
+          activeIdx.value = 0;
+        }
+      } else if (key === "End") {
+        if (open.value && opts.length) {
+          e.preventDefault();
+          activeIdx.value = opts.length - 1;
+        }
+      } else if (key === "ArrowLeft" || key === "ArrowRight") {
         // 闭合态 ←→ 切换选项（打开态由 ↑↓ 导航接管）
         if (open.value) return;
         e.preventDefault();
         if (!opts.length) return;
         var curIdx = currentIndex();
-        var dir = key === 'ArrowRight' ? 1 : -1;
+        var dir = key === "ArrowRight" ? 1 : -1;
         var newIdx = curIdx + dir;
         if (newIdx < 0) newIdx = opts.length - 1;
         if (newIdx >= opts.length) newIdx = 0;
         if (opts[newIdx]) {
-          emit('update:modelValue', opts[newIdx].value);
-          emit('change', opts[newIdx].value);
+          emit("update:modelValue", opts[newIdx].value);
+          emit("change", opts[newIdx].value);
         }
-      } else if (key === 'Tab') {
-        if (open.value) open.value = false;   // Tab 离开时收起下拉
-      } else if (key === 'Escape') {
+      } else if (key === "Tab") {
+        if (open.value) open.value = false; // Tab 离开时收起下拉
+      } else if (key === "Escape") {
         open.value = false;
       }
     }
@@ -130,9 +154,9 @@ var UiSelect = Vue.defineComponent({
       Vue.nextTick(() => {
         var box = root.value;
         if (!box) return;
-        var opts = box.querySelectorAll('.ui-select__option');
+        var opts = box.querySelectorAll(".ui-select__option");
         var el = opts[idx];
-        if (el && el.scrollIntoView) el.scrollIntoView({ block: 'nearest' });
+        if (el && el.scrollIntoView) el.scrollIntoView({ block: "nearest" });
       });
     });
 
@@ -142,8 +166,12 @@ var UiSelect = Vue.defineComponent({
       if (root.value && root.value.contains(e.target)) return;
       open.value = false;
     }
-    Vue.onMounted(() => { document.addEventListener('click', onDocClick); });
-    Vue.onBeforeUnmount(() => { document.removeEventListener('click', onDocClick); });
+    Vue.onMounted(() => {
+      document.addEventListener("click", onDocClick);
+    });
+    Vue.onBeforeUnmount(() => {
+      document.removeEventListener("click", onDocClick);
+    });
 
     return {
       open: open,
@@ -154,7 +182,7 @@ var UiSelect = Vue.defineComponent({
       filteredOptions: filteredOptions,
       toggleOpen: toggleOpen,
       selectOption: selectOption,
-      onKeydown: onKeydown
+      onKeydown: onKeydown,
     };
-  }
+  },
 });

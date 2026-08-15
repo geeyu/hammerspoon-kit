@@ -1,13 +1,29 @@
 <template id="tpl-ui-select">
-  <div class="ui-select" ref="root" :class="{ 'ui-select--open': open, 'ui-select--disabled': disabled }">
-    <button class="ui-select__btn" @click="toggleOpen" @keydown.stop="onKeydown" type="button" :disabled="disabled" :aria-expanded="open ? 'true' : 'false'" aria-haspopup="listbox">
+  <div
+    class="ui-select"
+    ref="root"
+    :class="{ 'ui-select--open': open, 'ui-select--disabled': disabled }"
+  >
+    <button
+      class="ui-select__btn"
+      @click="toggleOpen"
+      @keydown.stop="onKeydown"
+      type="button"
+      :disabled="disabled"
+      :aria-expanded="open ? 'true' : 'false'"
+      aria-haspopup="listbox"
+    >
       <span class="ui-select__label">{{ currentLabel }}</span>
       <ui-icon name="down" :size="12" class="ui-select__arrow"></ui-icon>
     </button>
     <div v-if="open" class="ui-select__dropdown" role="listbox">
       <!-- 过滤输入框（filterable 时显示）：下拉内筛选，点击不冒泡关闭 -->
       <div v-if="filterable" class="ui-select__filter" @click.stop>
-        <ui-icon name="search" :size="12" class="ui-select__filter-icon"></ui-icon>
+        <ui-icon
+          name="search"
+          :size="12"
+          class="ui-select__filter-icon"
+        ></ui-icon>
         <input
           v-model="filter"
           class="ui-select__filter-input"
@@ -25,8 +41,15 @@
         :aria-selected="modelValue === opt.value ? 'true' : 'false'"
         @click="selectOption(opt)"
         @mouseenter="activeIdx = idx"
-      >{{ opt.label }}</div>
-      <div v-if="filterable && filteredOptions.length === 0" class="ui-select__empty">无匹配选项</div>
+      >
+        {{ opt.label }}
+      </div>
+      <div
+        v-if="filterable && filteredOptions.length === 0"
+        class="ui-select__empty"
+      >
+        无匹配选项
+      </div>
     </div>
   </div>
 </template>
