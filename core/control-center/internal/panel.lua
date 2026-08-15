@@ -31,7 +31,7 @@ local logger = HSUtil.log.new("ControlCenter.panel")
 -- ============================================================
 local view = nil         -- HSUtil.webview 单例(惰性:首次 open 创建,内部 webview 首次 show 创建)
 local aggregateUrl = nil -- 聚合页 URL(setup 注入;showAggregate 与 shim 的目标)
-local size = { widthRatio = 0.52, heightRatio = 0.62, yRatio = 0.22 }  -- 同 launcher panel
+local size = { widthRatio = 0.7, heightRatio = 0.78, yRatio = 0.1 }  -- 聚合配置页专用：大面板（宽 70% 高 78%）
 local shimTimer = nil    -- 导航完成轻轮询
 local shimmedUrl = nil   -- 已注入 shim 的文档 URL(每文档只注入一次)
 
@@ -59,9 +59,9 @@ local SHIM_JS_TMPL = [[
 --- ControlCenter.panel.setup(opts)
 --- 可选初始化(首次 open 前调用):
 ---   opts.aggregateUrl      聚合配置页 URL(showAggregate 与返回 shim 的目标;必填)
----   opts.widthRatio        面板宽/目标屏宽 比例,默认 0.52(同 launcher panel)
----   opts.heightRatio       面板高/目标屏高 比例,默认 0.62
----   opts.yRatio            垂直位置(屏高比例),默认 0.22
+---   opts.widthRatio        面板宽/目标屏宽 比例,默认 0.7(聚合页大面板)
+---   opts.heightRatio       面板高/目标屏高 比例,默认 0.78
+---   opts.yRatio            垂直位置(屏高比例),默认 0.1
 ---   opts.logger            可选日志器
 function panel.setup(opts)
     opts = opts or {}

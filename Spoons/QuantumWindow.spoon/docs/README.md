@@ -13,7 +13,7 @@ qw:start()
 ## 功能与默认热键
 
 | 功能 | 默认热键 | 说明 |
-|------|----------|------|
+| ------ | ---------- | ------ |
 | 左/右/上/下半屏 | `Ctrl+Opt+Cmd+←/→/↑/↓` | 当前窗口按方向半屏摆放 |
 | 移到上一个/下一个 Space | `Ctrl+Cmd+←/→` | 基于内置 hs.spaces |
 | 移到上方/下方显示器 | `Ctrl+Cmd+↑/↓` | 多显示器场景 |
@@ -38,7 +38,7 @@ config.center  = { hotkey = { { "ctrl", "alt", "cmd" }, "C" }, width = 800, heig
 - `init.lua`（装配/API）→ `internal/`：`window.lua`（窗口工具）、`split.lua`、`spaces.lua`、
   `fullscreen.lua`、`center.lua`、`notify.lua`（HUD）、`api.lua`（HTTP 路由）、`config.lua`
 - 零第三方依赖；`hs.window.animationDuration = 0` 消除窗口动画延迟
-- Launcher 集成：`launcher-commands.lua` 提供「窗口管理」配置页卡片
+- 控制中心集成：`launcher-commands.lua` 提供「窗口管理」配置页入口（菜单栏 🛠 → 控制中心）
 
 ## 测试
 

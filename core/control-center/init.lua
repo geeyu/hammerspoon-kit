@@ -2,15 +2,16 @@
 ---
 --- 统一菜单栏控制中心：常驻菜单栏按钮（🛠，每次打开菜单重建）+ 聚合配置页
 --- （webview 卡片网格，复用 HSUtil.webview / UI 组件库）。
---- 数据源只读复用 launcher-commands.lua 协议（internal/sources.lua，绝不写
---- launcher cfg/registry）；配置面板为单例（internal/panel.lua，setUrl 切换）；
---- HTTP 路由挂在 HSUtil 共享 server（internal/api.lua，/control-center/api/*）。
+--- 数据源只读复用各 Spoon 的 launcher-commands.lua 协议（internal/sources.lua，
+--- 扫描 Spoons/*.spoon 与 core/*/，绝不写任何配置）；配置面板为单例
+--- （internal/panel.lua，setUrl 切换）；HTTP 路由挂在 HSUtil 共享 server
+--- （internal/api.lua，/control-center/api/*）。
 ---
 --- 使用（框架层）：
 ---   require("core.control-center")   -- 自启：菜单栏按钮即现，无需显式 start()
 ---
---- 零侵入：只新增本目录 + 根 init.lua 一行 require；不写 launcher cfg/registry、
----         不挂多余路由、不改 hsutil/launcher/Spoons 任何既有文件。
+--- 零侵入：只新增本目录 + 根 init.lua 一行 require；不写任何既有模块的
+---         配置、不挂多余路由、不改 hsutil/Spoons 任何既有文件。
 --- ============================================================
 
 local obj = {}
@@ -29,7 +30,7 @@ end
 local modulePath = script_path()
 local loadMod = function(n) return dofile(modulePath .. "internal/" .. n) end
 
--- 加载各层（与 launcher 装配风格一致，按目录 dofile 兄弟模块）
+-- 加载各层（按目录 dofile 兄弟模块）
 local sources = loadMod("sources.lua")   -- 只读数据源（scan/get）
 local panel   = loadMod("panel.lua")     -- 配置面板单例（open/hide，惰性创建）
 local api     = loadMod("api.lua")       -- HTTP 路由（providers/open/close + 静态）

@@ -1,7 +1,7 @@
 # Hammerspoon Kit
 
 > 基于 [Hammerspoon](https://www.hammerspoon.org/) 的开源 macOS 桌面工具包：
-> **窗口管理 · 剪贴板历史 · 防睡眠**，外加一个 Raycast 式命令中枢（Launcher）。
+> **窗口管理 · 剪贴板历史 · 防睡眠 · 应用显隐 · Bing 壁纸**，统一菜单栏控制中心一键管理。
 
 由个人配置沉淀而来，遵循 Spoon 生态规范，克隆即用。
 
@@ -18,7 +18,7 @@
 | 🌙 防睡眠 | 菜单栏防睡眠：永久 / 1-24 小时 / 5-90 分钟 / 直到指定时间（允许息屏或屏幕常亮） | StayAwake |
 | 🔄 应用显隐 | 任意应用一键显隐（全局热键 + 按屏布局锁定 + 全屏接管，带管理页） | AppToggle |
 | 🖼️ Bing 壁纸 | Bing 每日壁纸（自动轮询 + 一键应用/随机 + 历史浏览 + 下载记录） | BingDaily |
-| 🚀 启动器 | Option+Space 命令中枢（启动应用/计算器/截屏/URL/书签，支持自定义命令，自动发现各 Spoon 功能卡片） | Launcher |
+| 🛠 控制中心 | 菜单栏一键管理：下拉直达各组件配置，聚合配置页统一入口 | ControlCenter |
 
 ## ⌨️ 快捷键速查表
 
@@ -35,7 +35,7 @@
 | `Ctrl` + `Opt` + `Cmd` + `M` | 当前 Space 内**铺满**（再次按还原原尺寸） |
 | `Ctrl` + `Opt` + `Cmd` + `C` | **居中** + 绝对尺寸（默认 800×600，可配） |
 | `Ctrl` + `V` | **剪贴板历史**面板（输入即搜索；**→/←** 开启/取消右侧预览；Enter 粘贴，Esc 关） |
-| `Option` + `Space` | **Launcher** 命令中枢（应用/计算器/截屏/URL/书签/自定义命令 + 各 Spoon 功能卡片） |
+| 菜单栏 🛠 | **控制中心**：下拉各组件配置入口，点「打开控制中心」进聚合配置页 |
 | `Cmd` + `Opt` + `Ctrl` + `R` | 重载 Hammerspoon 配置 |
 
 > QuantumWindow 各窗口操作执行时会在屏幕中央弹出 **HUD**，同时显示「按键 + 动作」，如 `⌃⌥⌘→ 右半屏`。
@@ -71,7 +71,7 @@ ln -s ~/path/to/hammerspoon-kit/Spoons ~/.hammerspoon/Spoons
 
 | 测试 | 命令 | 环境 |
 | ------ | ------ | ------ |
-| Launcher 单元测试 | `lua5.4 core/launcher/test/unit_test.lua` | 纯 Lua，无需 Hammerspoon |
+| ControlCenter 单元测试 | `lua5.5 core/control-center/test/unit_test.lua` | 纯 Lua，无需 Hammerspoon |
 | QuantumWindow | `hs -c "dofile('$HOME/.hammerspoon/Spoons/QuantumWindow.spoon/test/run.lua')"` | Hammerspoon 运行中 |
 | StayAwake | `hs -c "dofile('$HOME/.hammerspoon/Spoons/StayAwake.spoon/test/run.lua')"` | Hammerspoon 运行中 |
 | Clipboard 前端（历史面板） | `node Spoons/Clipboard.spoon/test/headless-panel-test.js` | 需 Microsoft Edge |
@@ -81,10 +81,10 @@ ln -s ~/path/to/hammerspoon-kit/Spoons ~/.hammerspoon/Spoons
 
 ```
 hammerspoon-kit/
-├── init.lua                  # 入口：加载核心框架与三个 Spoon
+├── init.lua                  # 入口：加载核心框架与各 Spoon
 ├── core/
 │   ├── hsutil/               # 核心框架：HTTP 网关 + SQLite ORM + webview + UI 组件库 + Spoon 脚手架模板
-│   └── launcher/             # 命令中枢（Option+Space，Vue3 面板）
+│   └── control-center/       # 统一菜单栏控制中心（菜单栏 🛠 + 聚合配置页）
 ├── Spoons/
 │   ├── QuantumWindow.spoon/  # 窗口管理（init.lua + internal/ 分层 + launcher-commands.lua）
 │   ├── Clipboard.spoon/      # 剪贴板历史（SQLite + chooser 面板 + webview 预览）
@@ -102,7 +102,7 @@ hammerspoon-kit/
 
 - **Spoon 封装**：功能全部收敛进 `Spoons/*.spoon/`，根目录只留装载入口，便于分发与跨机复用。
 - **核心框架（core/hsutil）**：共享 HTTP 网关（各 Spoon 通过 `HS.http.app` 挂路由）、SQLite ORM、webview 面板工具与 Vue3 UI 组件库；`core/hsutil/template/tool.spoon` 提供新 Spoon 脚手架。
-- **命令中枢（core/launcher）**：与 Spoon 通过 `launcher-commands.lua` 协议解耦——任何 Spoon 放一个 `launcher-commands.lua` 即可向 Launcher 提供功能卡片/命令，无需改动 Launcher 本体。
+- **统一控制中心（core/control-center）**：菜单栏 🛠 常驻按钮 + 聚合配置页；通过 `launcher-commands.lua` 协议只读扫描各 Spoon 配置入口，零侵入聚合管理。
 - **零第三方依赖**：不依赖任何第三方 spoon；Space 操作基于内置 `hs.spaces`。
 
 ## 📦 数据与配置

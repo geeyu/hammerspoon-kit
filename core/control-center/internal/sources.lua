@@ -1,8 +1,8 @@
 --- ControlCenter.internal.sources
 --- 只读数据源：扫描 Spoons/*.spoon/ 与 core/*/ 下的 launcher-commands.lua，
---- 复用 Launcher「Spoon 接入协议」（core/launcher/README.md）。
+--- 复用 Spoon 统一接入协议（各 Spoon 根目录的 launcher-commands.lua）。
 ---
---- 与 launcher 的 registry.scanCommandDirs 完全一致的目录发现方式：
+--- 目录发现方式（与 launcher 时代的 registry.scanCommandDirs 一致）：
 ---   * 遍历给定目录的一级子目录（dirs 默认 hs.configdir/Spoons + hs.configdir/core）
 ---   * hs.fs.dir 返回 (iteratorFn, dirUserdata) 两个值，dirUserdata 是 for 循环的 state——
 ---     必须直接 `for entry in hs.fs.dir(dir)`（先 pcall 取第一个返回值再迭代会丢掉
@@ -10,8 +10,8 @@
 ---   * 每目录 pcall 防单目录失败
 ---
 --- 只提取 manifest 的 name/cards/pages（含 config_pages 老字段兼容），页面 URL 按
---- launcher 相同规则归一化（值不含 "/" 时推断为 /<modName>/view/pages/<值>/index.html）。
---- 绝不写 launcher 的 cfg/registry、不注册任何路由、不改任何既有文件（只读零侵入）。
+--- 统一规则归一化（值不含 "/" 时推断为 /<modName>/view/pages/<值>/index.html）。
+--- 绝不写任何模块的配置、不注册任何路由、不改任何既有文件（只读零侵入）。
 ---
 --- 对外：
 ---   sources.scan()  -> [{ name, icon?, cards={key,description,icon,kind,url?}, pages={name,icon,configUrl?,searchUrl?} }]

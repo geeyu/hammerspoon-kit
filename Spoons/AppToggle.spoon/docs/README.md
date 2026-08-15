@@ -16,7 +16,7 @@ hs.loadSpoon("AppToggle"):start()
 
 管理页面（应用增删改 / 热键录制 / 测试 / 布局管理）：
 
-1. Launcher → "应用显隐" 卡片
+1. 菜单栏 🛠 → 控制中心 → 应用显隐
 2. 或直调 `hs.loadSpoon("AppToggle"):showManager()`
 
 ## 管理页功能

@@ -115,15 +115,15 @@ local function addProvider(fsRoot, relDir, manifestLua)
 end
 
 -- =========================================================
--- A.1 真实仓库布局镜像:5 个 Spoon + core/{hsutil,launcher/template}
---    (与 launcher 实际合并结果一致:5 个提供者;template 在 core/*/ 二层,
---      与 launcher 一样不会被一级扫描发现,且其 cards 为空,无可见贡献)
+-- A.1 真实仓库布局镜像:5 个 Spoon + core 下非提供者目录
+--    (与 sources.scan 行为一致:5 个提供者;core/*/ 二层目录
+--      不会被一级扫描发现,且其 cards 为空,无可见贡献)
 -- =========================================================
 local tmpRoot = os.tmpname()
 os.remove(tmpRoot)
 mkdir(tmpRoot .. "/Spoons")
 mkdir(tmpRoot .. "/core/hsutil")
-mkdir(tmpRoot .. "/core/launcher/template")
+mkdir(tmpRoot .. "/core/some-module/template")
 -- 5 个 Spoon(manifest 内容与仓库真实文件一致)
 addProvider(tmpRoot, "Spoons/AppToggle.spoon", [[
 return {
@@ -185,9 +185,9 @@ writeFile(tmpRoot .. "/Spoons/.DS_Store", "")
 _mockFS.files[tmpRoot .. "/Spoons/.DS_Store"] = true
 _mockFS.dirs[tmpRoot .. "/Spoons/NotASpoon"] = {}
 _mockFS.dirs[tmpRoot .. "/core/hsutil"] = {}
-_mockFS.dirs[tmpRoot .. "/core/launcher"] = { "template" }
-_mockFS.dirs[tmpRoot .. "/core/launcher/template"] = {}
-addProvider(tmpRoot, "core/launcher/template", [[
+_mockFS.dirs[tmpRoot .. "/core/some-module"] = { "template" }
+_mockFS.dirs[tmpRoot .. "/core/some-module/template"] = {}
+addProvider(tmpRoot, "core/some-module/template", [[
 -- 模板:cards 全注释(空贡献),且位于 core/*/ 二层不会被一级扫描发现
 return {
     name = "myspoon",
@@ -196,7 +196,7 @@ return {
 ]])
 -- 顶层目录表
 _mockFS.dirs[tmpRoot .. "/Spoons"] = { "AppToggle.spoon", "BingDaily.spoon", "Clipboard.spoon", ".DS_Store", "NotASpoon", "QuantumWindow.spoon", "StayAwake.spoon" }
-_mockFS.dirs[tmpRoot .. "/core"] = { "hsutil", "launcher" }
+_mockFS.dirs[tmpRoot .. "/core"] = { "hsutil", "some-module" }
 
 -- 默认扫描(hs.configdir 指向 tmpRoot,走 scan() 无参默认目录)
 hs.configdir = tmpRoot
@@ -206,7 +206,7 @@ check("A1 默认扫描返回 5 个提供者", #listA == 5, tostring(#listA))
 check("A2 提供者名齐全", findProv(listA, "apptoggle") ~= nil and findProv(listA, "bingdaily") ~= nil
     and findProv(listA, "clipboard") ~= nil and findProv(listA, "quantumwindow") ~= nil
     and findProv(listA, "stayawake") ~= nil)
-check("A3 core/launcher/template 未被扫描（二层，与 launcher 一致）", findProv(listA, "myspoon") == nil)
+check("A3 core 二层模块未被扫描（template 在二层）", findProv(listA, "myspoon") == nil)
 
 -- AppToggle:卡片 + 页面 URL 简写推断
 local at = findProv(listA, "apptoggle")
@@ -459,8 +459,8 @@ do
     local ok = panel.open(P1)
     check("D1 open 返回 true", ok == true)
     check("D2 单例以首载 url 创建", #M.created == 1 and M.created[1].url == P1)
-    check("D3 尺寸比例同 launcher(0.52/0.62/0.22)",
-        M.created[1].widthRatio == 0.52 and M.created[1].heightRatio == 0.62 and M.created[1].yRatio == 0.22)
+    check("D3 尺寸比例(0.7/0.78/0.1)",
+        M.created[1].widthRatio == 0.7 and M.created[1].heightRatio == 0.78 and M.created[1].yRatio == 0.1)
     check("D4 首次 show 后底层 webview 已建且指向首载 url",
         M.view:raw() ~= nil and M.view:raw():url() == P1)
     check("D5 面板可见", panel.visible() == true)

@@ -3,7 +3,7 @@
 ----
 --- 组成（统一风格）：
 ---   * core/hsutil         核心框架（HTTP 网关 + SQLite ORM + UI 组件库）
----   * core/launcher       命令中枢（Option+Space）
+---   * core/control-center 统一菜单栏控制中心（聚合配置页）
 ---   * QuantumWindow.spoon 窗口管理（带 HUD）
 ---   * Clipboard.spoon     剪贴板历史（Ctrl+V）
 ---   * StayAwake.spoon     菜单栏防睡眠
@@ -27,10 +27,8 @@ if not HS.http.app:port() or HS.http.app:port() == 0 then
         "HTTP server 启动失败：端口 %d 可能被占用，请重载 Hammerspoon 配置", HS.http.PORT)
 end
 
--- 框架层：Launcher 命令中枢（core/launcher）
+-- 框架层：统一菜单栏控制中心（core/control-center，菜单栏 🛠 → 聚合配置页）
 package.path = package.path .. ";" .. hs.configdir .. "/?.lua;" .. hs.configdir .. "/?/init.lua"
-local launcher = require("core.launcher")
-launcher:start()
 require("core.control-center")
 
 -- QuantumWindow：窗口管理（分屏/Space/跨屏/铺满/居中 + HUD）
