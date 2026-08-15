@@ -74,7 +74,10 @@ end
 function spaces.moveScreen(win, direction)
     win = win or hs.window.focusedWindow()
     if not win then return false, "无聚焦窗口" end
-    windowTool.moveToScreen(win, direction)
+    local ok = windowTool.moveToScreen(win, direction)
+    if not ok then
+        return false, "该方向没有显示器"
+    end
     return true
 end
 

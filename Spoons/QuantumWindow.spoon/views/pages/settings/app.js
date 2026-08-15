@@ -24,13 +24,26 @@ createApp({
       }
     }
 
+    // 规范化热键串：mods 排序 + 主键小写。
+    // hs.hotkey 对修饰键顺序与主键大小写不敏感（"ctrl+shift+v" ≡ "shift+ctrl+v" ≡ "ctrl+shift+V"），
+    // 字符串直接比较会漏判冲突 → 后端绑定后者覆盖前者、功能静默失效
+    function normHotkey(s) {
+      if (!s) return '';
+      const parts = String(s).split('+');
+      const key = (parts.pop() || '').toLowerCase();
+      const MODS_ORDER = { ctrl: 0, alt: 1, cmd: 2, shift: 3 };
+      parts.sort(function (a, b) { return (MODS_ORDER[a] ?? 9) - (MODS_ORDER[b] ?? 9); });
+      return parts.join('+') + '+' + key;
+    }
+
     // 冲突校验：同一快捷键被多个「启用中」功能使用 → 返回 [先者, 后者]
     function findConflict() {
       const map = {};
       for (const a of state.actions.value) {
         if (!a.enabled || !a.hotkey) continue;
-        if (map[a.hotkey]) return [map[a.hotkey], a];
-        map[a.hotkey] = a;
+        const nk = normHotkey(a.hotkey);
+        if (map[nk]) return [map[nk], a];
+        map[nk] = a;
       }
       return null;
     }

@@ -57,6 +57,19 @@
       </div>
       <ui-switch v-model="form.recordImages" />
     </div>
+
+    <!-- 面板尺寸（宽/高占屏幕比例 + 垂直位置；保存后即时生效） -->
+    <div class="setting-row">
+      <div class="setting-label">
+        <div class="setting-name">面板尺寸</div>
+        <div class="setting-desc">宽/高按鼠标所在屏幕的比例；位置 0=贴顶 50=居中</div>
+      </div>
+      <div class="setting-controls">
+        <ui-input v-model="form.panelWidth" type="number" placeholder="宽 %" class="setting-control-sm" />
+        <ui-input v-model="form.panelHeight" type="number" placeholder="高 %" class="setting-control-sm" />
+        <ui-input v-model="form.panelPos" type="number" placeholder="位置 %" class="setting-control-sm" />
+      </div>
+    </div>
     </div><!-- /ctrl-body -->
 
     <div class="page-actions">

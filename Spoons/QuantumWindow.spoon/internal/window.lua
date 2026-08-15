@@ -32,12 +32,15 @@ function window.centerAbsolute(win, w, h)
 end
 
 --- 把窗口移到指定方向的另一块显示器
+--- @return boolean 是否真的移动了（无相邻显示器时 moveOneScreen* 返回 nil）
 function window.moveToScreen(win, direction)
-    if not win then return end
-    if direction == "north" then win:moveOneScreenNorth() end
-    if direction == "south" then win:moveOneScreenSouth() end
-    if direction == "east"  then win:moveOneScreenEast()  end
-    if direction == "west"  then win:moveOneScreenWest()  end
+    if not win then return false end
+    local ok
+    if direction == "north" then ok = win:moveOneScreenNorth() end
+    if direction == "south" then ok = win:moveOneScreenSouth() end
+    if direction == "east"  then ok = win:moveOneScreenEast()  end
+    if direction == "west"  then ok = win:moveOneScreenWest()  end
+    return ok ~= nil and ok ~= false
 end
 
 return window

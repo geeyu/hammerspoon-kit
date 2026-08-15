@@ -18,6 +18,12 @@ require("hs.ipc")
 local HS = require("core.hsutil")
 -- 启动共享 HTTP server（各 Spoon 通过 HS.http.app 挂路由）
 HS.http.app:start()
+-- 端口启动检测：异常 reload（旧 server 未及时释放）时 hs.httpserver 绑定失败是静默的，
+-- 前端全部 404。绑定失败时 getPort 返回 0/nil，显式告警便于排查
+if not HS.http.app:port() or HS.http.app:port() == 0 then
+    hs.logger.new("HSUtil", "error"):e(
+        "HTTP server 启动失败：端口 %d 可能被占用，请重载 Hammerspoon 配置", HS.http.PORT)
+end
 
 -- 框架层：Launcher 命令中枢（core/launcher）
 package.path = package.path .. ";" .. hs.configdir .. "/?.lua;" .. hs.configdir .. "/?/init.lua"

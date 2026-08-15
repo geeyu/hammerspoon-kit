@@ -18,19 +18,26 @@ function fullscreen.toggle(win)
     end
 
     local current = win:frame()
+    -- 还原判定以 prevFrames 记录为准（权威），不再依赖尺寸近似比较：
+    -- maximize 后的窗口尺寸 ≠ 全屏 frame（菜单栏/Dock 占位，差 >2px 很常见），
+    -- 原 isMaxed 比较在 Dock 可见时恒为 false → 第二次按键重复铺满、永远无法还原
+    local prev = prevFrames[wid]
+    if prev then
+        prevFrames[wid] = nil
+        win:setFrame(prev)
+        return true
+    end
+
     local isMaxed = math.abs(current.w - screenFrame.w) < 2
         and math.abs(current.h - screenFrame.h) < 2
-
     if isMaxed then
-        -- 已铺满 -> 还原
-        local prev = prevFrames[wid]
-        if prev then win:setFrame(prev) end
-        prevFrames[wid] = nil
-    else
-        -- 记录当前，再铺满
-        prevFrames[wid] = current
-        win:maximize(0)  -- 0 = 关闭动画
+        -- 外部铺满且无记录：无可还原，保持现状
+        return true
     end
+
+    -- 记录当前，再铺满
+    prevFrames[wid] = current
+    win:maximize(0)  -- 0 = 关闭动画
     return true
 end
 

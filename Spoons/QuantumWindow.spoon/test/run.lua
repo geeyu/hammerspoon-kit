@@ -29,5 +29,6 @@ spoonDir = testDir .. "/.."
 
 dofile(testDir .. "/config_test.lua")
 dofile(testDir .. "/actions_test.lua")
+dofile(testDir .. "/notify_test.lua")
 
 print(string.format("\n结果：%d 通过，%d 失败", results.pass, results.fail))

@@ -184,7 +184,10 @@ const LauncherStore = {
       // 复位（reset 调用）：清输入/结果/关键词/loading + 回主页网格
       resetState() {
         clearTimeout(_timer);
-        _seq = 0;
+        // 不能归零 _seq：面板重开时在途的旧请求可能仍持有旧序号，
+        // 归零会让新请求序号与旧请求撞号（旧响应蒙混过关覆盖新数据）。
+        // 递增使任何新请求的序号必然大于全部在途旧请求，旧响应全部被丢弃。
+        _seq++;
         state.query.value = "";
         state.items.value = [];
         state.terms.value = "";

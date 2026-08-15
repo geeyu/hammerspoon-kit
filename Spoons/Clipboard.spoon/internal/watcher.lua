@@ -48,6 +48,9 @@ function watcher.start()
     -- 容量兑底：与 max_entries 对齐（正常时 _push 内存裁剪已同步删 DB，
     -- 此处防历史遗留/配置调小后首次启动的存量超标）
     store.trim(cfg.max_entries or 300)
+    -- trim 删库后内存缓存 entries 仍含已删行（僵尸条目：面板显示、confirm/star 404），
+    -- 必须重载。原实现 reload 在 trim 之前，顺序颠倒
+    watcher.reload()
     -- 每日清理
     if not purgeTimer then
         purgeTimer = hs.timer.doEvery(24 * 60 * 60, function()
@@ -208,7 +211,9 @@ function watcher.captureCurrent()
     if isImage and not (cfg and cfg.text_only) then
         local img = hs.pasteboard.readImage()
         if img then
-            local ok, b64 = pcall(function() return img:encodeAsURLString("png") end)
+            -- 签名 encodeAsURLString([scale], [type])：显式 (false, "png")，
+            -- 传 "png" 会被当 truthy scale（Retina 图片被降采样）
+            local ok, b64 = pcall(function() return img:encodeAsURLString(false, "png") end)
             if ok and b64 and b64 ~= "" then
                 watcher._push(b64, "image")
                 return

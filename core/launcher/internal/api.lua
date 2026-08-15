@@ -20,7 +20,9 @@ local function rowToJSON(r)
     local out = {}
     for k, v in pairs(r) do
         if k == "image" then
-            local ok, uri = pcall(function() return v:encodeAsURLString("png") end)
+            -- 签名 encodeAsURLString([scale], [type])：第一个参数是 scale(boolean)，
+            -- 传 "png" 会被当 truthy scale（Retina 图标被降采样），显式 (false, "png")
+            local ok, uri = pcall(function() return v:encodeAsURLString(false, "png") end)
             if ok and uri and uri ~= "" then out.image = uri end
         elseif type(v) ~= "function" and k ~= "cmd" then
             out[k] = v

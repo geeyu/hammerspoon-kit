@@ -5,7 +5,7 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
+const { execSync, spawn } = require('child_process');
 
 const SPOON = __dirname + '/..';
 const EDGE = '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge';
@@ -107,14 +107,33 @@ setTimeout(async function(){
 </script>`;
 fs.writeFileSync('/tmp/panel-selftest.html', html);
 
-const dump = execSync(
-  `${JSON.stringify(EDGE)} --headless --disable-gpu --no-sandbox --virtual-time-budget=6000 --dump-dom file:///tmp/panel-selftest.html 2>/dev/null`,
-  { encoding: 'utf8', maxBuffer: 50 * 1024 * 1024 });
-const m = dump.match(/<pre id="res">([\s\S]*?)<\/pre>/);
-if (!m) { console.error('无结果'); process.exit(2); }
-const R = JSON.parse(m[1].replace(/^RES=/,''));
-console.log('====== Headless 前端自测 ======');
-console.log(JSON.stringify(R, null, 2));
-const pass = R.firstItems>0 && R.img>=1 && R.paginationWorked && R.searchWorked;
-console.log(pass ? '\n✔ 通过' : '\n✘ 未通过');
-process.exit(pass?0:1);
+// Headless Edge dump：spawn + 读到 </html> 即杀（Edge 的 updater/GPU 子进程常使进程不退出，
+// execSync 会挂死；--disable-crashpad/--user-data-dir 规避沙箱权限与 profile 锁）
+const EDGE_ARGS = ['--headless', '--disable-gpu', '--no-sandbox', '--disable-crashpad',
+  '--no-first-run', '--user-data-dir=/tmp/hs-edge-profile', '--virtual-time-budget=6000',
+  '--dump-dom', 'file:///tmp/panel-selftest.html'];
+function edgeDump() {
+  return new Promise(function (resolve, reject) {
+    const child = spawn(EDGE, EDGE_ARGS, { stdio: ['ignore', 'pipe', 'ignore'] });
+    let out = '';
+    const timer = setTimeout(function () { child.kill('SIGKILL'); }, 30000);
+    child.stdout.on('data', function (d) {
+      out += d;
+      if (out.indexOf('</html>') >= 0) { clearTimeout(timer); child.kill('SIGKILL'); }
+    });
+    child.on('error', reject);
+    child.on('close', function () { clearTimeout(timer); resolve(out); });
+  });
+}
+
+(async function () {
+  const dump = await edgeDump();
+  const m = dump.match(/<pre id="res">([\s\S]*?)<\/pre>/);
+  if (!m) { console.error('无结果'); process.exit(2); }
+  const R = JSON.parse(m[1].replace(/^RES=/,''));
+  console.log('====== Headless 前端自测 ======');
+  console.log(JSON.stringify(R, null, 2));
+  const pass = R.firstItems>0 && R.img>=1 && R.paginationWorked && R.searchWorked;
+  console.log(pass ? '\n✔ 通过' : '\n✘ 未通过');
+  process.exit(pass?0:1);
+})();

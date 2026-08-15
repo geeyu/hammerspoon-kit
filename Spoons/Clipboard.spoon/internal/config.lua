@@ -19,6 +19,14 @@ local defaults = {
     enable_search = true,
     -- 面板可视行数
     visible_rows = 8,
+    -- 面板尺寸（屏幕比例；设置页可改）：
+    --   widthRatio/heightRatio 按「目标屏幕」（默认鼠标所在屏）计算
+    --   yRatio 垂直位置：0=贴顶，0.5=居中
+    panel = {
+        widthRatio  = 0.52,
+        heightRatio = 0.62,
+        yRatio      = 0.22,
+    },
     -- 数据库文件名
     db_file = "history.db",
 }
@@ -28,33 +36,12 @@ local data_dir = HSUtil.path.dataDir() .. "/" .. defaults.pkg
 local settings_file = data_dir .. "/settings.json"
 
 -- 可编辑白名单（settings 页暴露的项）
-local editable_keys = { "hotkey_show", "max_entries", "retain_days", "text_only" }
+local editable_keys = { "hotkey_show", "max_entries", "retain_days", "text_only", "panel" }
 
 local config = {}
 
 -- =====================================================================
--- 加载/合并
--- =====================================================================
-
-for k, v in pairs(defaults) do config[k] = v end
-config.data_dir = data_dir
-
---- 从 settings.json 合并覆盖（不存在则跳过）
---- @param file string|nil 覆盖文件路径（测试用）
-function config.loadOverrides(file)
-    file = file or settings_file
-    local f = io.open(file, "rb")
-    local raw = f and HSUtil.json.tryDecode(f:read("*a"), nil) or nil
-    if f then f:close() end
-    if type(raw) ~= "table" then return end
-    for _, k in ipairs(editable_keys) do
-        if raw[k] ~= nil then config[k] = raw[k] end
-    end
-end
-config.loadOverrides()
-
--- =====================================================================
--- 校验
+-- 校验（loadOverrides 与 update 共用同一套 sanitize）
 -- =====================================================================
 
 local MOD_WHITELIST = { ctrl = true, alt = true, cmd = true, shift = true }
@@ -84,14 +71,58 @@ local function sanitizeInt(v, name, min, max)
     return n
 end
 
+--- 校验并归一化面板尺寸 {widthRatio, heightRatio, yRatio}
+local function sanitizePanel(v)
+    if type(v) ~= "table" then return nil, "panel 需为 table" end
+    local function ratio(x, name, minv, maxv)
+        local n = tonumber(x)
+        if not n or n < minv or n > maxv then
+            return nil, name .. " 需为 " .. minv .. "~" .. maxv .. " 的数值"
+        end
+        return n
+    end
+    local w, e1 = ratio(v.widthRatio, "widthRatio", 0.3, 0.95)
+    if not w then return nil, e1 end
+    local h, e2 = ratio(v.heightRatio, "heightRatio", 0.3, 0.95)
+    if not h then return nil, e2 end
+    local y, e3 = ratio(v.yRatio, "yRatio", 0, 0.95)
+    if not y then return nil, e3 end
+    return { widthRatio = w, heightRatio = h, yRatio = y }
+end
+
 --- 校验并归一化一个可编辑项；非法返回 nil + err
 local function sanitize(key, v)
     if key == "hotkey_show" then return sanitizeHotkey(v) end
     if key == "max_entries" then return sanitizeInt(v, "max_entries", 50, 5000) end
     if key == "retain_days" then return sanitizeInt(v, "retain_days", 1, 365) end
     if key == "text_only" then return v and true or false end
+    if key == "panel" then return sanitizePanel(v) end
     return nil, "未知配置项: " .. tostring(key)
 end
+
+-- =====================================================================
+-- 加载/合并
+-- =====================================================================
+
+for k, v in pairs(defaults) do config[k] = v end
+config.data_dir = data_dir
+
+--- 从 settings.json 合并覆盖（不存在则跳过）
+--- 注意：与 update 一样过 sanitize——手改坏 settings.json（如 hotkey_show 结构非法）
+--- 会导致 rebindHotkey 里 hs.hotkey.new 抛错、启动崩溃；非法项丢弃回退默认
+--- @param file string|nil 覆盖文件路径（测试用）
+function config.loadOverrides(file)
+    file = file or settings_file
+    local f = io.open(file, "rb")
+    local raw = f and HSUtil.json.tryDecode(f:read("*a"), nil) or nil
+    if f then f:close() end
+    if type(raw) ~= "table" then return end
+    for _, k in ipairs(editable_keys) do
+        local val, err = sanitize(k, raw[k])
+        if val ~= nil then config[k] = val end
+    end
+end
+config.loadOverrides()
 
 -- =====================================================================
 -- 对外 API
@@ -104,6 +135,7 @@ function config.editable()
         max_entries = config.max_entries,
         retain_days = config.retain_days,
         text_only = config.text_only,
+        panel = config.panel,
     }
 end
 

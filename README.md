@@ -72,7 +72,8 @@ ln -s ~/path/to/hammerspoon-kit/Spoons ~/.hammerspoon/Spoons
 | Launcher 单元测试 | `lua5.4 core/launcher/test/unit_test.lua` | 纯 Lua，无需 Hammerspoon |
 | QuantumWindow | `hs -c "dofile('$HOME/.hammerspoon/Spoons/QuantumWindow.spoon/test/run.lua')"` | Hammerspoon 运行中 |
 | StayAwake | `hs -c "dofile('$HOME/.hammerspoon/Spoons/StayAwake.spoon/test/run.lua')"` | Hammerspoon 运行中 |
-| Clipboard 前端 | `node Spoons/Clipboard.spoon/test/headless-panel-test.js` | 需 Microsoft Edge |
+| Clipboard 前端（历史面板） | `node Spoons/Clipboard.spoon/test/headless-panel-test.js` | 需 Microsoft Edge |
+| Clipboard 前端（设置页） | `node Spoons/Clipboard.spoon/test/settings-panel-test.js` | 需 Microsoft Edge |
 
 ## 📁 目录结构
 

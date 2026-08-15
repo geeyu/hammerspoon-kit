@@ -32,14 +32,22 @@ local hstask = require("hs.task")
 --- @return hs.task object
 function task.run(cmd, args, onDone, timeoutSec)
     onDone = onDone or function() end
-    local t = hstask.new(cmd, function(exitCode, stdout, stderr)
+    -- 去重：timeout 触发后 terminate 会再走一次真实完成回调，
+    -- 若不加闸，onDone 会被调两次（副作用重复执行）
+    local finished = false
+    local function finish(stdout, stderr, exitCode)
+        if finished then return end
+        finished = true
         onDone(stdout or "", stderr or "", exitCode)
+    end
+    local t = hstask.new(cmd, function(exitCode, stdout, stderr)
+        finish(stdout, stderr, exitCode)
     end, args)
     if timeoutSec then
         hs.timer.doAfter(timeoutSec, function()
             if t:isRunning() then
                 pcall(function() t:terminate() end)
-                onDone("", "timeout", -1)
+                finish("", "timeout", -1)
             end
         end)
     end

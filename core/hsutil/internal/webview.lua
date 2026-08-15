@@ -8,8 +8,13 @@
 ---   local view = HSUtil.webview.new({
 ---       url = "...",                -- 首屏 URL（必填）
 ---       width = 560, height = 640,  -- 可选，默认主屏 52% x 62%
+---       widthRatio = 0.52,          -- 可选，按「目标屏幕」宽的比例（优先于 width）
+---       heightRatio = 0.62,         -- 可选，按「目标屏幕」高的比例（优先于 height）
 ---       yRatio = 0.22,              -- 可选，垂直位置（屏高比例），默认 0.22
 ---       level = ...,                -- 可选，默认 screenSaver
+---       screenFor = fn(),           -- 可选，返回目标屏幕（每次 show 调用）；
+---                                  --   缺省主屏。多屏场景让面板跟随鼠标/焦点屏幕
+---       repositionOnShow = true,    -- 可选，每次 show 按目标屏幕重算位置（屏幕布局变化不悬空）
 ---       resetJs = "QW.reload && QW.reload()",  -- 前端刷新钩子（可选）
 ---       resetOnShow = true,         -- true=每次 show 刷新（Launcher 模式）；
 ---                                  -- false=隐藏时刷新（Clipboard 模式，下次展示即最新）
@@ -19,6 +24,7 @@
 ---   })
 ---   view:show() / view:hide() / view:visible() / view:toggle()
 ---   view:reset()   -- 主动调前端 resetJs（隐藏态静默刷新等场景）
+---   view:resize({ widthRatio=, heightRatio=, yRatio= })  -- 动态调尺寸/位置（设置保存后即时生效）
 ---   view:teardown()  -- 销毁（stop 时）
 ---   view:raw()     -- 底层 hs.webview（需要原始对象时）
 local webview = {}
@@ -38,10 +44,14 @@ function webview.new(opts)
     local scr = hs.screen.mainScreen():frame()
     return setmetatable({
         _url = opts.url,
+        _widthRatio = opts.widthRatio,   -- 比例优先：按目标屏幕 frame 计算，天然适配副屏
+        _heightRatio = opts.heightRatio,
         _width = opts.width or math.floor(scr.w * 0.52),
         _height = opts.height or math.floor(scr.h * 0.62),
         _yRatio = opts.yRatio or 0.22,
         _level = opts.level or hs.drawing.windowLevels.screenSaver,
+        _screenFor = opts.screenFor,     -- function() -> hs.screen|nil（缺省主屏）
+        _repositionOnShow = opts.repositionOnShow == true,
         _resetJs = opts.resetJs,
         _resetOnShow = opts.resetOnShow ~= false,  -- 默认 show 时刷新
         _logger = opts.logger or hs.logger.new("HSUtil.webview", "info"),
@@ -55,16 +65,34 @@ function webview.new(opts)
     }, View)
 end
 
+--- 目标屏幕：注入函数优先（pcall 防注入函数抛错），退化主屏
+function View:_targetScreen()
+    if self._screenFor then
+        local ok, scr = pcall(self._screenFor)
+        if ok and scr then return scr end
+    end
+    return hs.screen.mainScreen()
+end
+
+--- 计算面板 frame（目标屏幕 + 比例/绝对尺寸 + 越界钳制）。
+--- 钳制保证任何屏幕尺寸下面板不越界（竖屏副屏/极小屏安全）。
+function View:_frame()
+    local scr = self:_targetScreen()
+    local f = scr and scr:frame() or hs.screen.mainScreen():frame()
+    local w = self._widthRatio and math.floor(f.w * self._widthRatio) or self._width
+    local h = self._heightRatio and math.floor(f.h * self._heightRatio) or self._height
+    w = math.min(w, math.floor(f.w))
+    h = math.min(h, math.floor(f.h))
+    local x = math.floor(f.x + (f.w - w) / 2)
+    local y = math.floor(f.y + (f.h - h) * self._yRatio)
+    return { x = x, y = y, w = w, h = h }
+end
+
 function View:_ensure()
     if self._wv then return self._wv end
 
-    local scr = hs.screen.mainScreen():frame()
-    local w, h = self._width, self._height
-    local wv = hs.webview.new({
-        x = math.floor(scr.x + (scr.w - w) / 2),
-        y = math.floor(scr.y + (scr.h - h) * self._yRatio),
-        w = w, h = h,
-    })
+    local fr = self:_frame()
+    local wv = hs.webview.new(fr)
     wv:darkMode(true)
     wv:transparent(true)      -- 圆角玻璃露出桌面
     wv:allowTextEntry(true)
@@ -115,6 +143,12 @@ function View:show()
     if not wv then
         hs.alert.show("无法创建面板")
         return false
+    end
+
+    -- repositionOnShow：每次呼出按目标屏幕重算位置（面板跟随鼠标/焦点屏幕，
+    -- 且拔外接屏/改分辨率后不悬空）。Launcher 模式不开此选项 → 位置保持首次创建值
+    if self._repositionOnShow then
+        pcall(function() wv:setFrame(self:_frame()) end)
     end
 
     -- 激活 Hammerspoon 进程：screenSaver level 下不激活进程，
@@ -177,6 +211,22 @@ end
 --- 主动刷新前端（隐藏态静默刷新等场景）
 function View:reset()
     self:_reset()
+end
+
+--- 动态调整面板尺寸/位置（设置保存后调用）。
+--- 支持比例或绝对尺寸；已创建则立即 setFrame 生效（面板开着也能看到变化）
+--- @param opts table {widthRatio=, heightRatio=, yRatio=, width=, height=}
+function View:resize(opts)
+    opts = opts or {}
+    if opts.widthRatio ~= nil then self._widthRatio = opts.widthRatio end
+    if opts.heightRatio ~= nil then self._heightRatio = opts.heightRatio end
+    if opts.width ~= nil then self._width = opts.width; self._widthRatio = nil end
+    if opts.height ~= nil then self._height = opts.height; self._heightRatio = nil end
+    if opts.yRatio ~= nil then self._yRatio = opts.yRatio end
+    if self._wv then
+        pcall(function() self._wv:setFrame(self:_frame()) end)
+    end
+    return self
 end
 
 function View:teardown()

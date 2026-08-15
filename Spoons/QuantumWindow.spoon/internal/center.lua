@@ -9,7 +9,8 @@ local function doCenter(win, cfg)
     if not win then return false, "无聚焦窗口" end
     local w = cfg.width or 800
     local h = cfg.height or 600
-    windowTool.centerAbsolute(win, w, h)
+    local ok = windowTool.centerAbsolute(win, w, h)
+    if not ok then return false, "无法获取窗口所在屏幕" end
     if cfg.raise then win:raise() end
     return true
 end

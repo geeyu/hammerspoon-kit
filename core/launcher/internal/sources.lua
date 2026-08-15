@@ -387,12 +387,19 @@ sources.useractions = {
             self.keywords[v.keyword] = function(self2, text)
                 local arg = text
                 if arg == ".*" then arg = "" end
-                return {{
+                local row = {
                     text = v.keyword .. " " .. arg,
                     subText = v.description or name,
-                    image = v.icon, arg = arg, plugin = "useractions",
+                    arg = arg, plugin = "useractions",
                     url = v.url, fn = v.fn, type = "invokeKeyword",
-                }}
+                }
+                -- 与 build 相同的 icon 字段契约：字符串（emoji）进 icon，hs.image 进 image
+                if type(v.icon) == "string" and v.icon ~= "" then
+                    row.icon = v.icon
+                else
+                    row.image = v.icon
+                end
+                return { row }
             end
         end
     end,
@@ -434,7 +441,14 @@ sources.useractions = {
         if not text or text == "" then return rows end
         for action, v in pairs(self:_all()) do
             if action:lower():find(text:lower(), 1, true) then
-                local row = { text = action, plugin = "useractions", image = v.icon or self.default_icon }
+                local row = { text = action, plugin = "useractions" }
+                -- icon 字段契约：字符串（emoji）进 icon，hs.image 对象进 image。
+                -- 放错字段（字符串进 image）会被后端 rowToJSON 的 encodeAsURLString pcall 丢弃 → 前端无图标
+                if type(v.icon) == "string" and v.icon ~= "" then
+                    row.icon = v.icon
+                else
+                    row.image = v.icon or self.default_icon
+                end
                 if v.description then row.subText = v.description end
                 if v.fn then
                     row.type = "runFunction"; row.fn = v.fn
@@ -448,23 +462,37 @@ sources.useractions = {
         return rows
     end,
 
-    favIcon = function(self, url)
+    favIcon = function(self, url, cb)
         local q = string.format("http://www.google.com/s2/favicons?sz=64&domain_url=%s",
             hs.http.encodeForQuery(url))
+        -- 带回调 = 异步加载（同步无回调路径对网络 URL 会阻塞主线程，
+        -- 实测可达数十秒超时 → 添加书签时整个 Hammerspoon 冻结）
+        if cb then
+            return hs.image.imageFromURL(q, cb)
+        end
         return hs.image.imageFromURL(q)
     end,
 
     -- 供 runner/registry 调用：持久化（内存 + SQLite 双写，对齐 Clipboard）
+    -- 图标异步后补：favicon 走网络，同步拉取会冻结主线程。
+    -- 先存 url（图标列留空），回调拿到图片后再编码写入内存 + DB
     saveAdd = function(self, row)
         if row.url and row.name then
             self.stored[row.name] = { url = row.url }
-            local ico = self:favIcon(row.url)
-            local encoded = ico and ico:encodeAsURLString() or nil
-            if encoded then self.stored[row.name].encoded_icon = encoded end
             -- 持久化到 SQLite（对齐 Clipboard 的内存 + DB 双写）
             if self.store then
-                self.store.upsertAction(row.name, { url = row.url, icon = encoded })
+                self.store.upsertAction(row.name, { url = row.url })
             end
+            self:favIcon(row.url, function(img)
+                local ok, encoded = pcall(function() return img and img:encodeAsURLString() or nil end)
+                if not ok or not encoded or encoded == "" then return end
+                -- 回调时书签可能已被删除：保护性写入
+                local s = self.stored[row.name]
+                if s then s.encoded_icon = encoded end
+                if self.store then
+                    self.store.upsertAction(row.name, { url = row.url, icon = encoded })
+                end
+            end)
         end
     end,
     saveDel = function(self, row)

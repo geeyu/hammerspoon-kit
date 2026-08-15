@@ -24,6 +24,9 @@ const SettingsStore = {
         retainDays: 7,
         maxEntries: 300,
         recordImages: true,
+        panelWidth: 52,     // 面板宽占目标屏幕比例（%）
+        panelHeight: 62,    // 面板高占目标屏幕比例（%）
+        panelPos: 22,       // 面板垂直位置（0=贴顶，50=居中，%）
       },
       loaded: false,
     });
@@ -39,6 +42,10 @@ const SettingsStore = {
           state.form.retainDays = s.retain_days;
           state.form.maxEntries = s.max_entries;
           state.form.recordImages = !s.text_only;
+          var p = s.panel || {};
+          state.form.panelWidth = Math.round((p.widthRatio || 0.52) * 100);
+          state.form.panelHeight = Math.round((p.heightRatio || 0.62) * 100);
+          state.form.panelPos = Math.round((p.yRatio || 0.22) * 100);
           state.loaded = true;
         });
       },
@@ -49,6 +56,11 @@ const SettingsStore = {
           retain_days: state.form.retainDays,
           max_entries: Number(state.form.maxEntries) || 300,
           text_only: !state.form.recordImages,
+          panel: {
+            widthRatio: (Number(state.form.panelWidth) || 52) / 100,
+            heightRatio: (Number(state.form.panelHeight) || 62) / 100,
+            yRatio: (Number(state.form.panelPos) || 22) / 100,
+          },
         };
         return fetch('/clipboard/api/settings', {
           method: 'POST',

@@ -19,3 +19,6 @@ clipboard_history.sqlite3
 clipboard_history.sqlite3-*
 clips/
 .superpowers/
+
+# pi 编码助手运行时状态（session/目标日志，不入库）
+.pi-glla/

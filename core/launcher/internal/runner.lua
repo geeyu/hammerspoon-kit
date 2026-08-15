@@ -110,7 +110,8 @@ function runner.run(row)
         if cmd and cmd.kind == "shell" and cmd.exec and cmd.exec[1] then
             local argv = {}
             for _, a in ipairs(cmd.exec[2] or {}) do
-                argv[#argv + 1] = a:gsub("${query}", row.arg or "")
+                -- tostring 对齐 cardShell 分支：非字符串 argv（数字等）不崩溃
+                argv[#argv + 1] = tostring(a or ""):gsub("${query}", row.arg or "")
             end
             if runner.onCustom then
                 runner.onCustom(cmd, argv, row.arg)

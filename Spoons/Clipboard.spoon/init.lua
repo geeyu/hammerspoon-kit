@@ -125,6 +125,14 @@ function obj:start()
             rebindHotkey()
             obj.logger.i("热键已更新: %s+%s", table.concat(settings.hotkey_show[1], "+"), settings.hotkey_show[2])
         end
+        -- 面板尺寸变更立即应用（webview resize，下次呼出即新尺寸）
+        if settings and settings.panel then
+            panel.applySettings(settings.panel)
+            obj.logger.i("面板尺寸已更新: %s%% x %s%% @ %s%%",
+                math.floor((settings.panel.widthRatio or 0.52) * 100),
+                math.floor((settings.panel.heightRatio or 0.62) * 100),
+                math.floor((settings.panel.yRatio or 0.22) * 100))
+        end
     end)
     panel.setup(config)
 

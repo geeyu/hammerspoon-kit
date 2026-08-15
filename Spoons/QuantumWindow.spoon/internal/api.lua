@@ -41,6 +41,14 @@ local function startGuard()
     guard.result = nil
     guard.tap = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, function(e)
         local code = e:getKeyCode()
+        -- Esc（53）：放行 + 停止录制。前端 ui-hotkey remote 模式的取消/清空依赖
+        -- keydown 事件——若吞掉，用户无法取消录制（只能等 6s 超时），
+        -- 且录制中的热键会残留吞键状态。Esc 本身无副作用，放行安全。
+        if code == 53 then
+            stopGuard()
+            return false
+        end
+        -- Backspace/Delete 保持吞掉：放行会误删焦点所在其他应用的文本
         if not MOD_CODES[code] then
             local flags = e:getFlags()
             local mods = {}

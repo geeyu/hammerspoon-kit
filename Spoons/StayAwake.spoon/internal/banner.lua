@@ -231,8 +231,15 @@ local function startDragTap()
             ny = math.max(sf.y, math.min(ny, sf.y + sf.h - HEIGHT))
             setBannerFrame(nx, ny)
         else
-            M.savePos(dragFrameOrigin.x + (p.x - dragStartPoint.x),
-                      dragFrameOrigin.y + (p.y - dragStartPoint.y))
+            -- 与拖动时相同的 clamp：mouseUp 保存的是未约束坐标，
+            -- 拖出屏幕后直接落盘 → 重启后 banner 在屏幕外找不到
+            local sf = hs.screen.mainScreen():frame()
+            local bw = drawings[1] and drawings[1]:frame().w or WIDTH
+            local nx = dragFrameOrigin.x + (p.x - dragStartPoint.x)
+            local ny = dragFrameOrigin.y + (p.y - dragStartPoint.y)
+            nx = math.max(sf.x, math.min(nx, sf.x + sf.w - bw))
+            ny = math.max(sf.y, math.min(ny, sf.y + sf.h - HEIGHT))
+            M.savePos(nx, ny)
             stopDragTap()
         end
         return true   -- 吞掉拖动/抬起事件，不穿透到底层窗口

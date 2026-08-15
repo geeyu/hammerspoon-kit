@@ -90,6 +90,10 @@ var UiHotkey = Vue.defineComponent({
       e.stopPropagation();
 
       if (e.key === 'Escape') {
+        // remote 模式（后端 eventtap 吞键）：Esc 已被后端放行用于取消录制——
+        // 只停止捕获，不清空已保存值（用户按 Esc 通常是想放弃本次录制，而非清空热键）；
+        // 非 remote 模式保持文档行为：Esc 清空
+        if (props.remote) { stopCapture(false); return; }
         ctx.emit('update:modelValue', '');
         stopCapture(false);
         return;
@@ -113,7 +117,16 @@ var UiHotkey = Vue.defineComponent({
       if (e.shiftKey) mods.push('shift');
 
       // 主键归一化：单字符转小写，其余（F5/ArrowUp 等）原样
-      var mainKey = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+      // 浏览器 e.key 与 hs.hotkey 键名不一致的映射：
+      //   Space 的 e.key 是 " "（单字符会走小写分支，产出 "ctrl+ " 非法键名）
+      //   方向键是 "ArrowLeft"（hs.hotkey 用 "Left"），Enter 是 "Enter"（hs 用 "return"）
+      var MAIN_KEY_MAP = {
+        ' ': 'space',
+        'ArrowLeft': 'Left', 'ArrowRight': 'Right',
+        'ArrowUp': 'Up', 'ArrowDown': 'Down',
+        'Enter': 'return',
+      };
+      var mainKey = MAIN_KEY_MAP[e.key] || (e.key.length === 1 ? e.key.toLowerCase() : e.key);
       var val = mods.concat([mainKey]).join('+');
       display.value = formatDisplay(val);
       ctx.emit('update:modelValue', val);

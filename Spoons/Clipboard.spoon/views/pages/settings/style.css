@@ -50,6 +50,16 @@ html, body, #app { height: 100%; margin: 0; }
   flex-shrink: 0;
 }
 
+/* 面板尺寸：三个小输入框横排 */
+.setting-controls {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.setting-control-sm {
+  width: 76px;
+}
+
 /* ─── 底部操作 ─── */
 .page-actions {
   display: flex; gap: 10px;

@@ -232,15 +232,31 @@ function ui.expand(html)
     return (html:gsub("<!%-%-%s*hsutil:(%w+)%s+([^<]-)%s*%-%->", repl))
 end
 
+--- FNV-1a 64 位内容 hash（与 static.lua 同算法；展开后重算 ETag 用）
+local function hashContent(s)
+    local h = 0xcbf29ce484222325
+    for i = 1, #s do
+        h = (h ~ s:byte(i)) * 0x100000001b3
+    end
+    return h
+end
+
 --- 响应 transform（挂到 server:transform）：
---- 仅处理 text/html 且含占位符的响应；展开结果确定，保留原 ETag（304 缓存 = 展开后版本）
+--- 仅处理 text/html 且含占位符的响应。
+--- 注意：static 中间件先按「未展开的原始文件」计算并设置了 ETag；展开会改变 body
+--- （依赖注册表/组件文件状态），原始 ETag 随即失效。若不重算，webview 拿旧 ETag
+--- 直接 304 缓存旧展开——组件注册表或依赖变化（改 ui.lua 后 reload）不生效。
+--- 这里展开后基于展开结果重算 ETag：raw 内容不变 + 展开结果不变 → ETag 不变 → 304 仍命中；
+--- 任一侧变化 → ETag 变化 → 200 拉新。语义与 raw ETag 完全一致且更正确。
 function ui.transform()
     return function(body, headers)
         local ct = headers["Content-Type"] or ""
         if not ct:find("text/html") then return body, headers end
         if type(body) ~= "string" then return body, headers end
         if not body or not body:find("hsutil:") then return body, headers end
-        return ui.expand(body), headers
+        local out = ui.expand(body)
+        headers["ETag"] = string.format('"%x"', hashContent(out))
+        return out, headers
     end
 end
 

@@ -24,10 +24,6 @@ local onConfirmFn   -- 确认回调（init 注入：写回+提升+粘贴）
 local onCloseFn     -- 关闭面板回调（init 注入：panel.hide）
 local onSettingsApplied  -- 配置保存后回调（init 注入：热键重绑等）
 
-local watcher
-local onConfirmFn   -- 确认回调（init 注入：写回+提升+粘贴）
-local onCloseFn     -- 关闭面板回调（init 注入：panel.hide）
-
 --- 注册路由
 --- @param w watcher 业务入口
 --- @param onConfirm function(entry) 确认动作（由 init 提供）

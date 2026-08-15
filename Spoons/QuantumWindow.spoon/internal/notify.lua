@@ -66,6 +66,9 @@ function notify.keyLabel(mods, key)
         space = "Space", Left = "←", Right = "→", Up = "↑", Down = "↓",
         tab = "⇥", ["return"] = "⏎", returnKey = "⏎",
     }
+    -- key 为 nil（动作未绑定/无热键时直接调用 :leftHalf() 等公开方法）→
+    -- 返回纯修饰键前缀，避免 "" .. nil 报错
+    if not key then return prefix end
     local k = keymap[key] or key
     return prefix .. k
 end
