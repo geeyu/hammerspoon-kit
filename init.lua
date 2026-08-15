@@ -31,6 +31,7 @@ end
 package.path = package.path .. ";" .. hs.configdir .. "/?.lua;" .. hs.configdir .. "/?/init.lua"
 local launcher = require("core.launcher")
 launcher:start()
+require("core.control-center")
 
 -- QuantumWindow：窗口管理（分屏/Space/跨屏/铺满/居中 + HUD）
 local qw = hs.loadSpoon("QuantumWindow")

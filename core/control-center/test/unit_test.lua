@@ -921,7 +921,7 @@ do
 end
 
 -- =========================================================
--- D. api HTTP 路由(23 用例)
+-- F. api HTTP 路由(23 用例)
 -- =========================================================
 package.loaded["core.hsutil"] = nil
 
@@ -1177,75 +1177,191 @@ local VIEWS = "/tmp/cc-views"
 api.setup(fakeSourcesMod, fakePanelMod, VIEWS)
 
 -- 注册面
-check("D1 静态挂载 /control-center/view", #mockStatic == 1
+check("F1 静态挂载 /control-center/view", #mockStatic == 1
     and mockStatic[1].prefix == "/control-center/view" and mockStatic[1].root == VIEWS)
-check("D2 三个路由已注册(providers/open/close)", #mockRoutes == 3)
+check("F2 三个路由已注册(providers/open/close)", #mockRoutes == 3)
 local allCCOk = true
 for _, r in ipairs(mockRoutes) do
     if r.pattern:sub(1, #"/control-center/api/") ~= "/control-center/api/" then allCCOk = false end
 end
-check("D3 路由全部挂在 /control-center/api 前缀(与 /launcher、/stayawake 命名空间无冲突)", allCCOk)
+check("F3 路由全部挂在 /control-center/api 前缀(与 /launcher、/stayawake 命名空间无冲突)", allCCOk)
 
 -- GET providers
 local body, code = dispatch("GET", "/control-center/api/providers")
 local providersBody = jsonDecode(body)
-check("D4 providers 返回 200 合法 JSON", code == 200 and type(providersBody) == "table", tostring(code))
-check("D5 providers 数量与数据源一致", providersBody and #providersBody.providers == 2, providersBody and tostring(#providersBody.providers))
+check("F4 providers 返回 200 合法 JSON", code == 200 and type(providersBody) == "table", tostring(code))
+check("F5 providers 数量与数据源一致", providersBody and #providersBody.providers == 2, providersBody and tostring(#providersBody.providers))
 local atj = providersBody and providersBody.providers[1]
-check("D6 提供者 name/icon 透传", atj and atj.name == "apptoggle" and atj.icon == "🔄")
-check("D7 卡片字段透传(key/url)", atj and atj.cards[1].key == "应用显隐"
+check("F6 提供者 name/icon 透传", atj and atj.name == "apptoggle" and atj.icon == "🔄")
+check("F7 卡片字段透传(key/url)", atj and atj.cards[1].key == "应用显隐"
     and atj.cards[1].url == "/apptoggle/view/pages/apps/index.html")
-check("D8 页面 configUrl/searchUrl 透传", atj and atj.pages[1].configUrl == "/apptoggle/view/pages/apps/index.html")
+check("F8 页面 configUrl/searchUrl 透传", atj and atj.pages[1].configUrl == "/apptoggle/view/pages/apps/index.html")
 local bdj = providersBody and providersBody.providers[2]
-check("D9 searchUrl 透传(bingdaily)", bdj and bdj.pages[1].searchUrl == "/bingdaily/view/pages/search/index.html")
+check("F9 searchUrl 透传(bingdaily)", bdj and bdj.pages[1].searchUrl == "/bingdaily/view/pages/search/index.html")
 
 -- GET providers 故障 → 500
 failGet = true
 local _, codeFail = dispatch("GET", "/control-center/api/providers")
-check("D10 sources.get 抛错 → 500 + err", codeFail == 500)
+check("F10 sources.get 抛错 → 500 + err", codeFail == 500)
 failGet = false
 
 -- POST open
 local P_URL = "http://127.0.0.1:8821/stayawake/view/pages/control/index.html"
 local ob, oc = dispatch("POST", "/control-center/api/open", {}, jsonEncode({ url = P_URL }))
 local oj = jsonDecode(ob)
-check("D11 open 带 url → 200 {ok:true}", oc == 200 and oj and oj.ok == true, tostring(oc))
-check("D12 open 调用 panel.open(url)", #openedUrls == 1 and openedUrls[1] == P_URL, tostring(#openedUrls))
+check("F11 open 带 url → 200 {ok:true}", oc == 200 and oj and oj.ok == true, tostring(oc))
+check("F12 open 调用 panel.open(url)", #openedUrls == 1 and openedUrls[1] == P_URL, tostring(#openedUrls))
 
 -- POST open 参数校验 → 400
 local _, cNoBody = dispatch("POST", "/control-center/api/open")
-check("D13 open 缺 body → 400", cNoBody == 400, tostring(cNoBody))
+check("F13 open 缺 body → 400", cNoBody == 400, tostring(cNoBody))
 local _, cNoUrl = dispatch("POST", "/control-center/api/open", {}, jsonEncode({}))
-check("D14 open 缺 url → 400", cNoUrl == 400, tostring(cNoUrl))
+check("F14 open 缺 url → 400", cNoUrl == 400, tostring(cNoUrl))
 local _, cBadType = dispatch("POST", "/control-center/api/open", {}, jsonEncode({ url = 123 }))
-check("D15 open url 非字符串 → 400", cBadType == 400, tostring(cBadType))
+check("F15 open url 非字符串 → 400", cBadType == 400, tostring(cBadType))
 local _, cEmpty = dispatch("POST", "/control-center/api/open", {}, jsonEncode({ url = "" }))
-check("D16 open url 空串 → 400", cEmpty == 400, tostring(cEmpty))
+check("F16 open url 空串 → 400", cEmpty == 400, tostring(cEmpty))
 local _, cBadJson = dispatch("POST", "/control-center/api/open", {}, "not-json{")
-check("D17 open body 非法 JSON → 400", cBadJson == 400, tostring(cBadJson))
-check("D18 校验失败不触发 panel.open", #openedUrls == 1)
+check("F17 open body 非法 JSON → 400", cBadJson == 400, tostring(cBadJson))
+check("F18 校验失败不触发 panel.open", #openedUrls == 1)
 
 -- POST open 故障 → 500
 failOpen = true
 local _, cOpenFail = dispatch("POST", "/control-center/api/open", {}, jsonEncode({ url = P_URL }))
-check("D19 panel.open 抛错 → 500 + err", cOpenFail == 500, tostring(cOpenFail))
+check("F19 panel.open 抛错 → 500 + err", cOpenFail == 500, tostring(cOpenFail))
 failOpen = false
 
 -- POST close
 local cb_, cc = dispatch("POST", "/control-center/api/close")
 local cj = jsonDecode(cb_)
-check("D20 close → 200 {ok:true}", cc == 200 and cj and cj.ok == true, tostring(cc))
-check("D21 close 调用 panel.hide", hideCalls == 1, tostring(hideCalls))
+check("F20 close → 200 {ok:true}", cc == 200 and cj and cj.ok == true, tostring(cc))
+check("F21 close 调用 panel.hide", hideCalls == 1, tostring(hideCalls))
 
 -- POST close 故障 → 500
 failHide = true
 local _, cCloseFail = dispatch("POST", "/control-center/api/close")
-check("D22 panel.hide 抛错 → 500 + err", cCloseFail == 500, tostring(cCloseFail))
+check("F22 panel.hide 抛错 → 500 + err", cCloseFail == 500, tostring(cCloseFail))
 failHide = false
 
 -- 与既有路由无冲突:未注册的路径不被命中
 local _, cOther = dispatch("GET", "/launcher/api/query")
-check("D23 未注册路径(/launcher/api/query)→ 404", cOther == 404, tostring(cOther))
+check("F23 未注册路径(/launcher/api/query)→ 404", cOther == 404, tostring(cOther))
+
+-- =========================================================
+-- G. init.lua 装配(8 用例):模块自启(require 即生效)、路由/静态挂载、
+--     面板单例聚合页 URL、菜单栏创建、启动日志、start 幂等
+-- =========================================================
+package.loaded["core.hsutil"] = nil
+
+-- 独立 mock 状态(不污染前序段)
+local G = {
+    routes = {},        -- mockApp 路由
+    statics = {},       -- mockApp 静态挂载
+    bars = {},          -- hs.menubar.new 调用
+    views = {},         -- HSUtil.webview.new 调用
+    logs = {},          -- 启动日志记录
+    timerCb = nil,
+}
+local function resetG()
+    G.routes = {}
+    G.statics = {}
+    G.bars = {}
+    G.views = {}
+    G.logs = {}
+    G.timerCb = nil
+end
+
+local gApp = {}
+for _, m in ipairs({ "get", "post", "put", "delete", "patch", "head", "options" }) do
+    gApp[m] = function(_, pattern, handler)
+        G.routes[#G.routes + 1] = { method = m:upper(), pattern = pattern, handler = handler }
+        return gApp
+    end
+end
+function gApp:static(prefix, root)
+    G.statics[#G.statics + 1] = { prefix = prefix, root = root }
+    return gApp
+end
+
+local gRaw = { _url = nil, loading = function() return false end }
+local gView = {
+    _raw = nil,
+    _visible = false,
+    show = function(self)
+        if not self._raw then self._raw = gRaw end
+        self._visible = true
+        return true
+    end,
+    hide = function(self) self._visible = false end,
+    visible = function(self) return self._visible end,
+    teardown = function(self) self._raw = nil; self._visible = false end,
+    raw = function(self) return self._raw end,
+}
+
+hs = {
+    logger = { new = function() return makeLogger() end },
+    menubar = {
+        new = function(globalFlag)
+            G.bars[#G.bars + 1] = globalFlag
+            local b = { _menu = nil }
+            b.setTitle = function() end
+            b.setTooltip = function() end
+            b.setMenu = function(_, menuFn) b._menu = menuFn end
+            b.remove = function() end
+            return b
+        end,
+    },
+    timer = {
+        doEvery = function(_, cb) G.timerCb = cb; return { stop = function() end } end,
+    },
+    screen = { mainScreen = function() return { frame = function() return { x = 0, y = 0, w = 1440, h = 900 } end } end },
+    reload = function() end,
+    exit = function() end,
+}
+
+package.preload["core.hsutil"] = function()
+    return {
+        log = { new = function()
+            return {
+                i = function(msg) G.logs[#G.logs + 1] = msg end,
+                w = function() end, e = function() end,
+                f = function() end, wf = function() end, ef = function() end, df = function() end,
+            }
+        end },
+        http = { app = gApp, BASE = "http://127.0.0.1:8821" },
+        webview = {
+            new = function(opts)
+                G.views[#G.views + 1] = opts
+                return gView
+            end,
+        },
+        json = { encode = function(v) return '"' .. tostring(v) .. '"' end },
+        path = { join = function(a, b) return a .. "/" .. b end },
+    }
+end
+
+resetG()
+-- 模块自启:require(经 dofile 模拟)即完成装配,无需显式 start()
+local cc = dofile(ROOT .. "init.lua")
+check("G1 模块自启:require 即装配(started=true)", cc and cc.started == true)
+check("G2 菜单栏已创建(menubar.new(true) 全局)", #G.bars == 1 and G.bars[1] == true)
+check("G3 api 路由注册:3 条全在 /control-center/api 前缀", #G.routes == 3
+    and G.routes[1].pattern:sub(1, #"/control-center/api/") == "/control-center/api/")
+check("G4 静态挂载 /control-center/view → 模块 views 目录", #G.statics == 1
+    and G.statics[1].prefix == "/control-center/view" and G.statics[1].root:find("views$") ~= nil)
+local startLogged = false
+for _, m in ipairs(G.logs) do
+    if m:find("ControlCenter 已启动") then startLogged = true end
+end
+check("G5 启动日志已输出", startLogged)
+check("G6 面板懒创建:装配时不建 webview", #G.views == 0)
+check("G7 面板单例聚合页 URL 指向聚合配置页",
+    cc.panel.showAggregate() == true and #G.views == 1
+    and G.views[1].url == "http://127.0.0.1:8821/control-center/view/pages/control-center/index.html",
+    G.views[1] and G.views[1].url or "nil")
+-- start 幂等:重复调用不重复注册路由/不重建菜单栏
+cc:start()
+check("G8 start 幂等(路由/菜单栏不重复)", #G.routes == 3 and #G.bars == 1)
 
 -- =========================================================
 -- 汇总
