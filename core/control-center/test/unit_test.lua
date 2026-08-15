@@ -1,7 +1,10 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> gittree-wf-wf-control-center-4
+=======
+>>>>>>> gittree-wf-wf-control-center-6
 -- ControlCenter 纯 Lua 单元测试(lua5.4/lua5.5 运行,mock 掉 hs.* 与 core.hsutil)
 -- 运行:  lua core/control-center/test/unit_test.lua
 -- 覆盖:
@@ -12,6 +15,7 @@
 --      返回 shim 注入时机(导航完成检测)与内容 / teardown 停止轮询
 --   C. menubar:菜单结构(聚合页/各 Spoon 入口/重载/退出)、每次打开重新扫描、
 --      扫描异常降级、点击入口打开面板配置页(含真实兄弟模块集成)
+<<<<<<< HEAD
 <<<<<<< HEAD
 --   D. api:路由注册(providers/open/close + 静态挂载)、参数校验 400、pcall 容错 500、
 --      未注册路径 404(与 /launcher、/stayawake 命名空间无冲突)
@@ -36,6 +40,12 @@
 -- =========================================================
 
 >>>>>>> gittree-wf-wf-control-center-4
+=======
+--   D. api:路由注册(providers/open/close + 静态挂载)、参数校验 400、pcall 容错 500、
+--      未注册路径 404(与 /launcher、/stayawake 命名空间无冲突)
+-- =========================================================
+
+>>>>>>> gittree-wf-wf-control-center-6
 local results = { pass = 0, fail = 0 }
 local function check(name, cond, detail)
     if cond then
@@ -48,8 +58,11 @@ end
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> gittree-wf-wf-control-center-4
+=======
+>>>>>>> gittree-wf-wf-control-center-6
 -- 文件系统 mock(共享):A 段与 C 段集成测试均消费 _mockFS 全局
 local function makeFSMock()
     return {
@@ -57,6 +70,7 @@ local function makeFSMock()
         -- dirUserdata 是 for 循环的 state;迭代器校验 state 参数,缺 state(如被
         -- pcall 丢掉)时报错,与真实 HS 行为一致("directory metatable expected")。
         -- 未知目录直接报错(与真实 HS 一致),验证模块的 pcall 单目录容错。
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
 -- 按名取提供者（扫描顺序依赖 hs.fs.dir，按名断言最稳）
@@ -143,6 +157,8 @@ hs = {
 >>>>>>> gittree-wf-wf-control-center-3
 =======
 >>>>>>> gittree-wf-wf-control-center-4
+=======
+>>>>>>> gittree-wf-wf-control-center-6
         dir = function(path)
             if _mockFS.dirs[path] == nil then
                 error("no such file or directory: " .. tostring(path))
@@ -164,8 +180,11 @@ hs = {
         end,
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> gittree-wf-wf-control-center-4
+=======
+>>>>>>> gittree-wf-wf-control-center-6
     }
 end
 
@@ -194,6 +213,7 @@ hs = {
     logger = { new = function() return makeLogger() end },
     configdir = "",
     fs = makeFSMock(),
+<<<<<<< HEAD
 <<<<<<< HEAD
 }
 
@@ -432,6 +452,8 @@ package.loaded["core.hsutil"] = {
 -- 定位本文件目录（source 形如 core/control-center/test/unit_test.lua）
 >>>>>>> gittree-wf-wf-control-center-3
 =======
+=======
+>>>>>>> gittree-wf-wf-control-center-6
 }
 
 -- mock core.hsutil(sources.lua require 到的部分:log + path)
@@ -443,13 +465,17 @@ package.preload["core.hsutil"] = function()
 end
 
 -- 定位本文件目录(source 形如 core/control-center/test/unit_test.lua)
+<<<<<<< HEAD
 >>>>>>> gittree-wf-wf-control-center-4
+=======
+>>>>>>> gittree-wf-wf-control-center-6
 local ROOT = (debug.getinfo(1, "S").source:sub(2):match("^(.-)[/\\]test[/\\]") or "")
 if ROOT == "" then ROOT = "core/control-center/" end
 if ROOT:sub(-1) ~= "/" then ROOT = ROOT .. "/" end
 local sources = dofile(ROOT .. "internal/sources.lua")
 
 -- =========================================================
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 -- 工具:构造真实临时目录结构(dofile 需要真实文件;_mockFS 供 mock fs 消费)
@@ -459,6 +485,9 @@ local sources = dofile(ROOT .. "internal/sources.lua")
 =======
 -- 工具:构造真实临时目录结构(dofile 需要真实文件;_mockFS 供 mock fs 消费)
 >>>>>>> gittree-wf-wf-control-center-4
+=======
+-- 工具:构造真实临时目录结构(dofile 需要真实文件;_mockFS 供 mock fs 消费)
+>>>>>>> gittree-wf-wf-control-center-6
 -- =========================================================
 local function mkdir(p)
     os.execute('mkdir -p "' .. p .. '"')
@@ -470,6 +499,7 @@ local function writeFile(p, content)
 end
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 -- 注册一个提供者:真实目录 + 文件 + _mockFS 目录表/文件表
 =======
 -- 注册一个提供者：真实目录 + 文件 + _mockFS 目录表/文件表
@@ -477,6 +507,9 @@ end
 =======
 -- 注册一个提供者:真实目录 + 文件 + _mockFS 目录表/文件表
 >>>>>>> gittree-wf-wf-control-center-4
+=======
+-- 注册一个提供者:真实目录 + 文件 + _mockFS 目录表/文件表
+>>>>>>> gittree-wf-wf-control-center-6
 local function addProvider(fsRoot, relDir, manifestLua)
     local dir = fsRoot .. "/" .. relDir
     mkdir(dir)
@@ -488,6 +521,7 @@ local function addProvider(fsRoot, relDir, manifestLua)
 end
 
 -- =========================================================
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 -- A.1 真实仓库布局镜像:5 个 Spoon + core/{hsutil,launcher/template}
@@ -503,12 +537,18 @@ end
 --    (与 launcher 实际合并结果一致:5 个提供者;template 在 core/*/ 二层,
 --      与 launcher 一样不会被一级扫描发现,且其 cards 为空,无可见贡献)
 >>>>>>> gittree-wf-wf-control-center-4
+=======
+-- A.1 真实仓库布局镜像:5 个 Spoon + core/{hsutil,launcher/template}
+--    (与 launcher 实际合并结果一致:5 个提供者;template 在 core/*/ 二层,
+--      与 launcher 一样不会被一级扫描发现,且其 cards 为空,无可见贡献)
+>>>>>>> gittree-wf-wf-control-center-6
 -- =========================================================
 local tmpRoot = os.tmpname()
 os.remove(tmpRoot)
 mkdir(tmpRoot .. "/Spoons")
 mkdir(tmpRoot .. "/core/hsutil")
 mkdir(tmpRoot .. "/core/launcher/template")
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 -- 5 个 Spoon(manifest 内容与仓库真实文件一致)
@@ -518,6 +558,9 @@ mkdir(tmpRoot .. "/core/launcher/template")
 =======
 -- 5 个 Spoon(manifest 内容与仓库真实文件一致)
 >>>>>>> gittree-wf-wf-control-center-4
+=======
+-- 5 个 Spoon(manifest 内容与仓库真实文件一致)
+>>>>>>> gittree-wf-wf-control-center-6
 addProvider(tmpRoot, "Spoons/AppToggle.spoon", [[
 return {
     name = "apptoggle",
@@ -575,6 +618,7 @@ return {
 ]])
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 -- 干扰项:点文件、无 manifest 的目录、core 二层 template(不应被发现)
 =======
 -- 干扰项：点文件、无 manifest 的目录、core 二层 template（不应被发现）
@@ -582,6 +626,9 @@ return {
 =======
 -- 干扰项:点文件、无 manifest 的目录、core 二层 template(不应被发现)
 >>>>>>> gittree-wf-wf-control-center-4
+=======
+-- 干扰项:点文件、无 manifest 的目录、core 二层 template(不应被发现)
+>>>>>>> gittree-wf-wf-control-center-6
 writeFile(tmpRoot .. "/Spoons/.DS_Store", "")
 _mockFS.files[tmpRoot .. "/Spoons/.DS_Store"] = true
 _mockFS.dirs[tmpRoot .. "/Spoons/NotASpoon"] = {}
@@ -591,6 +638,7 @@ _mockFS.dirs[tmpRoot .. "/core/launcher/template"] = {}
 addProvider(tmpRoot, "core/launcher/template", [[
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 -- 模板:cards 全注释(空贡献),且位于 core/*/ 二层不会被一级扫描发现
 =======
 -- 模板：cards 全注释（空贡献），且位于 core/*/ 二层不会被一级扫描发现
@@ -598,6 +646,9 @@ addProvider(tmpRoot, "core/launcher/template", [[
 =======
 -- 模板:cards 全注释(空贡献),且位于 core/*/ 二层不会被一级扫描发现
 >>>>>>> gittree-wf-wf-control-center-4
+=======
+-- 模板:cards 全注释(空贡献),且位于 core/*/ 二层不会被一级扫描发现
+>>>>>>> gittree-wf-wf-control-center-6
 return {
     name = "myspoon",
     cards = {},
@@ -609,6 +660,7 @@ _mockFS.dirs[tmpRoot .. "/core"] = { "hsutil", "launcher" }
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 -- 默认扫描(hs.configdir 指向 tmpRoot,走 scan() 无参默认目录)
 =======
 -- 默认扫描（hs.configdir 指向 tmpRoot，走 scan() 无参默认目录）
@@ -616,6 +668,9 @@ _mockFS.dirs[tmpRoot .. "/core"] = { "hsutil", "launcher" }
 =======
 -- 默认扫描(hs.configdir 指向 tmpRoot,走 scan() 无参默认目录)
 >>>>>>> gittree-wf-wf-control-center-4
+=======
+-- 默认扫描(hs.configdir 指向 tmpRoot,走 scan() 无参默认目录)
+>>>>>>> gittree-wf-wf-control-center-6
 hs.configdir = tmpRoot
 local listA = sources.scan()
 
@@ -627,6 +682,7 @@ check("A3 core/launcher/template 未被扫描（二层，与 launcher 一致）"
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 -- AppToggle:卡片 + 页面 URL 简写推断
 =======
 -- AppToggle：卡片 + 页面 URL 简写推断
@@ -634,6 +690,9 @@ check("A3 core/launcher/template 未被扫描（二层，与 launcher 一致）"
 =======
 -- AppToggle:卡片 + 页面 URL 简写推断
 >>>>>>> gittree-wf-wf-control-center-4
+=======
+-- AppToggle:卡片 + 页面 URL 简写推断
+>>>>>>> gittree-wf-wf-control-center-6
 local at = findProv(listA, "apptoggle")
 check("A4 apptoggle 卡片数=1", at and #at.cards == 1, at and tostring(#at.cards))
 if at and at.cards[1] then
@@ -648,6 +707,7 @@ check("A8 apptoggle 无 searchUrl（可选字段缺省）", at and at.pages[1].s
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 -- Clipboard:search 页推断
 =======
 -- Clipboard：search 页推断
@@ -655,6 +715,9 @@ check("A8 apptoggle 无 searchUrl（可选字段缺省）", at and at.pages[1].s
 =======
 -- Clipboard:search 页推断
 >>>>>>> gittree-wf-wf-control-center-4
+=======
+-- Clipboard:search 页推断
+>>>>>>> gittree-wf-wf-control-center-6
 local cb = findProv(listA, "clipboard")
 check("A9 clipboard 卡片 url 推断", cb and cb.cards[1] and cb.cards[1].url == "/clipboard/view/pages/settings/index.html",
     cb and cb.cards[1] and tostring(cb.cards[1].url))
@@ -682,6 +745,7 @@ check("A16 重扫结果仍 5 个", #listA2 == 5, tostring(#listA2))
 -- =========================================================
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 -- A.2 边界:scan(dirs) 显式目录 + 异常容错
 =======
 -- B. 边界：scan(dirs) 显式目录 + 异常容错
@@ -689,6 +753,9 @@ check("A16 重扫结果仍 5 个", #listA2 == 5, tostring(#listA2))
 =======
 -- A.2 边界:scan(dirs) 显式目录 + 异常容错
 >>>>>>> gittree-wf-wf-control-center-4
+=======
+-- A.2 边界:scan(dirs) 显式目录 + 异常容错
+>>>>>>> gittree-wf-wf-control-center-6
 -- =========================================================
 local tmpRoot2 = os.tmpname()
 os.remove(tmpRoot2)
@@ -698,6 +765,7 @@ mkdir(tmpRoot2 .. "/core/dupe")
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 -- 无 name 字段:回退目录名;openurl 完整 URL 原样透传
 =======
 -- 无 name 字段：回退目录名；openurl 完整 URL 原样透传
@@ -705,6 +773,9 @@ mkdir(tmpRoot2 .. "/core/dupe")
 =======
 -- 无 name 字段:回退目录名;openurl 完整 URL 原样透传
 >>>>>>> gittree-wf-wf-control-center-4
+=======
+-- 无 name 字段:回退目录名;openurl 完整 URL 原样透传
+>>>>>>> gittree-wf-wf-control-center-6
 addProvider(tmpRoot2, "Spoons/NoName.spoon", [[
 return {
     cards = {
@@ -714,6 +785,7 @@ return {
 ]])
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 -- config_pages 老字段:仅老字段也可出页面
 =======
 -- config_pages 老字段：仅老字段也可出页面
@@ -721,6 +793,9 @@ return {
 =======
 -- config_pages 老字段:仅老字段也可出页面
 >>>>>>> gittree-wf-wf-control-center-4
+=======
+-- config_pages 老字段:仅老字段也可出页面
+>>>>>>> gittree-wf-wf-control-center-6
 addProvider(tmpRoot2, "Spoons/ConfigPages.spoon", [[
 return {
     name = "configpages",
@@ -731,6 +806,7 @@ return {
 ]])
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 -- pages 与 config_pages 同名:新字段优先,老字段跳过
 =======
 -- pages 与 config_pages 同名：新字段优先，老字段跳过
@@ -738,6 +814,9 @@ return {
 =======
 -- pages 与 config_pages 同名:新字段优先,老字段跳过
 >>>>>>> gittree-wf-wf-control-center-4
+=======
+-- pages 与 config_pages 同名:新字段优先,老字段跳过
+>>>>>>> gittree-wf-wf-control-center-6
 addProvider(tmpRoot2, "Spoons/BothPages.spoon", [[
 return {
     name = "bothpages",
@@ -751,10 +830,14 @@ return {
 ]])
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> gittree-wf-wf-control-center-6
 -- 非法 manifest:非 table / 加载抛错 → 跳过不崩溃
 addProvider(tmpRoot2, "Spoons/ZBad.spoon", "return 42")
 addProvider(tmpRoot2, "Spoons/ZBroken.spoon", 'error("boom")')
 -- 同名 provider 去重覆盖:core 后扫,覆盖 Spoons 同名提供者
+<<<<<<< HEAD
 =======
 -- 非法 manifest：非 table / 加载抛错 → 跳过不崩溃
 addProvider(tmpRoot2, "Spoons/ZBad.spoon", "return 42")
@@ -767,6 +850,8 @@ addProvider(tmpRoot2, "Spoons/ZBad.spoon", "return 42")
 addProvider(tmpRoot2, "Spoons/ZBroken.spoon", 'error("boom")')
 -- 同名 provider 去重覆盖:core 后扫,覆盖 Spoons 同名提供者
 >>>>>>> gittree-wf-wf-control-center-4
+=======
+>>>>>>> gittree-wf-wf-control-center-6
 addProvider(tmpRoot2, "Spoons/DupeA.spoon", [[
 return {
     name = "dupeme",
@@ -785,6 +870,7 @@ return {
 ]])
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 -- 干扰项:点文件、无 manifest 目录
 =======
 -- 干扰项：点文件、无 manifest 目录
@@ -792,6 +878,9 @@ return {
 =======
 -- 干扰项:点文件、无 manifest 目录
 >>>>>>> gittree-wf-wf-control-center-4
+=======
+-- 干扰项:点文件、无 manifest 目录
+>>>>>>> gittree-wf-wf-control-center-6
 writeFile(tmpRoot2 .. "/Spoons/.DS_Store", "")
 _mockFS.files[tmpRoot2 .. "/Spoons/.DS_Store"] = true
 _mockFS.dirs[tmpRoot2 .. "/Spoons/Empty.spoon"] = {}
@@ -799,6 +888,7 @@ _mockFS.dirs[tmpRoot2 .. "/core/hsutil"] = {}
 _mockFS.dirs[tmpRoot2 .. "/Spoons"] = { "NoName.spoon", "ConfigPages.spoon", "BothPages.spoon", "ZBad.spoon", "ZBroken.spoon", "DupeA.spoon", ".DS_Store", "Empty.spoon" }
 _mockFS.dirs[tmpRoot2 .. "/core"] = { "dupe", "hsutil" }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 -- 显式传目录(含一个不存在的目录,验证 pcall 单目录容错)
@@ -814,6 +904,11 @@ local listB = sources.scan({ tmpRoot2 .. "/Spoons", tmpRoot2 .. "/Nope", tmpRoot
 local listB = sources.scan({ tmpRoot2 .. "/Spoons", tmpRoot2 .. "/Nope", tmpRoot2 .. "/core" })
 -- 4 个提供者:NoName.spoon/configpages/bothpages/dupeme(ZBad/ZBroken/Empty/点文件被跳过)
 >>>>>>> gittree-wf-wf-control-center-4
+=======
+-- 显式传目录(含一个不存在的目录,验证 pcall 单目录容错)
+local listB = sources.scan({ tmpRoot2 .. "/Spoons", tmpRoot2 .. "/Nope", tmpRoot2 .. "/core" })
+-- 4 个提供者:NoName.spoon/configpages/bothpages/dupeme(ZBad/ZBroken/Empty/点文件被跳过)
+>>>>>>> gittree-wf-wf-control-center-6
 check("B1 显式目录扫描无错误且结果齐全（不存在的目录被 pcall 容错）", #listB == 4, tostring(#listB))
 check("B2 无 name 回退目录名", findProv(listB, "NoName.spoon") ~= nil)
 local nn = findProv(listB, "NoName.spoon")
@@ -833,6 +928,7 @@ check("B8 加载抛错的 manifest 被跳过", findProv(listB, "ZBroken.spoon") 
 check("B9 点文件/无 manifest 目录不产生提供者", findProv(listB, ".DS_Store") == nil and findProv(listB, "Empty.spoon") == nil)
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 -- 同名覆盖:core/dupe 后扫覆盖 Spoons/DupeA.spoon
 =======
 -- 同名覆盖：core/dupe 后扫覆盖 Spoons/DupeA.spoon
@@ -840,6 +936,9 @@ check("B9 点文件/无 manifest 目录不产生提供者", findProv(listB, ".DS
 =======
 -- 同名覆盖:core/dupe 后扫覆盖 Spoons/DupeA.spoon
 >>>>>>> gittree-wf-wf-control-center-4
+=======
+-- 同名覆盖:core/dupe 后扫覆盖 Spoons/DupeA.spoon
+>>>>>>> gittree-wf-wf-control-center-6
 local dm = findProv(listB, "dupeme")
 check("B10 同名 provider 去重为 1 个", dm ~= nil)
 local dmCount = 0
@@ -852,6 +951,7 @@ check("B12 后扫描者覆盖（卡片=后扫描卡片）", dm and #dm.cards == 
 -- =========================================================
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 -- A.3 只读零侵入:manifest 文件未被改写,源表未被污染
 =======
 -- C. 只读零侵入：manifest 文件未被改写，源表未被污染
@@ -859,6 +959,9 @@ check("B12 后扫描者覆盖（卡片=后扫描卡片）", dm and #dm.cards == 
 =======
 -- A.3 只读零侵入:manifest 文件未被改写,源表未被污染
 >>>>>>> gittree-wf-wf-control-center-4
+=======
+-- A.3 只读零侵入:manifest 文件未被改写,源表未被污染
+>>>>>>> gittree-wf-wf-control-center-6
 -- =========================================================
 local f = io.open(tmpRoot .. "/Spoons/AppToggle.spoon/launcher-commands.lua", "r")
 local contentA = f:read("*a"); f:close()
@@ -871,8 +974,11 @@ check("C2 原 manifest 表未被修改（url 推断生成新表）",
 -- =========================================================
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> gittree-wf-wf-control-center-4
+=======
+>>>>>>> gittree-wf-wf-control-center-6
 -- B. panel 配置面板单例(31 用例)
 -- =========================================================
 package.loaded["core.hsutil"] = nil
@@ -957,12 +1063,15 @@ end
 
 -- 每个用例重新 dofile panel.lua(模块级单例状态随 chunk 重置)
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 -- D. panel.lua：配置面板单例 + 返回 shim
 -- =========================================================
 >>>>>>> gittree-wf-wf-control-center-3
 =======
 >>>>>>> gittree-wf-wf-control-center-4
+=======
+>>>>>>> gittree-wf-wf-control-center-6
 local PANEL_PATH = ROOT .. "internal/panel.lua"
 local function newPanel()
     resetMocks()
@@ -1112,6 +1221,9 @@ end
 
 -- =========================================================
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> gittree-wf-wf-control-center-6
 -- C. menubar 菜单栏(26 用例)
 -- =========================================================
 package.loaded["core.hsutil"] = nil
@@ -1660,6 +1772,7 @@ end
 local api = dofile(ROOT .. "internal/api.lua")
 
 -- 与 sources.scan() 输出同构的提供者数据(name/icon/cards/pages,含 configUrl/searchUrl)
+<<<<<<< HEAD
 =======
 -- E. api.lua：路由注册（providers/open/close + 静态挂载）+ 参数校验 + pcall 容错
 -- =========================================================
@@ -1668,15 +1781,21 @@ local api = dofile(ROOT .. "internal/api.lua")
 
 -- 与 sources.scan() 输出同构的提供者数据（name/icon/cards/pages，含 configUrl/searchUrl）
 >>>>>>> gittree-wf-wf-control-center-3
+=======
+>>>>>>> gittree-wf-wf-control-center-6
 local apiProviders = {
     {
         name = "apptoggle", icon = "🔄",
         cards = {
 <<<<<<< HEAD
+<<<<<<< HEAD
             { key = "应用显隐", description = "一键显隐应用(全局热键 + 布局锁定)", icon = "🔄", kind = "page", url = "/apptoggle/view/pages/apps/index.html" },
 =======
             { key = "应用显隐", description = "一键显隐应用（全局热键 + 布局锁定）", icon = "🔄", kind = "page", url = "/apptoggle/view/pages/apps/index.html" },
 >>>>>>> gittree-wf-wf-control-center-3
+=======
+            { key = "应用显隐", description = "一键显隐应用(全局热键 + 布局锁定)", icon = "🔄", kind = "page", url = "/apptoggle/view/pages/apps/index.html" },
+>>>>>>> gittree-wf-wf-control-center-6
         },
         pages = {
             { name = "应用显隐", icon = "🔄", configUrl = "/apptoggle/view/pages/apps/index.html" },
@@ -1692,10 +1811,14 @@ local apiProviders = {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 -- fake 模块:记录调用 + 可注入故障(验证 pcall 容错)
 =======
 -- fake 模块：记录调用 + 可注入故障（验证 pcall 容错）
 >>>>>>> gittree-wf-wf-control-center-3
+=======
+-- fake 模块:记录调用 + 可注入故障(验证 pcall 容错)
+>>>>>>> gittree-wf-wf-control-center-6
 local openedUrls = {}
 local hideCalls = 0
 local failOpen, failHide, failGet = false, false, false
@@ -1722,6 +1845,7 @@ api.setup(fakeSourcesMod, fakePanelMod, VIEWS)
 
 -- 注册面
 <<<<<<< HEAD
+<<<<<<< HEAD
 check("F1 静态挂载 /control-center/view", #mockStatic == 1
     and mockStatic[1].prefix == "/control-center/view" and mockStatic[1].root == VIEWS)
 check("F2 三个路由已注册(providers/open/close)", #mockRoutes == 3)
@@ -1730,20 +1854,32 @@ check("E1 静态挂载 /control-center/view", #mockStatic == 1
     and mockStatic[1].prefix == "/control-center/view" and mockStatic[1].root == VIEWS)
 check("E2 三个路由已注册（providers/open/close）", #mockRoutes == 3)
 >>>>>>> gittree-wf-wf-control-center-3
+=======
+check("F1 静态挂载 /control-center/view", #mockStatic == 1
+    and mockStatic[1].prefix == "/control-center/view" and mockStatic[1].root == VIEWS)
+check("F2 三个路由已注册(providers/open/close)", #mockRoutes == 3)
+>>>>>>> gittree-wf-wf-control-center-6
 local allCCOk = true
 for _, r in ipairs(mockRoutes) do
     if r.pattern:sub(1, #"/control-center/api/") ~= "/control-center/api/" then allCCOk = false end
 end
 <<<<<<< HEAD
+<<<<<<< HEAD
 check("F3 路由全部挂在 /control-center/api 前缀(与 /launcher、/stayawake 命名空间无冲突)", allCCOk)
 =======
 check("E3 路由全部挂在 /control-center/api 前缀（与 /launcher、/stayawake 命名空间无冲突）", allCCOk)
 >>>>>>> gittree-wf-wf-control-center-3
+=======
+check("F3 路由全部挂在 /control-center/api 前缀(与 /launcher、/stayawake 命名空间无冲突)", allCCOk)
+>>>>>>> gittree-wf-wf-control-center-6
 
 -- GET providers
 local body, code = dispatch("GET", "/control-center/api/providers")
 local providersBody = jsonDecode(body)
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> gittree-wf-wf-control-center-6
 check("F4 providers 返回 200 合法 JSON", code == 200 and type(providersBody) == "table", tostring(code))
 check("F5 providers 数量与数据源一致", providersBody and #providersBody.providers == 2, providersBody and tostring(#providersBody.providers))
 local atj = providersBody and providersBody.providers[1]
@@ -1753,6 +1889,7 @@ check("F7 卡片字段透传(key/url)", atj and atj.cards[1].key == "应用显�
 check("F8 页面 configUrl/searchUrl 透传", atj and atj.pages[1].configUrl == "/apptoggle/view/pages/apps/index.html")
 local bdj = providersBody and providersBody.providers[2]
 check("F9 searchUrl 透传(bingdaily)", bdj and bdj.pages[1].searchUrl == "/bingdaily/view/pages/search/index.html")
+<<<<<<< HEAD
 =======
 check("E4 providers 返回 200 合法 JSON", code == 200 and type(providersBody) == "table", tostring(code))
 check("E5 providers 数量与数据源一致", providersBody and #providersBody.providers == 2, providersBody and tostring(#providersBody.providers))
@@ -1764,15 +1901,21 @@ check("E8 页面 configUrl/searchUrl 透传", atj and atj.pages[1].configUrl == 
 local bdj = providersBody and providersBody.providers[2]
 check("E9 searchUrl 透传（bingdaily）", bdj and bdj.pages[1].searchUrl == "/bingdaily/view/pages/search/index.html")
 >>>>>>> gittree-wf-wf-control-center-3
+=======
+>>>>>>> gittree-wf-wf-control-center-6
 
 -- GET providers 故障 → 500
 failGet = true
 local _, codeFail = dispatch("GET", "/control-center/api/providers")
 <<<<<<< HEAD
+<<<<<<< HEAD
 check("F10 sources.get 抛错 → 500 + err", codeFail == 500)
 =======
 check("E10 sources.get 抛错 → 500 + err", codeFail == 500)
 >>>>>>> gittree-wf-wf-control-center-3
+=======
+check("F10 sources.get 抛错 → 500 + err", codeFail == 500)
+>>>>>>> gittree-wf-wf-control-center-6
 failGet = false
 
 -- POST open
@@ -1780,6 +1923,9 @@ local P_URL = "http://127.0.0.1:8821/stayawake/view/pages/control/index.html"
 local ob, oc = dispatch("POST", "/control-center/api/open", {}, jsonEncode({ url = P_URL }))
 local oj = jsonDecode(ob)
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> gittree-wf-wf-control-center-6
 check("F11 open 带 url → 200 {ok:true}", oc == 200 and oj and oj.ok == true, tostring(oc))
 check("F12 open 调用 panel.open(url)", #openedUrls == 1 and openedUrls[1] == P_URL, tostring(#openedUrls))
 
@@ -1795,6 +1941,7 @@ check("F16 open url 空串 → 400", cEmpty == 400, tostring(cEmpty))
 local _, cBadJson = dispatch("POST", "/control-center/api/open", {}, "not-json{")
 check("F17 open body 非法 JSON → 400", cBadJson == 400, tostring(cBadJson))
 check("F18 校验失败不触发 panel.open", #openedUrls == 1)
+<<<<<<< HEAD
 =======
 check("E11 open 带 url → 200 {ok:true}", oc == 200 and oj and oj.ok == true, tostring(oc))
 check("E12 open 调用 panel.open(url)", #openedUrls == 1 and openedUrls[1] == P_URL, tostring(#openedUrls))
@@ -1812,20 +1959,27 @@ local _, cBadJson = dispatch("POST", "/control-center/api/open", {}, "not-json{"
 check("E17 open body 非法 JSON → 400", cBadJson == 400, tostring(cBadJson))
 check("E18 校验失败不触发 panel.open", #openedUrls == 1)
 >>>>>>> gittree-wf-wf-control-center-3
+=======
+>>>>>>> gittree-wf-wf-control-center-6
 
 -- POST open 故障 → 500
 failOpen = true
 local _, cOpenFail = dispatch("POST", "/control-center/api/open", {}, jsonEncode({ url = P_URL }))
 <<<<<<< HEAD
+<<<<<<< HEAD
 check("F19 panel.open 抛错 → 500 + err", cOpenFail == 500, tostring(cOpenFail))
 =======
 check("E19 panel.open 抛错 → 500 + err", cOpenFail == 500, tostring(cOpenFail))
 >>>>>>> gittree-wf-wf-control-center-3
+=======
+check("F19 panel.open 抛错 → 500 + err", cOpenFail == 500, tostring(cOpenFail))
+>>>>>>> gittree-wf-wf-control-center-6
 failOpen = false
 
 -- POST close
 local cb_, cc = dispatch("POST", "/control-center/api/close")
 local cj = jsonDecode(cb_)
+<<<<<<< HEAD
 <<<<<<< HEAD
 check("F20 close → 200 {ok:true}", cc == 200 and cj and cj.ok == true, tostring(cc))
 check("F21 close 调用 panel.hide", hideCalls == 1, tostring(hideCalls))
@@ -1833,11 +1987,18 @@ check("F21 close 调用 panel.hide", hideCalls == 1, tostring(hideCalls))
 check("E20 close → 200 {ok:true}", cc == 200 and cj and cj.ok == true, tostring(cc))
 check("E21 close 调用 panel.hide", hideCalls == 1, tostring(hideCalls))
 >>>>>>> gittree-wf-wf-control-center-3
+=======
+check("F20 close → 200 {ok:true}", cc == 200 and cj and cj.ok == true, tostring(cc))
+check("F21 close 调用 panel.hide", hideCalls == 1, tostring(hideCalls))
+>>>>>>> gittree-wf-wf-control-center-6
 
 -- POST close 故障 → 500
 failHide = true
 local _, cCloseFail = dispatch("POST", "/control-center/api/close")
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> gittree-wf-wf-control-center-6
 check("F22 panel.hide 抛错 → 500 + err", cCloseFail == 500, tostring(cCloseFail))
 failHide = false
 
@@ -1960,6 +2121,7 @@ check("G7 面板单例聚合页 URL 指向聚合配置页",
 -- start 幂等:重复调用不重复注册路由/不重建菜单栏
 cc:start()
 check("G8 start 幂等(路由/菜单栏不重复)", #G.routes == 3 and #G.bars == 1)
+<<<<<<< HEAD
 =======
 check("E22 panel.hide 抛错 → 500 + err", cCloseFail == 500, tostring(cCloseFail))
 failHide = false
@@ -2308,6 +2470,8 @@ do
         W.view and W.view:raw() and W.view:raw():url() or "nil")
 end
 >>>>>>> gittree-wf-wf-control-center-4
+=======
+>>>>>>> gittree-wf-wf-control-center-6
 
 -- =========================================================
 -- 汇总
