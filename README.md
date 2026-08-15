@@ -8,7 +8,7 @@
 ## ✨ 功能一览
 
 | 分类 | 说明 | 所属包 |
-|------|------|--------|
+| ------ | ------ | -------- |
 | 🪟 分屏 | 一屏四向半屏摆放 | QuantumWindow |
 | 🔀 相邻 Space | 快速把窗口移到上/下一个虚拟桌面 | QuantumWindow |
 | 🖥️ 跨显示器 | 把窗口移到上/下方显示器 | QuantumWindow |
@@ -16,12 +16,14 @@
 | 🎯 居中 | 按绝对尺寸居中显示 | QuantumWindow |
 | 📋 剪贴板历史 | 记录复制内容，弹出面板回选粘贴（SQLite 持久化 + 模糊搜索） | Clipboard |
 | 🌙 防睡眠 | 菜单栏防睡眠：永久 / 1-24 小时 / 5-90 分钟 / 直到指定时间（允许息屏或屏幕常亮） | StayAwake |
+| 🔄 应用显隐 | 任意应用一键显隐（全局热键 + 按屏布局锁定 + 全屏接管，带管理页） | AppToggle |
+| 🖼️ Bing 壁纸 | Bing 每日壁纸（自动轮询 + 一键应用/随机 + 历史浏览 + 下载记录） | BingDaily |
 | 🚀 启动器 | Option+Space 命令中枢（启动应用/计算器/截屏/URL/书签，支持自定义命令，自动发现各 Spoon 功能卡片） | Launcher |
 
 ## ⌨️ 快捷键速查表
 
 | 快捷键 | 动作 |
-|--------|------|
+| -------- | ------ |
 | `Ctrl` + `Opt` + `Cmd` + `←` | 左半屏 |
 | `Ctrl` + `Opt` + `Cmd` + `→` | 右半屏 |
 | `Ctrl` + `Opt` + `Cmd` + `↑` | 上半屏 |
@@ -68,7 +70,7 @@ ln -s ~/path/to/hammerspoon-kit/Spoons ~/.hammerspoon/Spoons
 ## 🧪 运行测试
 
 | 测试 | 命令 | 环境 |
-|------|------|------|
+| ------ | ------ | ------ |
 | Launcher 单元测试 | `lua5.4 core/launcher/test/unit_test.lua` | 纯 Lua，无需 Hammerspoon |
 | QuantumWindow | `hs -c "dofile('$HOME/.hammerspoon/Spoons/QuantumWindow.spoon/test/run.lua')"` | Hammerspoon 运行中 |
 | StayAwake | `hs -c "dofile('$HOME/.hammerspoon/Spoons/StayAwake.spoon/test/run.lua')"` | Hammerspoon 运行中 |
@@ -86,7 +88,9 @@ hammerspoon-kit/
 ├── Spoons/
 │   ├── QuantumWindow.spoon/  # 窗口管理（init.lua + internal/ 分层 + launcher-commands.lua）
 │   ├── Clipboard.spoon/      # 剪贴板历史（SQLite + chooser 面板 + webview 预览）
-│   └── StayAwake.spoon/      # 防睡眠（菜单栏入口 + 倒计时横幅）
+│   ├── StayAwake.spoon/      # 防睡眠（菜单栏入口 + 倒计时横幅）
+│   ├── AppToggle.spoon/      # 应用一键显隐（全局热键 + 布局锁定 + 管理页）
+│   └── BingDaily.spoon/      # Bing 每日壁纸（轮询 + 一键执行 + 归档浏览）
 ├── docs/
 │   ├── quickstart.md         # 五分钟上手
 │   └── development.md        # 二次开发指南
@@ -111,6 +115,7 @@ hammerspoon-kit/
 - **快捷键无效**：检查 `系统设置 → 键盘 → 键盘快捷键 → 调度中心` 是否占用了 `Ctrl+Cmd+方向键`。
 - **Space 切换有视觉过渡**：`hs.spaces.moveWindowToSpace` 基于 macOS 私有 API，过渡动画属系统层面行为。
 - **剪贴板不记录**：确认 Hammerspoon 已获「辅助功能」授权。
+- **BingDaily 默认不启用**：默认不下载/更换壁纸；取消 `init.lua` 中对应注释即可启用。
 
 ## 📄 开源协议
 

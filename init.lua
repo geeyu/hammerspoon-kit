@@ -7,6 +7,8 @@
 ---   * QuantumWindow.spoon 窗口管理（带 HUD）
 ---   * Clipboard.spoon     剪贴板历史（Ctrl+V）
 ---   * StayAwake.spoon     菜单栏防睡眠
+---   * AppToggle.spoon     应用一键显隐（全局热键 + 布局锁定）
+---   * BingDaily.spoon     Bing 每日壁纸（可选启用）
 --- ============================================================
 
 hs.window.animationDuration = 0
@@ -43,6 +45,16 @@ local stayAwake = hs.loadSpoon("StayAwake")
 if stayAwake then
     stayAwake:start()
 end
+
+-- AppToggle：应用一键显隐（无配置时零副作用，管理页加应用后生效）
+local appToggle = hs.loadSpoon("AppToggle")
+if appToggle then
+    appToggle:start()
+end
+
+-- BingDaily：Bing 每日壁纸（轮询 + 一键执行；默认不启用，避免未经同意下载/更换壁纸）
+-- 启用：取消注释下行
+-- local bingDaily = hs.loadSpoon("BingDaily") bingDaily:start()
 
 hs.hotkey.bind({ "cmd", "alt", "ctrl" }, "R", function()
     hs.reload()

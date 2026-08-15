@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>Bing 壁纸</title>
+<!-- 占位符：ui 注入 vue + theme/base（对齐 Clipboard history：搜索栏 + 卡片列表） -->
+<!-- hsutil:ui toast -->
+<!-- hsutil:fx glass -->
+<link rel="stylesheet" href="/bingdaily/view/pages/search/style.css">
+</head>
+<body>
+<div id="app" v-cloak>
+  <div class="bd-panel glass-panel">
+    <!-- 搜索栏（Tab 注入 embed 模式隐藏：输入由 launcher 转发） -->
+    <div class="searchbar" v-if="!isEmbed">
+      <span class="icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/>
+        </svg>
+      </span>
+      <input id="q" ref="q" v-model="query" type="text"
+             placeholder="搜索壁纸（名称/日期）…" autocomplete="off" spellcheck="false"
+             @input="onQuery">
+      <span class="badge">{{ filtered.length }} 张</span>
+      <a class="settings-btn" href="/bingdaily/view/pages/settings/index.html" title="设置">⚙</a>
+    </div>
+
+    <!-- 卡片列表 -->
+    <div class="card-list thin-scroll" ref="list">
+      <div class="empty-state anim-fade-in" v-if="filtered.length === 0">
+        <div class="empty-icon anim-beat">🖼️</div>
+        <div class="empty-text">
+          <template v-if="loading">正在拉取最近壁纸…</template>
+          <template v-else-if="query.trim()">未找到匹配「{{ query.trim() }}」的壁纸</template>
+          <template v-else>暂无壁纸<br>检查网络或稍后重试</template>
+        </div>
+      </div>
+
+      <div class="wall-card"
+           v-for="(it, i) in filtered" :key="it.date"
+           :class="{ selected: i === selected, current: it.name === currentName }"
+           @click="apply(i)" @mouseenter="selected = i">
+        <span class="wall-thumb">
+          <img :src="it.url" alt="" loading="lazy" @error="thumbErr = true">
+          <span v-if="thumbErr" class="wall-thumb-fallback">🖼️</span>
+        </span>
+        <div class="wall-body">
+          <div class="wall-title">
+            {{ fmtDate(it.date) }}
+            <span class="wall-current" v-if="it.name === currentName">当前</span>
+            <span class="wall-applying" v-if="applying === it.name">应用中…</span>
+          </div>
+          <div class="wall-sub">{{ it.name }}</div>
+          <div class="wall-copy" v-if="it.copyright">{{ it.copyright }}</div>
+        </div>
+        <span class="wall-apply">应用</span>
+      </div>
+    </div>
+
+    <!-- 底部状态栏（embed 隐藏） -->
+    <div class="statusbar" v-if="!isEmbed">
+      <span class="hint"><span class="kbd">↑</span><span class="kbd">↓</span> 选择</span>
+      <span class="hint"><span class="kbd">Enter</span> 应用壁纸</span>
+      <span class="hint"><span class="kbd">Esc</span> 关闭</span>
+    </div>
+  </div>
+</div>
+<script src="store.js" defer></script>
+<script src="app.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,188 @@
+/* ===== Bing 壁纸搜索页（views/pages/search/style.css）=====
+   对齐 Clipboard history：搜索栏 + 卡片列表 + 状态栏。 */
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  font-family: var(--font);
+  background: transparent;
+  color: var(--fg-1);
+  overflow: hidden;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+[v-cloak] { display: none; }
+#app { height: 100%; }
+
+.bd-panel {
+  width: 100%; height: 100%;
+  border-radius: var(--radius-p);
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ─── 搜索栏 ─── */
+.searchbar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.searchbar .icon {
+  width: 18px; height: 18px;
+  color: var(--fg-3); flex-shrink: 0;
+  transition: color .2s ease;
+}
+.searchbar .icon svg { width: 100%; height: 100%; }
+.searchbar:focus-within .icon { color: var(--accent); }
+.searchbar input {
+  flex: 1; border: none; outline: none;
+  background: transparent;
+  font-size: 17px; color: var(--fg-1);
+  font-family: var(--font);
+  caret-color: var(--accent);
+  min-width: 0;
+}
+.searchbar input::placeholder { color: var(--fg-3); }
+.searchbar .badge {
+  flex: none; font-size: 11px; color: var(--fg-3);
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.searchbar .settings-btn {
+  flex: none; width: 26px; height: 26px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px;
+  color: var(--fg-3); text-decoration: none;
+  border: 1px solid var(--border); border-radius: 7px;
+}
+.searchbar .settings-btn:hover { color: var(--fg-1); border-color: var(--border-h); }
+
+/* ─── 卡片列表 ─── */
+.card-list {
+  flex: 1; overflow-y: auto;
+  min-height: 0;
+  padding: 10px 12px;
+}
+.thin-scroll::-webkit-scrollbar { width: 6px; }
+.thin-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.10); border-radius: 3px; }
+.thin-scroll::-webkit-scrollbar-track { background: transparent; }
+
+.wall-card {
+  position: relative;
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 8px;
+  padding: 10px 14px;
+  border-radius: var(--radius-c);
+  background: var(--bg-card);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.22);
+  cursor: pointer;
+  overflow: hidden;
+  transition:
+    transform    0.20s var(--ease),
+    box-shadow   0.20s ease,
+    border-color 0.20s ease,
+    background   0.22s ease;
+}
+.wall-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 10px; bottom: 10px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--accent);
+  transform: scaleY(0);
+  transform-origin: center;
+  transition: transform 0.26s var(--ease);
+}
+.wall-card:hover {
+  background: var(--bg-card-h);
+  border-color: var(--border-h);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+}
+.wall-card:hover::before { transform: scaleY(1); }
+.wall-card.selected {
+  background: var(--accent-soft);
+  border-color: var(--accent-ring);
+  box-shadow: 0 0 0 1px var(--accent-ring), 0 4px 20px var(--accent-soft);
+}
+.wall-card.selected::before { transform: scaleY(1); }
+.wall-card.current { border-color: rgba(74, 222, 128, 0.4); }
+
+.wall-thumb {
+  width: 96px; height: 54px; flex: none;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--bg-row-h);
+  position: relative;
+}
+.wall-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.wall-thumb-fallback {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+}
+.wall-body { flex: 1; min-width: 0; }
+.wall-title {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13.5px; color: var(--fg-1);
+}
+.wall-current {
+  font-size: 10px; color: #4ade80;
+  border: 1px solid rgba(74,222,128,0.4); border-radius: 4px;
+  padding: 0 5px;
+}
+.wall-applying { font-size: 10px; color: var(--accent); }
+.wall-sub {
+  font-size: 11px; color: var(--fg-3);
+  margin-top: 2px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.wall-copy {
+  font-size: 10.5px; color: var(--fg-3);
+  margin-top: 1px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  opacity: 0.8;
+}
+.wall-apply {
+  flex: none; font-size: 10.5px; color: var(--accent);
+  border: 1px solid var(--accent-ring); border-radius: 5px;
+  padding: 3px 10px;
+}
+.wall-card.selected .wall-apply { background: var(--accent); color: #fff; }
+
+/* ─── 空态 ─── */
+.empty-state {
+  height: 100%;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 10px;
+  color: var(--fg-3);
+  text-align: center;
+}
+.empty-icon { font-size: 36px; opacity: 0.6; }
+.empty-text { font-size: 12.5px; color: var(--fg-2); line-height: 1.7; }
+
+/* ─── 状态栏 ─── */
+.statusbar {
+  display: flex; gap: 16px;
+  padding: 8px 16px;
+  border-top: 1px solid var(--border);
+  font-size: 11px; color: var(--fg-3);
+  flex-shrink: 0;
+}
+.statusbar .hint { display: flex; align-items: center; gap: 4px; }
+.kbd {
+  font-family: var(--mono); font-size: 10px;
+  background: var(--bg-row-h);
+  border: 1px solid var(--border);
+  border-radius: 3px; padding: 1px 5px;
+  color: var(--fg-2);
+}
