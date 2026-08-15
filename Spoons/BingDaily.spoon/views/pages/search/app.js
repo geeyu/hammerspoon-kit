@@ -17,9 +17,7 @@ createApp({
     const isEmbed = new URLSearchParams(location.search).get('embed') === '1';
 
     // 过滤后的列表
-    const filtered = computed(function () {
-      return state.filteredRows(state);
-    });
+    const filtered = computed(() => state.filteredRows(state));
 
     function fmtDate(d) {
       if (!d) return '';
@@ -57,7 +55,7 @@ createApp({
     }
 
     // Launcher Tab 注入
-    window.addEventListener('message', function (e) {
+    window.addEventListener('message', (e) => {
       const d = e.data || {};
       if (d.type === 'query') { state.query.value = d.text || ''; state.selected.value = 0; return; }
       if (d.type === 'key') {
@@ -67,15 +65,19 @@ createApp({
       }
     });
 
-    onMounted(function () {
-      store.load().then(function () {
+    onMounted(() => {
+      store.load().then(() => {
         // 加载后补当前壁纸状态（status 接口）
-        fetch('/bingdaily/api/status').then(function (r) { return r.json(); })
-          .then(function (d) { if (d && d.last_pic) state.currentName.value = d.last_pic; })
-          .catch(function () {});
+        fetch('/bingdaily/api/status').then((r) => r.json())
+          .then((d) => { if (d && d.last_pic) state.currentName.value = d.last_pic; })
+          .catch(() => {});
       });
       const el = q.value;
       if (el && el.focus && !isEmbed) { try { el.focus(); } catch (e) {} }
+      // 玻璃光尘特效（fx 占位符已注入 anime/glass-fx）
+      try {
+        if (window.HSUI && HSUI.initGlassFX) HSUI.initGlassFX();
+      } catch (e) {}
     });
 
     return { query: state.query, filtered, selected: state.selected,

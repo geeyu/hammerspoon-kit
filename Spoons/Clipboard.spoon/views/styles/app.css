@@ -59,11 +59,12 @@ body.ch-history .panel-shell {
  min-height: 0;
  display: flex;
  flex-direction: column;
- /* 纵向微渐变：顶部稍亮、底部更深，纯净有层次（不用平坦色） */
- background: linear-gradient(
+  /* 纵向微渐变：顶部稍亮、底部更深，纯净有层次（不用平坦色）。
+     透明度 0.93/0.96（与 page.css .page-panel 对齐） */
+  background: linear-gradient(
   180deg,
-  rgba(24, 27, 38, 0.86) 0%,
-  rgba(9, 11, 17, 0.9) 100%
+  rgba(24, 27, 38, 0.93) 0%,
+  rgba(9, 11, 17, 0.96) 100%
  );
  /* 重模糊把壁纸抽象成柔和色块；brightness 压暗避免艳丽壁纸泛脏；低饱和保持干净 */
  backdrop-filter: blur(64px) saturate(120%) brightness(0.72);

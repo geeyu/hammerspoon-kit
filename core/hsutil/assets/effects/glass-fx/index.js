@@ -6,13 +6,13 @@
  *   HSUI.cardSheen(el);   // hover 扫光（目标元素需 position:relative + overflow:hidden）
  * 样式：effects/glass-fx.css（随 fx 占位符注入）
  */
-(function () {
+(() => {
   // 合并而非覆盖：overlay.js 等可能已挂载 HSUI 子模块
   window.HSUI = window.HSUI || {};
   var HSUI = window.HSUI;
 
   // hover 高光扫过：一道玻璃反光快速扫过卡面
-  HSUI.cardSheen = function (card) {
+  HSUI.cardSheen = (card) => {
     if (!window.anime || !card || card.querySelector('.card-sheen')) return;
     var s = document.createElement('span');
     s.className = 'card-sheen';
@@ -22,14 +22,16 @@
       translateX: ['-130%', '340%'],
       duration: 680,
       ease: 'inOutQuad',           // v4: easing → ease，easeInOutQuad → inOutQuad
-      onComplete: function () { s.remove(); }
+      onComplete: () => { s.remove(); }
     });
   };
 
   // 玻璃光尘：4 条贝塞尔曲线 + 柔光微粒漂移 + 呼吸闪烁
-  HSUI.initGlassFX = function () {
+  HSUI.initGlassFX = () => {
     if (!window.anime || !anime.svg || !anime.svg.createMotionPath) return;
     if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    // 控制中心 iframe 内嵌入：宿主面板已有光效，不再重复撒粒子（避免双层光效）
+    if (document.documentElement.classList.contains('in-iframe')) return;
     // 特效层自动创建：所有使用 glass-panel 背景的页面只需声明 fx 占位符 + 调用本函数，
     // 无需手写 <div class="fx-layer">（页面已自带 layer 时复用，避免重复）。
     var layer = document.querySelector('.fx-layer');
@@ -55,13 +57,13 @@
       'M 180,580 C 100,480 260,420 220,320 C 180,220 60,260 80,140 C 95,60 220,80 300,40',
       'M 20,300 C 100,220 180,380 260,300 C 320,240 340,160 300,100'
     ];
-    defs.forEach(function (d, i) {
+    defs.forEach((d, i) => {
       var p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
       p.setAttribute('id', 'fxp' + (i + 1));
       p.setAttribute('d', d);
       svg.appendChild(p);
     });
-    var paths = defs.map(function (_, i) {
+    var paths = defs.map((_, i) => {
       return anime.svg.createMotionPath('#fxp' + (i + 1));   // v4: anime.path → anime.svg.createMotionPath
     });
     // 注：createMotionPath 返回 { translateX, translateY, rotate } 函数描述符（非数组），

@@ -6,11 +6,12 @@
     <link rel="icon" href="data:," />
     <!-- 占位符：服务端展开注入 vue + theme.css + base.css + 组件（声明即可，勿手写 link/script） -->
     <!-- hsutil:ui select,switch,button,toast,confirm,input,hotkey,modal,empty -->
+    <!-- hsutil:fx glass -->
     <link rel="stylesheet" href="/apptoggle/view/pages/apps/style.css" />
   </head>
   <body>
     <div id="app" v-cloak>
-      <div class="page-panel">
+      <div class="page-panel glass-panel">
         <div class="page-head">
           <div class="page-title">🔄 应用显隐管理</div>
           <ui-button variant="ghost" size="sm" @click="goBack"

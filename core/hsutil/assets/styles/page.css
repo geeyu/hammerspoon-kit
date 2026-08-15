@@ -37,11 +37,12 @@ body {
   height: 100%;
   display: flex;
   flex-direction: column;
-  /* 纵向微渐变：顶部稍亮、底部更深（对齐 Clipboard .panel-shell） */
+  /* 纵向微渐变：顶部稍亮、底部更深（对齐 Clipboard .panel-shell）。
+     透明度 0.93/0.96：壁纸透出柔和但主体更实（0.86/0.9 太透，与内容对比发虚） */
   background: linear-gradient(
     180deg,
-    rgba(24, 27, 38, 0.86) 0%,
-    rgba(9, 11, 17, 0.9) 100%
+    rgba(24, 27, 38, 0.93) 0%,
+    rgba(9, 11, 17, 0.96) 100%
   );
   /* 重模糊把壁纸抽象成柔和色块；brightness 压暗避免艳丽壁纸泛脏；
      低饱和保持干净（对齐 Clipboard 主体） */
@@ -222,4 +223,21 @@ body {
   font-weight: 600;
   color: var(--fg-2);
   padding: 18px 22px 6px;
+}
+
+/* ── 控制中心 iframe 内嵌入（html.in-iframe，由 ui/index.js 检测 parent.__ccPanelShim 添加）──
+   配置页在控制中心聚合面板的 iframe 内打开时，去掉自身玻璃面板——
+   否则双层玻璃（宿主面板 + iframe 内面板各自 blur/渐变）叠加导致明显更暗、更浑浊，
+   与控制中心首页色差大。去玻璃后内容直接铺在宿主面板上，风格统一。 */
+html.in-iframe .page-panel,
+html.in-iframe .glass-panel {
+  background: transparent !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  box-shadow: none !important;
+  border: none !important;
+  border-radius: 0 !important;
+}
+html.in-iframe #app {
+  padding: 10px; /* 内容距宿主面板边距（宿主面板 1px 边框 + 本边距 ≈ 首页内容 padding） */
 }

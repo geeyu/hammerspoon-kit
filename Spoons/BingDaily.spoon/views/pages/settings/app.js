@@ -99,6 +99,10 @@ createApp({
 
     onMounted(() => {
       store.load();
+      // 玻璃光尘特效（fx 占位符已注入 anime/glass-fx）
+      try {
+        if (window.HSUI && HSUI.initGlassFX) HSUI.initGlassFX();
+      } catch (e) {}
     });
 
     return {

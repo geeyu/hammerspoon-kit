@@ -77,6 +77,10 @@ createApp({
       store.load().catch(() => {});
       // 预加载运行中的应用列表：打开添加弹窗零等待（不阻塞动画）
       store.loadRunningApps();
+      // 玻璃光尘特效（fx 占位符已注入 anime/glass-fx）
+      try {
+        if (window.HSUI && HSUI.initGlassFX) HSUI.initGlassFX();
+      } catch (e) {}
     });
 
     return {

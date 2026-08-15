@@ -2,32 +2,32 @@
    用法：registerUiComponents(app) 一键注册所有已加载组件 */
 
 var uiComponents = {
-  'ui-button':      typeof UiButton !== 'undefined'      ? UiButton      : null,
-  'ui-badge':       typeof UiBadge !== 'undefined'       ? UiBadge       : null,
-  'ui-status-badge': typeof UiStatusBadge !== 'undefined' ? UiStatusBadge : null,
-  'ui-divider':     typeof UiDivider !== 'undefined'     ? UiDivider     : null,
-  'ui-avatar':      typeof UiAvatar !== 'undefined'      ? UiAvatar      : null,
-  'ui-empty':       typeof UiEmpty !== 'undefined'       ? UiEmpty       : null,
-  'ui-loading':     typeof UiLoading !== 'undefined'     ? UiLoading     : null,
-  'ui-input':       typeof UiInput !== 'undefined'       ? UiInput       : null,
-  'ui-hotkey':      typeof UiHotkey !== 'undefined'      ? UiHotkey      : null,
-  'ui-datetime':    typeof UiDatetime !== 'undefined'    ? UiDatetime    : null,
-  'ui-select':      typeof UiSelect !== 'undefined'      ? UiSelect      : null,
-  'ui-switch':      typeof UiSwitch !== 'undefined'      ? UiSwitch      : null,
-  'ui-radio-group': typeof UiRadio !== 'undefined'       ? UiRadio       : null,
-  'ui-form-field':  typeof UiFormField !== 'undefined'   ? UiFormField   : null,
-  'ui-form':        typeof UiForm !== 'undefined'        ? UiForm        : null,
-  'ui-modal':       typeof UiModal !== 'undefined'       ? UiModal       : null,
-  'ui-drawer':      typeof UiDrawer !== 'undefined'      ? UiDrawer      : null,
-  'ui-tabs':        typeof UiTabs !== 'undefined'        ? UiTabs        : null,
-  'ui-table':       typeof UiTable !== 'undefined'       ? UiTable       : null,
-  'ui-pagination':  typeof UiPagination !== 'undefined'  ? UiPagination  : null,
-  'ui-icon':        typeof UiIcon !== 'undefined'          ? UiIcon        : null
+  'ui-button':      typeof UiButton === 'undefined'      ? null      : UiButton,
+  'ui-badge':       typeof UiBadge === 'undefined'       ? null       : UiBadge,
+  'ui-status-badge': typeof UiStatusBadge === 'undefined' ? null : UiStatusBadge,
+  'ui-divider':     typeof UiDivider === 'undefined'     ? null     : UiDivider,
+  'ui-avatar':      typeof UiAvatar === 'undefined'      ? null      : UiAvatar,
+  'ui-empty':       typeof UiEmpty === 'undefined'       ? null       : UiEmpty,
+  'ui-loading':     typeof UiLoading === 'undefined'     ? null     : UiLoading,
+  'ui-input':       typeof UiInput === 'undefined'       ? null       : UiInput,
+  'ui-hotkey':      typeof UiHotkey === 'undefined'      ? null      : UiHotkey,
+  'ui-datetime':    typeof UiDatetime === 'undefined'    ? null    : UiDatetime,
+  'ui-select':      typeof UiSelect === 'undefined'      ? null      : UiSelect,
+  'ui-switch':      typeof UiSwitch === 'undefined'      ? null      : UiSwitch,
+  'ui-radio-group': typeof UiRadio === 'undefined'       ? null       : UiRadio,
+  'ui-form-field':  typeof UiFormField === 'undefined'   ? null   : UiFormField,
+  'ui-form':        typeof UiForm === 'undefined'        ? null        : UiForm,
+  'ui-modal':       typeof UiModal === 'undefined'       ? null       : UiModal,
+  'ui-drawer':      typeof UiDrawer === 'undefined'      ? null      : UiDrawer,
+  'ui-tabs':        typeof UiTabs === 'undefined'        ? null        : UiTabs,
+  'ui-table':       typeof UiTable === 'undefined'       ? null       : UiTable,
+  'ui-pagination':  typeof UiPagination === 'undefined'  ? null  : UiPagination,
+  'ui-icon':        typeof UiIcon === 'undefined'          ? null        : UiIcon
 };
 
 function registerUiComponents(app) {
   for (var name in uiComponents) {
-    if (uiComponents.hasOwnProperty(name) && uiComponents[name]) {
+    if (Object.hasOwn(uiComponents, name) && uiComponents[name]) {
       app.component(name, uiComponents[name]);
     }
   }
@@ -82,3 +82,14 @@ if (typeof window.UiTable === 'undefined' && typeof UiTable !== 'undefined') win
 if (typeof window.UiPagination === 'undefined' && typeof UiPagination !== 'undefined') window.UiPagination  = UiPagination;
 if (typeof window.UiIcon === 'undefined' && typeof UiIcon !== 'undefined') window.UiIcon        = UiIcon;
 if (typeof window.useCrud === 'undefined' && typeof useCrud !== 'undefined') window.useCrud       = useCrud;
+
+/* 控制中心 iframe 嵌入检测：聚合面板（parent.__ccPanelShim）内打开的配置页
+   在 html 上加 in-iframe 类 → page.css 去玻璃（避免双层玻璃色差）。
+   launcher 等其他 iframe 场景不受影响。 */
+(function detectCCFrame() {
+    try {
+        if (window.self !== window.top && window.parent && window.parent.__ccPanelShim) {
+            document.documentElement.classList.add('in-iframe');
+        }
+    } catch (e) {}
+})();
