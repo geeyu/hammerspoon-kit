@@ -6,139 +6,203 @@
 
 /* ── 高度链：webview 内 html/body/#app 默认无固定高度，缺了它
      .page-panel 的 100% 高度会塌陷成内容高 ── */
-html, body, #app { height: 100%; margin: 0; }
-
-body {
-  font-family: var(--font);
-  color: var(--fg-1);
-  -webkit-font-smoothing: antialiased;
+html,
+body,
+#app {
+ height: 100%;
+ margin: 0;
 }
 
-/* ── 面板壳：毛玻璃深色底 + 顶部受光，flex column、100% 高度、滚动收敛到 .ctrl-body ── */
+body {
+ font-family: var(--font);
+ color: var(--fg-1);
+ -webkit-font-smoothing: antialiased;
+}
+
+/* ── 面板壳：毛玻璃深色底 + 发光边缘立体感，flex column、100% 高度、滚动收敛到 .ctrl-body ── */
 .page-panel {
-  width: 100%; height: 100%;
-  display: flex; flex-direction: column;
-  /* 毛玻璃面板：半透明深色 + 背景模糊。webview 窗口透明时透出桌面壁纸；
+ width: 100%;
+ height: 100%;
+ display: flex;
+ flex-direction: column;
+ /* 毛玻璃面板：半透明深色 + 背景模糊。webview 窗口透明时透出桌面壁纸；
      浏览器全幅视口下 backdrop-filter 无内容可糊，回退为近实色（视觉等价） */
-  background: var(--glass-bg);
-  -webkit-backdrop-filter: var(--glass-blur);
-  backdrop-filter: var(--glass-blur);
-  /* 顶部受光边缘（Apple 风玻璃描边） */
-  border: 1px solid var(--glass-border);
-  border-top-color: var(--glass-highlight);
-  border-radius: var(--radius-p);
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.35);
-  overflow: hidden;            /* 滚动交给 .ctrl-body */
-  position: relative;          /* .glass-panel ::before/::after 定位参照 */
-  box-sizing: border-box;
+ background: var(--glass-bg);
+ -webkit-backdrop-filter: var(--glass-blur);
+ backdrop-filter: var(--glass-blur);
+ /* 发光边缘：内层高亮描边 + accent 微光 + 外发光 + 深阴影（悬浮立体感） */
+ border: 1px solid var(--glass-border);
+ border-top-color: var(--glass-highlight);
+ border-radius: var(--radius-p);
+ box-shadow:
+   0 0 0 1px rgba(74, 139, 245, 0.06),
+   0 0 24px rgba(74, 139, 245, 0.10),
+   0 0 48px rgba(0, 0, 0, 0.45),
+   0 12px 40px rgba(0, 0, 0, 0.35),
+   inset 0 1px 0 rgba(255, 255, 255, 0.08);   /* 内顶部受光（立体感） */
+ overflow: hidden; /* 滚动交给 .ctrl-body */
+ position: relative; /* .glass-panel ::before/::after 定位参照 */
+ box-sizing: border-box;
 }
 
 /* ── 页头：标题 + 右侧操作（返回/保存），顶底固定 ── */
 .page-head {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 18px 22px 14px;
-  border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
+ display: flex;
+ align-items: center;
+ justify-content: space-between;
+ padding: 18px 22px 14px;
+ border-bottom: 1px solid var(--border);
+ flex-shrink: 0;
 }
 .page-title {
-  font-size: 16px; font-weight: 600; color: var(--fg-1);
+ font-size: 16px;
+ font-weight: 600;
+ color: var(--fg-1);
 }
 .nav-back {
-  font-size: 13px; color: var(--accent); text-decoration: none;
+ font-size: 13px;
+ color: var(--accent);
+ text-decoration: none;
 }
-.nav-back:hover { text-decoration: underline; }
+.nav-back:hover {
+ text-decoration: underline;
+}
 
 /* ── 中间滚动区（页头/底部操作固定，仅此处滚动）── */
 .ctrl-body {
-  flex: 1; min-height: 0;
-  overflow-y: auto;
+ flex: 1;
+ min-height: 0;
+ overflow-y: auto;
 }
 
 /* ── 设置行：左标签（名称+描述）右控件，一行一项 ── */
 .setting-row {
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 20px;
-  padding: 15px 22px;
-  border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
+ display: flex;
+ align-items: center;
+ justify-content: space-between;
+ gap: 20px;
+ padding: 15px 22px;
+ border-bottom: 1px solid var(--border);
+ flex-shrink: 0;
 }
-.setting-label { flex: 1; min-width: 0; }
+.setting-label {
+ flex: 1;
+ min-width: 0;
+}
 .setting-name {
-  font-size: 14px; font-weight: 600; color: var(--fg-1);
-  margin-bottom: 3px;
+ font-size: 14px;
+ font-weight: 600;
+ color: var(--fg-1);
+ margin-bottom: 3px;
 }
 .setting-desc {
-  font-size: 12px; color: var(--fg-3);
-  line-height: 1.5;
+ font-size: 12px;
+ color: var(--fg-3);
+ line-height: 1.5;
 }
-.setting-control { width: 200px; flex-shrink: 0; }
+.setting-control {
+ width: 200px;
+ flex-shrink: 0;
+}
 
 /* 行内控件组：多个控件横排（宽/高/位置 三输入、开关+热键 等） */
 .setting-controls {
-  display: flex; align-items: center; gap: 10px;
-  flex-shrink: 0;
+ display: flex;
+ align-items: center;
+ gap: 10px;
+ flex-shrink: 0;
 }
-.setting-control-sm     { width: 76px; flex-shrink: 0; }   /* 小输入框（控件组内） */
-.setting-control-radio  { flex-shrink: 0; }                /* 单选组（direction=row） */
+.setting-control-sm {
+ width: 76px;
+ flex-shrink: 0;
+} /* 小输入框（控件组内） */
+.setting-control-radio {
+ flex-shrink: 0;
+} /* 单选组（direction=row） */
 
 /* ── 状态卡：只读状态展示（状态点 + 文本区），on 时高亮 ── */
 .status-card {
-  display: flex; align-items: center; gap: 12px;
-  margin: 14px 22px 4px;
-  padding: 14px 16px;
-  background: var(--bg-panel);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-c);
-  flex-shrink: 0;
-  transition: border-color .2s;
+ display: flex;
+ align-items: center;
+ gap: 12px;
+ margin: 14px 22px 4px;
+ padding: 14px 16px;
+ background: var(--bg-panel);
+ border: 1px solid var(--border);
+ border-radius: var(--radius-c);
+ flex-shrink: 0;
+ transition: border-color 0.2s;
 }
-.status-card.on { border-color: var(--success-soft); }
+.status-card.on {
+ border-color: var(--success-soft);
+}
 .status-dot {
-  width: 10px; height: 10px; border-radius: 50%;
-  background: var(--fg-3); flex: none;
-  transition: background .2s, box-shadow .2s;
+ width: 10px;
+ height: 10px;
+ border-radius: 50%;
+ background: var(--fg-3);
+ flex: none;
+ transition:
+  background 0.2s,
+  box-shadow 0.2s;
 }
 .status-card.on .status-dot {
-  background: var(--success);
-  box-shadow: 0 0 10px var(--success);
+ background: var(--success);
+ box-shadow: 0 0 10px var(--success);
 }
-.status-body { min-width: 0; }
+.status-body {
+ min-width: 0;
+}
 .status-main {
-  font-size: 14px; font-weight: 600; color: var(--fg-1);
-  margin-bottom: 3px;
+ font-size: 14px;
+ font-weight: 600;
+ color: var(--fg-1);
+ margin-bottom: 3px;
 }
 .status-line {
-  font-size: 11.5px; color: var(--fg-3);
-  line-height: 1.6;
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+ font-size: 11.5px;
+ color: var(--fg-3);
+ line-height: 1.6;
+ overflow: hidden;
+ text-overflow: ellipsis;
+ white-space: nowrap;
 }
 
 /* ── 操作卡：一键动作区（标题 + 按钮行）── */
 .action-card {
-  margin: 14px 22px 4px;
-  padding: 14px 16px;
-  background: var(--bg-panel);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-c);
+ margin: 14px 22px 4px;
+ padding: 14px 16px;
+ background: var(--bg-panel);
+ border: 1px solid var(--border);
+ border-radius: var(--radius-c);
 }
 .action-title {
-  font-size: 13.5px; font-weight: 600; color: var(--fg-1);
-  margin-bottom: 12px;
+ font-size: 13.5px;
+ font-weight: 600;
+ color: var(--fg-1);
+ margin-bottom: 12px;
 }
 .action-row {
-  display: flex; gap: 10px; flex-wrap: wrap;
+ display: flex;
+ gap: 10px;
+ flex-wrap: wrap;
 }
 
 /* ── 底部操作：右对齐按钮行，顶部分隔线，底固定 ── */
 .page-actions {
-  display: flex; align-items: center; justify-content: flex-end; gap: 10px;
-  padding: 16px 22px;
-  border-top: 1px solid var(--border);
-  flex-shrink: 0;
+ display: flex;
+ align-items: center;
+ justify-content: flex-end;
+ gap: 10px;
+ padding: 16px 22px;
+ border-top: 1px solid var(--border);
+ flex-shrink: 0;
 }
 
 /* ── 分区标题（滚动区内分组标题，消费方按需使用）── */
 .section-title {
-  font-size: 13px; font-weight: 600; color: var(--fg-2);
-  padding: 18px 22px 6px;
+ font-size: 13px;
+ font-weight: 600;
+ color: var(--fg-2);
+ padding: 18px 22px 6px;
 }

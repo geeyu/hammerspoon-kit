@@ -3,72 +3,72 @@
    与 Launcher/ClipboardHistory 的 shared/theme.css 同值：消费方 theme 先加载（head 中），
    本文件后加载（占位符注入于 body），同值覆盖无视觉差异。 */
 :root {
-  /* ── 背景层 ── */
-  --bg-deep:    #0D0D12;
-  --bg-panel:   #16161C;
-  --bg-row:     rgba(255,255,255,0.02);
-  --bg-row-h:   rgba(255,255,255,0.05);
-  --bg-row-sel: rgba(74,139,245,0.08);
+ /* ── 背景层 ── */
+ --bg-deep: #0d0d12;
+ --bg-panel: #16161c;
+ --bg-row: rgba(255, 255, 255, 0.02);
+ --bg-row-h: rgba(255, 255, 255, 0.05);
+ --bg-row-sel: rgba(74, 139, 245, 0.08);
 
-  /* ── 毛玻璃体系（面板/弹层/控件玻璃底）── */
-  --glass-bg:       rgba(22, 22, 28, 0.72);   /* 玻璃面板底（半透明深色） */
-  --glass-bg-soft:  rgba(255, 255, 255, 0.04); /* 玻璃控件底（输入/按钮） */
-  --glass-bg-hover: rgba(255, 255, 255, 0.08); /* 玻璃控件悬停 */
-  --glass-blur:     blur(20px) saturate(140%);  /* 标准模糊（面板/弹层） */
-  --glass-blur-sm:  blur(12px) saturate(140%);  /* 轻模糊（控件） */
-  --glass-border:   rgba(255, 255, 255, 0.09);  /* 玻璃描边 */
-  --glass-highlight: rgba(255, 255, 255, 0.10); /* 顶部受光（Apple 风） */
+ /* ── 毛玻璃体系（面板/弹层/控件玻璃底）── */
+ --glass-bg: rgba(22, 22, 28, 0.72); /* 玻璃面板底（半透明深色） */
+ --glass-bg-soft: rgba(255, 255, 255, 0.04); /* 玻璃控件底（输入/按钮） */
+ --glass-bg-hover: rgba(255, 255, 255, 0.08); /* 玻璃控件悬停 */
+ --glass-blur: blur(20px) saturate(140%); /* 标准模糊（面板/弹层） */
+ --glass-blur-sm: blur(12px) saturate(140%); /* 轻模糊（控件） */
+ --glass-border: rgba(255, 255, 255, 0.09); /* 玻璃描边 */
+ --glass-highlight: rgba(255, 255, 255, 0.1); /* 顶部受光（Apple 风） */
 
-  /* ── 文字 ── */
-  --fg-1:  #E8E8EC;
-  --fg-2:  #8A8A94;
-  --fg-3:  #55555E;
+ /* ── 文字 ── */
+ --fg-1: #e8e8ec;
+ --fg-2: #8a8a94;
+ --fg-3: #55555e;
 
-  /* ── 强调色 ── */
-  --accent:      #4A8BF5;
-  --accent-h:    #5B9AF5;
-  --accent-soft: rgba(74,139,245,0.14);
-  --accent-ring: rgba(74,139,245,0.35);
+ /* ── 强调色 ── */
+ --accent: #4a8bf5;
+ --accent-h: #5b9af5;
+ --accent-soft: rgba(74, 139, 245, 0.14);
+ --accent-ring: rgba(74, 139, 245, 0.35);
 
-  /* ── 边框 ── */
-  --border:   rgba(255,255,255,0.06);
-  --border-h: rgba(255,255,255,0.10);
-  --border-weak: rgba(255,255,255,0.035);
+ /* ── 边框 ── */
+ --border: rgba(255, 255, 255, 0.06);
+ --border-h: rgba(255, 255, 255, 0.1);
+ --border-weak: rgba(255, 255, 255, 0.035);
 
-  /* ── 语义色（badge/toast/status 统一走此处）── */
-  --success: #30A46C;
-  --success-h: #3DB97E;
-  --success-soft: rgba(48,164,108,0.14);
-  --warning: #F5A623;
-  --warning-h: #F7B33D;
-  --warning-soft: rgba(245,166,35,0.14);
-  --danger: #E5484D;
-  --danger-h: #E85D62;
-  --danger-soft: rgba(229,72,77,0.14);
-  --info: #54A0FF;
-  --info-soft: rgba(84,160,255,0.14);
+ /* ── 语义色（badge/toast/status 统一走此处）── */
+ --success: #30a46c;
+ --success-h: #3db97e;
+ --success-soft: rgba(48, 164, 108, 0.14);
+ --warning: #f5a623;
+ --warning-h: #f7b33d;
+ --warning-soft: rgba(245, 166, 35, 0.14);
+ --danger: #e5484d;
+ --danger-h: #e85d62;
+ --danger-soft: rgba(229, 72, 77, 0.14);
+ --info: #54a0ff;
+ --info-soft: rgba(84, 160, 255, 0.14);
 
-  /* ── 圆角 / 尺寸 ── */
-  --radius-p: 12px;       /* 面板（modal/drawer 面板、卡片） */
-  --radius-r: 8px;        /* 次级容器（toast、预览格） */
-  --radius-c: 6px;        /* 控件（按钮/输入/下拉/分页/关闭钮） */
-  --radius-full: 999px;   /* 胶囊（badge/switch/dot） */
-  --icon-w:   32px;
+ /* ── 圆角 / 尺寸 ── */
+ --radius-p: 12px; /* 面板（modal/drawer 面板、卡片） */
+ --radius-r: 8px; /* 次级容器（toast、预览格） */
+ --radius-c: 6px; /* 控件（按钮/输入/下拉/分页/关闭钮） */
+ --radius-full: 999px; /* 胶囊（badge/switch/dot） */
+ --icon-w: 32px;
 
-  /* ── 阴影 / 遮罩（弹层层级统一）── */
-  --shadow-modal:   0 16px 48px rgba(0,0,0,0.45);
-  --shadow-overlay: 0 6px 16px rgba(0,0,0,0.35);   /* toast / 下拉 */
-  --shadow-drawer:  -8px 0 24px rgba(0,0,0,0.35);
-  --mask: rgba(0,0,0,0.5);
+ /* ── 阴影 / 遮罩（弹层层级统一）── */
+ --shadow-modal: 0 16px 48px rgba(0, 0, 0, 0.45);
+ --shadow-overlay: 0 6px 16px rgba(0, 0, 0, 0.35); /* toast / 下拉 */
+ --shadow-drawer: -8px 0 24px rgba(0, 0, 0, 0.35);
+ --mask: rgba(0, 0, 0, 0.5);
 
-  /* ── 反白文字（按钮/开关滑块/toast 文字）── */
-  --fg-invert: #FFFFFF;
-  --bg-row-alt: rgba(255,255,255,0.035);   /* 表格 striped 行 */
+ /* ── 反白文字（按钮/开关滑块/toast 文字）── */
+ --fg-invert: #ffffff;
+ --bg-row-alt: rgba(255, 255, 255, 0.035); /* 表格 striped 行 */
 
-  /* ── 字体 ── */
-  --font: -apple-system, "PingFang SC", "SF Pro Text", sans-serif;
-  --mono: "SF Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+ /* ── 字体 ── */
+ --font: -apple-system, "PingFang SC", "SF Pro Text", sans-serif;
+ --mono: "SF Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 
-  /* ── 动效 ── */
-  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+ /* ── 动效 ── */
+ --ease: cubic-bezier(0.22, 1, 0.36, 1);
 }

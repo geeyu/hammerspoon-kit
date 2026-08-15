@@ -6,18 +6,19 @@
   position: relative;
   display: inline-flex;
   align-items: center;
-  width: 40px;   /* 36→40：加大触控目标（Apple HIG ≥ 44pt 近似） */
+  width: 40px; /* 36→40：加大触控目标（Apple HIG ≥ 44pt 近似） */
   height: 22px;
   padding: 0;
   /* 玻璃轨道：半透明 + 轻模糊 */
   background: var(--glass-bg-hover);
-  -webkit-backdrop-filter: var(--glass-blur-sm);
-  backdrop-filter: var(--glass-blur-sm);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-full);
   cursor: pointer;
   outline: none;
-  transition: background 0.2s var(--ease), border-color 0.2s var(--ease), box-shadow 0.2s var(--ease);
+  transition:
+    background 0.2s var(--ease),
+    border-color 0.2s var(--ease),
+    box-shadow 0.2s var(--ease);
   flex-shrink: 0;
   box-sizing: border-box;
 }
@@ -25,11 +26,13 @@
   outline: 2px solid var(--accent-ring);
   outline-offset: 2px;
 }
-.ui-switch:hover { border-color: var(--border-h); }
+.ui-switch:hover {
+  border-color: var(--border-h);
+}
 .ui-switch--on {
   background: var(--accent);
   border-color: var(--accent);
-  box-shadow: 0 0 10px var(--accent-soft);   /* 开启态柔光 */
+  box-shadow: 0 0 10px var(--accent-soft); /* 开启态柔光 */
 }
 .ui-switch--disabled {
   opacity: 0.45;
@@ -39,14 +42,14 @@
   position: absolute;
   top: 2px;
   left: 2px;
-  width: 16px;   /* 14→16：与轨道 40x22 匹配（22-2*2-16=2 边距） */
+  width: 16px; /* 14→16：与轨道 40x22 匹配（22-2*2-16=2 边距） */
   height: 16px;
   background: var(--fg-invert);
   border-radius: 50%;
   transition: left 0.2s var(--ease);
-  box-shadow: 0 1px 4px rgba(0,0,0,0.35);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
 }
 .ui-switch--on .ui-switch__thumb {
-  left: 20px;   /* 40-2*2-16=20 */
+  left: 20px; /* 40-2*2-16=20 */
   background: var(--fg-invert);
 }

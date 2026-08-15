@@ -8,22 +8,25 @@
   justify-content: center;
   gap: 5px;
   padding: 3px 12px;
-  height: 28px;   /* 26→28：与输入类控件统一 */
+  height: 28px; /* 26→28：与输入类控件统一 */
   font-size: 12px;
   font-family: var(--font);
   font-weight: 500;
   line-height: 1;
   color: var(--fg-1);
   background: var(--glass-bg-soft);
-  -webkit-backdrop-filter: var(--glass-blur-sm);
-  backdrop-filter: var(--glass-blur-sm);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-c);
   cursor: pointer;
   outline: none;
   white-space: nowrap;
   box-sizing: border-box;
-  transition: background 0.15s var(--ease), border-color 0.15s var(--ease), color 0.15s var(--ease), transform 0.12s var(--ease), box-shadow 0.15s var(--ease);
+  transition:
+    background 0.15s var(--ease),
+    border-color 0.15s var(--ease),
+    color 0.15s var(--ease),
+    transform 0.12s var(--ease),
+    box-shadow 0.15s var(--ease);
 }
 .ui-btn:hover:not(:disabled):not(.ui-btn--loading) {
   transform: translateY(-1px);
@@ -33,11 +36,28 @@
   background: var(--glass-bg-hover);
   border-color: var(--border-h);
 }
-.ui-btn:active:not(:disabled) { transform: scale(0.97); box-shadow: none; }
+.ui-btn:active:not(:disabled) {
+  transform: scale(0.97);
+  box-shadow: none;
+}
+
+/* 发光 hover：accent 微光（primary/ghost 共用，语义色按钮保持自身色） */
+.ui-btn:hover:not(:disabled):not(.ui-btn--loading):not(.ui-btn--danger):not(.ui-btn--success):not(.ui-btn--warning) {
+  box-shadow: 0 0 14px rgba(74, 139, 245, 0.18), 0 3px 10px rgba(0, 0, 0, 0.3);
+}
 
 /* size */
-.ui-btn--sm { height: 24px; padding: 1px 10px; font-size: 11px; border-radius: var(--radius-c); }
-.ui-btn--md { height: 28px; padding: 4px 14px; font-size: 12px; }
+.ui-btn--sm {
+  height: 24px;
+  padding: 1px 10px;
+  font-size: 11px;
+  border-radius: var(--radius-c);
+}
+.ui-btn--md {
+  height: 28px;
+  padding: 4px 14px;
+  font-size: 12px;
+}
 
 /* variant: primary（实色 + 柔光） */
 .ui-btn--primary {
@@ -116,14 +136,19 @@
   display: inline-block;
   width: 11px;
   height: 11px;
-  border: 2px solid rgba(255,255,255,0.15);
+  border: 2px solid rgba(255, 255, 255, 0.15);
   border-top-color: currentColor;
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
   flex-shrink: 0;
 }
 
-.ui-btn__icon { margin-right: 4px; }
+.ui-btn__icon {
+  margin-right: 4px;
+}
 
 /* 键盘焦点环 */
-.ui-btn:focus-visible { outline: 2px solid var(--accent-ring); outline-offset: 1px; }
+.ui-btn:focus-visible {
+  outline: 2px solid var(--accent-ring);
+  outline-offset: 1px;
+}

@@ -11,14 +11,14 @@
   font-size: 12px;
   font-family: var(--font);
   color: var(--fg-1);
-  /* 玻璃控件底：半透明 + 轻模糊，透出面板底色 */
+  /* 玻璃控件底：半透明（性能：不加 backdrop-filter——面板已提供模糊，
+     控件叠加 blur 会让 hover/focus 触发大面积重模糊 = 卡顿） */
   background: var(--glass-bg-soft);
-  -webkit-backdrop-filter: var(--glass-blur-sm);
-  backdrop-filter: var(--glass-blur-sm);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-c);
   outline: none;
   box-sizing: border-box;
+  /* 只用 transform/opacity/border-color/box-shadow 做过渡（GPU 友好，不重绘） */
   transition:
     border-color 0.15s var(--ease),
     background 0.15s var(--ease),
@@ -27,11 +27,15 @@
 .ui-input:hover {
   border-color: var(--border-h);
   background: var(--glass-bg-hover);
+  box-shadow: 0 0 12px rgba(74, 139, 245, 0.08);   /* 悬停微发光 */
 }
 .ui-input:focus {
   border-color: var(--accent);
   background: var(--glass-bg-soft);
-  box-shadow: 0 0 0 2px var(--accent-soft), 0 2px 8px rgba(0,0,0,0.25);
+  box-shadow:
+    0 0 0 2px var(--accent-soft),
+    0 0 16px var(--accent-soft),
+    0 2px 8px rgba(0, 0, 0, 0.25);   /* 聚焦发光环 */
 }
 .ui-input:disabled {
   opacity: 0.45;

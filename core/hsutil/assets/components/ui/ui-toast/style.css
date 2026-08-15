@@ -32,7 +32,9 @@
   pointer-events: auto;
   opacity: 0;
   transform: translateY(-12px);
-  transition: opacity 0.25s var(--ease), transform 0.25s var(--ease);
+  transition:
+    opacity 0.25s var(--ease),
+    transform 0.25s var(--ease);
 }
 .ui-toast--active {
   opacity: 1;
@@ -41,11 +43,21 @@
 .ui-toast--exit {
   opacity: 0;
   transform: translateY(-12px);
-  transition: opacity 0.2s var(--ease), transform 0.2s var(--ease);
+  transition:
+    opacity 0.2s var(--ease),
+    transform 0.2s var(--ease);
 }
 
 /* type 色：左边框强调（与 theme.css 语义色同源） */
-.ui-toast--success { border-left: 3px solid var(--success); }
-.ui-toast--error   { border-left: 3px solid var(--danger); }
-.ui-toast--info    { border-left: 3px solid var(--accent); }
-.ui-toast--warning { border-left: 3px solid var(--warning); }
+.ui-toast--success {
+  border-left: 3px solid var(--success);
+}
+.ui-toast--error {
+  border-left: 3px solid var(--danger);
+}
+.ui-toast--info {
+  border-left: 3px solid var(--accent);
+}
+.ui-toast--warning {
+  border-left: 3px solid var(--warning);
+}

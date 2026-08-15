@@ -65,6 +65,8 @@ function webview.new(opts)
         _navRetries = 0,    -- 导航失败重试计数（懒加载竞态：webview 扩展首次加载时
                             -- WebKit 进程未就绪，立即导航报 didFailProvisionalNavigation(101)，
                             -- 延迟重载即可恢复；最多重试 3 次）
+        -- 拖拽状态（标题区拖动面板；见 _ensure 中的 dragTap）
+        _drag = { active = false, moved = false, startX = 0, startY = 0, frame = nil, tap = nil },
     }, View)
 end
 
@@ -140,6 +142,67 @@ function View:_ensure()
         end
     end)
 
+    -- 标题区拖拽：按住面板顶部（标题栏一带，高度 34px）拖动即移动面板。
+    -- 策略：按下记录起点（不立即判定），移动超过 4px 才进入拖拽（区分点击 vs 拖动，
+    -- 不干扰页面内按钮/输入框交互）；拖动中同步 setFrame（隐藏态先切后显）。
+    local DRAG_BAR_H = 34     -- 顶部拖拽条高度（对齐 .page-head 视觉区）
+    local DRAG_THRESHOLD = 4  -- 判定为拖拽的移动阈值（px）
+    local function pointInPanel(mx, my)
+        if not self._wv or not self:visible() then return false end
+        local fr = self._wv:frame()
+        if not fr then return false end
+        return mx >= fr.x and mx <= fr.x + fr.w and my >= fr.y and my <= fr.y + fr.h
+    end
+    local function inDragBar(mx, my)
+        if not self._wv or not self:visible() then return false end
+        local fr = self._wv:frame()
+        if not fr then return false end
+        return mx >= fr.x and mx <= fr.x + fr.w and my >= fr.y and my <= fr.y + DRAG_BAR_H
+    end
+    self._drag.tap = eventtap.new({ event.types.leftMouseDown, event.types.leftMouseDragged, event.types.leftMouseUp }, function(e)
+        local drag = self._drag
+        local etype = e:getType()
+        -- 鼠标位置统一走 hs.mouse.absolutePosition()（官方 API；
+        -- event:absolutePosition 在部分版本不可用，避免踩坑）
+        local ok, mx, my = pcall(function()
+            local pt = hs.mouse.absolutePosition()
+            return pt.x, pt.y
+        end)
+        if not ok or not mx then return false end
+        if etype == event.types.leftMouseDown then
+            -- 只在顶部拖拽条按下时预备拖拽（页面内容区照常交互）
+            if inDragBar(mx, my) then
+                drag.active = true
+                drag.moved = false
+                drag.startX, drag.startY = mx, my
+                drag.frame = self._wv and self._wv:frame() or nil
+            end
+        elseif etype == event.types.leftMouseDragged then
+            if drag.active and drag.frame then
+                local dx, dy = mx - drag.startX, my - drag.startY
+                if not drag.moved then
+                    if math.abs(dx) < DRAG_THRESHOLD and math.abs(dy) < DRAG_THRESHOLD then
+                        return false   -- 尚未超过阈值：继续观察
+                    end
+                    drag.moved = true
+                end
+                if drag.moved and self._wv then
+                    pcall(function()
+                        self._wv:setFrame({ x = drag.frame.x + dx, y = drag.frame.y + dy, w = drag.frame.w, h = drag.frame.h })
+                    end)
+                end
+                return true   -- 拖拽中吞掉事件（页面不响应拖动）
+            end
+        elseif etype == event.types.leftMouseUp then
+            if drag.active then
+                drag.active = false
+                drag.moved = false
+                drag.frame = nil
+            end
+        end
+        return false
+    end)
+
     self._wv = wv
     return wv
 end
@@ -210,12 +273,24 @@ function View:show()
         end)
     end
     self._escTap:start()
+
+    -- 拖拽 tap 启动（面板创建时注册，随 show/hide 生效判定）
+    if self._drag and self._drag.tap then
+        self._drag.tap:start()
+    end
     return true
 end
 
 function View:hide()
     if self._wv then pcall(function() self._wv:hide() end) end
     if self._escTap then self._escTap:stop() end
+    -- 拖拽复位（隐藏期间不响应拖动）
+    if self._drag then
+        self._drag.active = false
+        self._drag.moved = false
+        self._drag.frame = nil
+        if self._drag.tap then self._drag.tap:stop() end
+    end
     -- 隐藏时刷新（CH 模式）：下次展示即最新
     if not self._resetOnShow then self:_reset() end
 end
@@ -252,6 +327,12 @@ end
 function View:teardown()
     if self._readyTimer then self._readyTimer:stop(); self._readyTimer = nil end
     if self._escTap then self._escTap:stop(); self._escTap = nil end
+    if self._drag then
+        if self._drag.tap then self._drag.tap:stop(); self._drag.tap = nil end
+        self._drag.active = false
+        self._drag.moved = false
+        self._drag.frame = nil
+    end
     if self._wv then pcall(function() self._wv:delete() end); self._wv = nil end
     self._pageReady = false
     self._loadedOnce = false

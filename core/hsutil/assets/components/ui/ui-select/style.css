@@ -19,23 +19,27 @@
   font-family: var(--font);
   color: var(--fg-1);
   background: var(--glass-bg-soft);
-  -webkit-backdrop-filter: var(--glass-blur-sm);
-  backdrop-filter: var(--glass-blur-sm);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-c);
   cursor: pointer;
   outline: none;
   white-space: nowrap;
-  transition: border-color 0.15s var(--ease), background 0.15s var(--ease), box-shadow 0.15s var(--ease);
+  transition:
+    border-color 0.15s var(--ease),
+    background 0.15s var(--ease),
+    box-shadow 0.15s var(--ease);
 }
 .ui-select__btn:hover {
   border-color: var(--border-h);
   background: var(--glass-bg-hover);
+  box-shadow: 0 0 12px rgba(74, 139, 245, 0.08);   /* 悬停微发光 */
 }
 .ui-select--open .ui-select__btn {
   border-color: var(--accent);
   background: var(--glass-bg-soft);
-  box-shadow: 0 0 0 2px var(--accent-soft), 0 2px 8px rgba(0,0,0,0.25);
+  box-shadow:
+    0 0 0 2px var(--accent-soft),
+    0 2px 8px rgba(0, 0, 0, 0.25);
 }
 .ui-select--disabled .ui-select__btn {
   opacity: 0.45;
@@ -78,7 +82,9 @@
   color: var(--fg-1);
   cursor: pointer;
   white-space: nowrap;
-  transition: background 0.1s var(--ease), color 0.1s var(--ease);
+  transition:
+    background 0.1s var(--ease),
+    color 0.1s var(--ease);
 }
 .ui-select__option:hover {
   background: var(--glass-bg-hover);
@@ -94,4 +100,7 @@
 }
 
 /* 键盘焦点环 */
-.ui-select__btn:focus-visible { outline: 2px solid var(--accent-ring); outline-offset: 1px; }
+.ui-select__btn:focus-visible {
+  outline: 2px solid var(--accent-ring);
+  outline-offset: 1px;
+}
