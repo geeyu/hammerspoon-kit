@@ -12,7 +12,7 @@
 </head>
 <body>
 <div id="app" v-cloak>
-  <div class="ctrl-panel">
+  <div class="page-panel">
     <!-- 页头：标题 + 返回 -->
     <div class="page-head">
       <div class="page-title">☕ 防睡眠</div>
@@ -73,7 +73,7 @@
         <div class="setting-name">直到时间点</div>
         <div class="setting-desc">从日历选择日期时间，点底部「启动」生效</div>
       </div>
-      <ui-datetime v-model="untilVal" class="ctrl-input"></ui-datetime>
+      <ui-datetime v-model="untilVal" class="setting-control"></ui-datetime>
     </div>
     </div><!-- /ctrl-body -->
 
