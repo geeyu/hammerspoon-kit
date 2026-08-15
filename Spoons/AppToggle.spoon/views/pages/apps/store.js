@@ -30,7 +30,7 @@ const AppToggleStore = {
       return list.filter(
         (a) =>
           (a.name || "").toLowerCase().includes(kw) ||
-          (a.bundle_id || "").toLowerCase().includes(kw)
+          (a.bundle_id || "").toLowerCase().includes(kw),
       );
     }
 
@@ -127,7 +127,9 @@ const AppToggleStore = {
         if (!ed) return Promise.resolve();
         const hk = actions.parseHotkey(ed.hotkeyStr);
         if (!hk) {
-          alert("热键格式无效：需为 修饰键+主键（如 ctrl+alt+t），或 F1-F12 功能键");
+          alert(
+            "热键格式无效：需为 修饰键+主键（如 ctrl+alt+t），或 F1-F12 功能键",
+          );
           return Promise.resolve();
         }
         if (!ed.name.trim()) {

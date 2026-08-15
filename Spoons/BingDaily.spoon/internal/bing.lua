@@ -26,12 +26,21 @@ local archiveCache = nil   -- { at=os.time(), rows={...} }
 --- 例：/th?id=OHR.HelsinkiBlue_JA-JP6468131752_1920x1080.jpg&rf=...&pid=hp
 ---   → OHR.HelsinkiBlue_JA-JP6468131752_1920x1080.jpg
 local function extractPicName(url)
-    local parts = hs.http.urlParts(url)
+    -- urlParts 对空串/特殊 URL 可能抛 "string did not match the expected pattern"，
+    -- pcall 保护：失败时退回 lastPathComponent 或空串
+    if not url or url == "" then return "" end
+    local ok, parts = pcall(hs.http.urlParts, url)
+    if not ok or type(parts) ~= "table" then
+        -- 兜底：从 url 尾部截取文件名
+        local last = url:match("([^/]+)$") or ""
+        local id = last:match("id=([^&]+)")
+        return id or last
+    end
     if parts.query then
         local id = parts.query:match("id=([^&]+)")
         if id then return id end
     end
-    return parts.lastPathComponent
+    return parts.lastPathComponent or ""
 end
 
 --- 展开 ~ 前缀

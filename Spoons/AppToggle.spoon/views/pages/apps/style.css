@@ -4,243 +4,243 @@
 
 /* 中间滚动区：骨架（flex 滚动）来自 page.css，此处只留页内纵向排列扩展 */
 .ctrl-body {
-  padding: 0 20px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+ padding: 0 20px 16px;
+ display: flex;
+ flex-direction: column;
+ gap: 10px;
 }
 
 /* 顶部说明 + 添加 */
 .intro-card {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 12px 14px;
-  border-radius: 10px;
-  background: rgba(127, 127, 127, 0.08);
-  flex-shrink: 0;
+ display: flex;
+ align-items: center;
+ justify-content: space-between;
+ gap: 12px;
+ padding: 12px 14px;
+ border-radius: 10px;
+ background: rgba(127, 127, 127, 0.08);
+ flex-shrink: 0;
 }
 
 .intro-text {
-  font-size: 12.5px;
-  line-height: 1.6;
+ font-size: 12.5px;
+ line-height: 1.6;
 }
 .intro-dim {
-  opacity: 0.55;
+ opacity: 0.55;
 }
 
 /* 应用行 */
 .app-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 12px 14px;
-  border-radius: 10px;
-  background: rgba(127, 127, 127, 0.06);
+ display: flex;
+ align-items: center;
+ justify-content: space-between;
+ gap: 12px;
+ padding: 12px 14px;
+ border-radius: 10px;
+ background: rgba(127, 127, 127, 0.06);
 }
 
 .app-row.disabled {
-  opacity: 0.55;
+ opacity: 0.55;
 }
 
 .app-main {
-  min-width: 0;
-  flex: 1;
+ min-width: 0;
+ flex: 1;
 }
 
 .app-name {
-  font-size: 14px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
+ font-size: 14px;
+ font-weight: 600;
+ display: flex;
+ align-items: center;
+ gap: 8px;
+ flex-wrap: wrap;
 }
 
 .app-badge {
-  font-size: 11px;
-  font-weight: 500;
-  padding: 1px 8px;
-  border-radius: 999px;
-  background: rgba(127, 127, 127, 0.18);
+ font-size: 11px;
+ font-weight: 500;
+ padding: 1px 8px;
+ border-radius: 999px;
+ background: rgba(127, 127, 127, 0.18);
 }
 .app-badge.running {
-  background: var(--success-soft);
-  color: var(--success);
+ background: var(--success-soft);
+ color: var(--success);
 }
 .app-badge.hidden {
-  background: var(--warning-soft);
-  color: var(--warning);
+ background: var(--warning-soft);
+ color: var(--warning);
 }
 .app-badge.off {
-  background: rgba(127, 127, 127, 0.25);
+ background: rgba(127, 127, 127, 0.25);
 }
 
 .app-sub {
-  font-size: 11.5px;
-  opacity: 0.55;
-  margin-top: 2px;
-  font-family: var(--mono);
+ font-size: 11.5px;
+ opacity: 0.55;
+ margin-top: 2px;
+ font-family: var(--mono);
 }
 
 .app-opts {
-  display: flex;
-  gap: 6px;
-  margin-top: 6px;
-  flex-wrap: wrap;
+ display: flex;
+ gap: 6px;
+ margin-top: 6px;
+ flex-wrap: wrap;
 }
 
 .opt-chip {
-  font-size: 11px;
-  padding: 1px 8px;
-  border-radius: 999px;
-  background: rgba(127, 127, 127, 0.14);
+ font-size: 11px;
+ padding: 1px 8px;
+ border-radius: 999px;
+ background: rgba(127, 127, 127, 0.14);
 }
 
 /* 右侧：热键 + 操作 */
 .app-side {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-shrink: 0;
+ display: flex;
+ align-items: center;
+ gap: 10px;
+ flex-shrink: 0;
 }
 
 .hotkey-chip {
-  font-size: 13px;
-  font-weight: 600;
-  font-family: var(--mono);
-  padding: 4px 10px;
-  border-radius: 8px;
-  background: var(--accent-soft);
-  color: var(--accent);
-  white-space: nowrap;
+ font-size: 13px;
+ font-weight: 600;
+ font-family: var(--mono);
+ padding: 4px 10px;
+ border-radius: 8px;
+ background: var(--accent-soft);
+ color: var(--accent);
+ white-space: nowrap;
 }
 .hotkey-chip.off {
-  background: rgba(127, 127, 127, 0.16);
-  color: inherit;
-  opacity: 0.7;
+ background: rgba(127, 127, 127, 0.16);
+ color: inherit;
+ opacity: 0.7;
 }
 
 .app-actions {
-  display: flex;
-  gap: 6px;
+ display: flex;
+ gap: 6px;
 }
 
 /* 空状态 */
 .empty-state {
-  text-align: center;
-  padding: 40px 0;
-  opacity: 0.75;
+ text-align: center;
+ padding: 40px 0;
+ opacity: 0.75;
 }
 .empty-icon {
-  font-size: 34px;
-  margin-bottom: 10px;
+ font-size: 34px;
+ margin-bottom: 10px;
 }
 .empty-text {
-  font-size: 13px;
-  line-height: 1.8;
+ font-size: 13px;
+ line-height: 1.8;
 }
 
 /* 编辑器抽屉 */
 .editor-body {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  padding: 4px 2px;
+ display: flex;
+ flex-direction: column;
+ gap: 14px;
+ padding: 4px 2px;
 }
 
 .form-row {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+ display: flex;
+ flex-direction: column;
+ gap: 6px;
 }
 .form-row label {
-  font-size: 12.5px;
-  font-weight: 600;
-  opacity: 0.8;
+ font-size: 12.5px;
+ font-weight: 600;
+ opacity: 0.8;
 }
 .form-hint {
-  font-size: 11.5px;
-  opacity: 0.55;
+ font-size: 11.5px;
+ opacity: 0.55;
 }
 
 .switch-row {
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
+ flex-direction: row;
+ align-items: center;
+ justify-content: space-between;
+ gap: 10px;
 }
 .switch-row .form-hint {
-  flex: 1;
+ flex: 1;
 }
 
 .editor-footer {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
+ display: flex;
+ align-items: center;
+ gap: 8px;
+ width: 100%;
 }
 .editor-footer .spacer {
-  flex: 1;
+ flex: 1;
 }
 
 /* ── 应用搜索选择器（添加应用弹窗内）── */
 .app-picker {
-  position: relative;
-  width: 100%;
+ position: relative;
+ width: 100%;
 }
 .app-picker-list {
-  position: absolute;
-  top: calc(100% + 4px);
-  left: 0;
-  right: 0;
-  z-index: 200;
-  max-height: 200px;
-  overflow-y: auto;
-  background: var(--glass-bg);
-  -webkit-backdrop-filter: var(--glass-blur);
-  backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--glass-border);
-  border-top-color: var(--glass-highlight);
-  border-radius: var(--radius-r);
-  box-shadow: var(--shadow-overlay);
-  padding: 4px;
+ position: absolute;
+ top: calc(100% + 4px);
+ left: 0;
+ right: 0;
+ z-index: 200;
+ max-height: 200px;
+ overflow-y: auto;
+ background: var(--glass-bg);
+ -webkit-backdrop-filter: var(--glass-blur);
+ backdrop-filter: var(--glass-blur);
+ border: 1px solid var(--glass-border);
+ border-top-color: var(--glass-highlight);
+ border-radius: var(--radius-r);
+ box-shadow: var(--shadow-overlay);
+ padding: 4px;
 }
 .app-picker-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 7px 10px;
-  border-radius: var(--radius-c);
-  cursor: pointer;
-  font-size: 12px;
-  transition: background 0.1s var(--ease);
+ display: flex;
+ align-items: center;
+ justify-content: space-between;
+ gap: 10px;
+ padding: 7px 10px;
+ border-radius: var(--radius-c);
+ cursor: pointer;
+ font-size: 12px;
+ transition: background 0.1s var(--ease);
 }
 .app-picker-item:hover {
-  background: var(--glass-bg-hover);
+ background: var(--glass-bg-hover);
 }
 .app-picker-name {
-  font-weight: 500;
-  color: var(--fg-1);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+ font-weight: 500;
+ color: var(--fg-1);
+ white-space: nowrap;
+ overflow: hidden;
+ text-overflow: ellipsis;
 }
 .app-picker-bid {
-  font-family: var(--mono);
-  font-size: 10.5px;
-  color: var(--fg-3);
-  flex-shrink: 0;
-  max-width: 45%;
-  overflow: hidden;
-  text-overflow: ellipsis;
+ font-family: var(--mono);
+ font-size: 10.5px;
+ color: var(--fg-3);
+ flex-shrink: 0;
+ max-width: 45%;
+ overflow: hidden;
+ text-overflow: ellipsis;
 }
 .app-picker-empty {
-  padding: 12px;
-  text-align: center;
-  font-size: 12px;
-  color: var(--fg-3);
+ padding: 12px;
+ text-align: center;
+ font-size: 12px;
+ color: var(--fg-3);
 }

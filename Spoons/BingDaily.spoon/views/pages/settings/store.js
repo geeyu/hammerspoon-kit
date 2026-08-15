@@ -3,6 +3,11 @@
 // /apply-today /random /open-dir /downloads。
 
 const BASE = "/bingdaily/api";
+// 轻量提示：优先命令式 UiToast（占位符注入），否则 console 兜底
+function toast(msg, opts) {
+  if (window.UiToast && window.UiToast.show) window.UiToast.show(msg, opts || {});
+  else console.warn("[BingDaily]", msg);
+}
 function hsFetch(p, opts) {
   opts = opts || {};
   // POST 无 body 时显式带 Content-Length: 0（hs.httpserver 对无 Content-Length
@@ -75,13 +80,16 @@ const BingSettingsStore = {
         });
       },
 
-      // ---- 一键执行 ----
+      // ---- 一键执行（toast 反馈：成功/失败，不弹原生 alert 阻塞）----
       refresh() {
         state.busy.value = "refresh";
         return hsFetch("/refresh", { method: "POST" })
-          .then(() => actions.refreshStatus())
+          .then(() => {
+            toast("已刷新今日壁纸");
+            return actions.refreshStatus();
+          })
           .catch((e) => {
-            alert("刷新失败: " + e.message);
+            toast("刷新失败: " + e.message);
           })
           .finally(() => {
             state.busy.value = "";
@@ -90,12 +98,12 @@ const BingSettingsStore = {
       applyToday() {
         state.busy.value = "applyToday";
         return hsFetch("/apply-today", { method: "POST" })
-          .then((d) => {
-            alert("已应用今日壁纸: " + (d.path || ""));
+          .then(() => {
+            toast("已应用今日壁纸");
             return actions.refreshStatus();
           })
           .catch((e) => {
-            alert("应用失败: " + e.message);
+            toast("应用失败: " + e.message);
           })
           .finally(() => {
             state.busy.value = "";
@@ -104,12 +112,12 @@ const BingSettingsStore = {
       applyRandom() {
         state.busy.value = "random";
         return hsFetch("/random", { method: "POST" })
-          .then((d) => {
-            alert("已随机应用壁纸: " + (d.path || ""));
+          .then(() => {
+            toast("已随机应用壁纸");
             return actions.refreshStatus();
           })
           .catch((e) => {
-            alert("随机应用失败: " + e.message);
+            toast("随机应用失败: " + e.message);
           })
           .finally(() => {
             state.busy.value = "";
@@ -119,10 +127,10 @@ const BingSettingsStore = {
         state.busy.value = "openDir";
         return hsFetch("/open-dir", { method: "POST" })
           .then((d) => {
-            alert("已打开保存目录: " + (d.dir || ""));
+            toast("已打开保存目录: " + (d.dir || ""));
           })
           .catch((e) => {
-            alert("打开失败: " + e.message);
+            toast("打开失败: " + e.message);
           })
           .finally(() => {
             state.busy.value = "";
