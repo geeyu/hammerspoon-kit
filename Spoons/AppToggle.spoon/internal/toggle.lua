@@ -331,14 +331,16 @@ function toggle.bind(app)
         handle._lastToggle = now
 
         local app = hs.application.get(bundleID)
-        if not app or #app:allWindows() == 0 then
+        -- allWindows 只调一次（XPC 开销大）：无窗口判定 + 取窗口共用
+        local wins = app and app:allWindows() or {}
+        if not app or #wins == 0 then
             -- 应用启动中/建窗需要时间：3s 内不重复触发 onNoWindow
             if handle._spawning and (now - handle._spawning) < 3 then return end
             handle._spawning = now
             noWindow(handle, app)
             return
         end
-        local win = app:mainWindow() or app:allWindows()[1]
+        local win = app:mainWindow() or wins[1]
         local mouseScreen = screenAtPoint(hs.mouse.absolutePosition())
 
         -- 光标所在屏的当前桌面是否全屏（决定"全屏接管"分支）

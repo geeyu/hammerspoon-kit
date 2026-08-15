@@ -55,9 +55,16 @@ createApp({
       );
     };
 
+    // 轻量提示：优先命令式 UiToast（占位符注入），否则 console 兜底
+    function toast(msg, opts) {
+      if (window.UiToast && window.UiToast.show)
+        window.UiToast.show(msg, opts || {});
+      else console.warn("[BingDaily]", msg);
+    }
+
     function save() {
       store.save().catch((e) => {
-        alert("保存失败: " + e.message);
+        toast("保存失败: " + e.message, { type: "error" });
       });
     }
 

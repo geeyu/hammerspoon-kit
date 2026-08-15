@@ -41,23 +41,17 @@ function api.setup(cfg_, bing_, store_, viewsDir)
     end)
 
     -- 一键应用今日壁纸（下载 + 设壁纸 + 通知；已下载过则直接用本地文件）
+    -- 注意：下载是异步的，HSUtil dispatch 为同步分发（异步 res 会丢）——立即回 ok，
+    -- 结果反映在 /status 的 status（fetching→ok/error），前端状态卡可见。
     app:post("/" .. cfg.pkg .. "/api/apply-today", function(req, res)
-        bing.applyToday(function(localPath, err)
-            if not localPath then
-                return res:status(500):json({ err = err or "应用失败" })
-            end
-            res:json({ ok = true, path = localPath })
-        end)
+        bing.applyToday(function() end)
+        res:json({ ok = true })
     end)
 
-    -- 一键随机应用归档壁纸
+    -- 一键随机应用归档壁纸（同样异步：立即回 ok，后台下载）
     app:post("/" .. cfg.pkg .. "/api/random", function(req, res)
-        bing.applyRandom(function(localPath, err)
-            if not localPath then
-                return res:status(500):json({ err = err or "随机应用失败" })
-            end
-            res:json({ ok = true, path = localPath })
-        end)
+        bing.applyRandom(function() end)
+        res:json({ ok = true })
     end)
 
     -- 打开保存目录（Finder）
@@ -71,12 +65,13 @@ function api.setup(cfg_, bing_, store_, viewsDir)
         res:json({ rows = bing.recentDownloads(8) })
     end)
 
-    -- 归档列表（搜索页）：最近 N 天壁纸
+    -- 归档列表（搜索页）：立即回当前缓存（miss 时后台拉取，前端收到 cached=false 稍后自刷）
     app:get("/" .. cfg.pkg .. "/api/archive", function(req, res)
-        bing.fetchArchive(function(rows, err)
-            if not rows then return res:status(500):json({ err = err or "拉取失败" }) end
-            res:json({ rows = rows, save_dir = cfg.save_dir })
-        end)
+        local rows, cached = bing.archiveSnapshot()
+        if not cached then
+            bing.fetchArchive(function() end) -- 后台拉取填缓存
+        end
+        res:json({ rows = rows or {}, save_dir = cfg.save_dir, cached = cached })
     end)
 
     -- 应用归档中的一张壁纸（下载 + 设壁纸）

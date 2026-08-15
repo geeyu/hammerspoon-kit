@@ -1,6 +1,12 @@
 // ===== views/pages/search/store.js —— 壁纸列表数据层 =====
 // 对齐 Clipboard history：GET /archive 列表；POST /apply 应用；embed 注入（query/key）。
 const BASE = "/bingdaily/api";
+// 轻量提示：优先命令式 UiToast（占位符注入），否则 console 兜底
+function toast(msg, opts) {
+  if (window.UiToast && window.UiToast.show)
+    window.UiToast.show(msg, opts || {});
+  else console.warn("[BingDaily]", msg);
+}
 function hsFetch(p, opts) {
   opts = opts || {};
   return fetch(BASE + p, opts).then((r) => {
@@ -31,6 +37,10 @@ const BingSearchStore = {
             state.rows.value = d.rows || [];
             state.loading.value = false;
             clampSelected();
+            // 后端缓存 miss（cached=false）：后台拉取中，稍后自动刷新一次
+            if (d.cached === false) {
+              setTimeout(() => actions.load(), 2500);
+            }
           })
           .catch(() => {
             state.loading.value = false;
@@ -61,7 +71,7 @@ const BingSearchStore = {
           })
           .catch((e) => {
             state.applying.value = "";
-            alert("应用失败: " + e.message);
+            toast("应用失败: " + e.message, { type: "error" });
           });
       },
     };

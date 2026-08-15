@@ -82,9 +82,16 @@ const BingSettingsStore = {
       },
 
       // ---- 一键执行（toast 反馈：成功/失败，不弹原生 alert 阻塞）----
+      // 注意：POST 必须带 body（"{}"）。hs.httpserver 对无 Content-Length 的 POST 直接 400，
+      // 而 fetch 无法保证无 body 请求带 Content-Length（WKWebView 下手动设置会被忽略），
+      // 带 body 后浏览器自动算 Content-Length，两个环境都稳。
       refresh() {
         state.busy.value = "refresh";
-        return hsFetch("/refresh", { method: "POST" })
+        return hsFetch("/refresh", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: "{}",
+        })
           .then(() => {
             toast("已刷新今日壁纸");
             return actions.refreshStatus();
@@ -98,9 +105,14 @@ const BingSettingsStore = {
       },
       applyToday() {
         state.busy.value = "applyToday";
-        return hsFetch("/apply-today", { method: "POST" })
+        return hsFetch("/apply-today", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: "{}",
+        })
           .then(() => {
-            toast("已应用今日壁纸");
+            // 后端异步下载：立即回 ok，结果反映在状态卡（fetching→ok/error）
+            toast("已开始应用今日壁纸");
             return actions.refreshStatus();
           })
           .catch((e) => {
@@ -112,9 +124,14 @@ const BingSettingsStore = {
       },
       applyRandom() {
         state.busy.value = "random";
-        return hsFetch("/random", { method: "POST" })
+        return hsFetch("/random", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: "{}",
+        })
           .then(() => {
-            toast("已随机应用壁纸");
+            // 后端异步下载：立即回 ok，结果反映在状态卡（fetching→ok/error）
+            toast("已开始随机应用壁纸");
             return actions.refreshStatus();
           })
           .catch((e) => {
@@ -126,7 +143,11 @@ const BingSettingsStore = {
       },
       openDir() {
         state.busy.value = "openDir";
-        return hsFetch("/open-dir", { method: "POST" })
+        return hsFetch("/open-dir", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: "{}",
+        })
           .then((d) => {
             toast("已打开保存目录: " + (d.dir || ""));
           })

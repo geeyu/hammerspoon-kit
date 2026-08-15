@@ -189,53 +189,83 @@ function manager.list()
 end
 
 --- 运行中的应用列表（添加应用时下拉选择用；排除已绑定的）
---- @return table [{name, bundle_id}]
---- 运行中的应用列表（添加应用时下拉选择用；排除已绑定）
 --- 显示名优先用 .app 目录名（中文应用名如「知音楼」「微信」），
 --- 兑底用 hs name()（英文）；只列有窗口的应用（过滤系统后台进程）
---- 性能：allWindows() 每应用一次 XPC 调用（几十个应用串行 = 秒级），
---- 加 30s 缓存——页面预加载一次即可，打开弹窗零等待
+--- 设计：纯缓存读取——后台定期刷新（hs.window.allWindows 一次取全部窗口，
+--- 避免对每个运行应用调 allWindows 的 ~30ms XPC），查询永远零阻塞。
 --- @return table [{name, bundle_id}]
 local runningAppsCache = { at = 0, list = nil }
-local RUNNING_CACHE_TTL = 30   -- 秒
-function manager.runningApps()
-    -- 缓存命中：TTL 内直接返回
-    if runningAppsCache.list and (os.time() - runningAppsCache.at) < RUNNING_CACHE_TTL then
-        return runningAppsCache.list
-    end
-    local out = {}
+local collecting = false        -- 后台收集进行中（防重复触发）
+local refreshTimer = nil        -- 定期后台刷新定时器
+
+--- 后台收集（~50ms 总开销：runningApplications + 一次 allWindows + 窗口遍历）
+local function collectRunningApps()
+    if collecting then return end
+    collecting = true
     local bound = {}
     for _, a in ipairs(store.listApps()) do bound[a.bundle_id] = true end
-    local ok, apps = pcall(function() return hs.application.runningApplications() end)
-    if ok and type(apps) == "table" then
-        for _, app in ipairs(apps) do
-            local bid = app and app:bundleID() or nil
-            if type(bid) == "string" and bid ~= "" and not bound[bid] then
-                -- 只列有窗口的应用（用户可见；过滤 loginwindow/WindowManager 等后台进程）
-                local okW, wins = pcall(function() return app:allWindows() end)
-                if okW and type(wins) == "table" and #wins > 0 then
-                    -- 显示名：.app 目录名优先（知音楼/微信 等中文/真实名）
-                    local name = ""
-                    local okP, path = pcall(function() return app:path() end)
-                    if okP and type(path) == "string" then
-                        local appName = path:match("/([^/]+)%.app$")
-                        if appName and appName ~= "" then name = appName end
-                    end
-                    if name == "" then
-                        local okN, n = pcall(function() return app:name() end)
-                        if okN and type(n) == "string" then name = n end
-                    end
-                    if name ~= "" then
-                        out[#out + 1] = { name = name, bundle_id = bid }
-                    end
-                end
+    -- 一次拿全部窗口，按 bundle_id 建「有窗口」集合
+    -- （per-app allWindows 约 30ms/个 × 近百应用 = 秒级，窗口遍历仅几十 ms）
+    local winApps = {}
+    local okW, wins = pcall(function() return hs.window.allWindows() end)
+    if okW and type(wins) == "table" then
+        for _, w in ipairs(wins) do
+            local okA, app = pcall(function() return w:application() end)
+            if okA and app then
+                local okB, bid = pcall(function() return app:bundleID() end)
+                if okB and type(bid) == "string" then winApps[bid] = true end
             end
         end
     end
-    -- 按名称排序
+    local ok, apps = pcall(function() return hs.application.runningApplications() end)
+    if not ok or type(apps) ~= "table" then
+        collecting = false
+        return
+    end
+    local out = {}
+    for _, app in ipairs(apps) do
+        local okB, bid = pcall(function() return app:bundleID() end)
+        if okB and type(bid) == "string" and bid ~= "" and not bound[bid] and winApps[bid] then
+            -- 显示名：.app 目录名优先（知音楼/微信 等中文/真实名）
+            local name = ""
+            local okP, path = pcall(function() return app:path() end)
+            if okP and type(path) == "string" then
+                local appName = path:match("/([^/]+)%.app$")
+                if appName and appName ~= "" then name = appName end
+            end
+            if name == "" then
+                local okN, n = pcall(function() return app:name() end)
+                if okN and type(n) == "string" then name = n end
+            end
+            if name ~= "" then
+                out[#out + 1] = { name = name, bundle_id = bid }
+            end
+        end
+    end
+    -- 按名称排序后更新缓存
     table.sort(out, function(a, b) return a.name < b.name end)
     runningAppsCache = { at = os.time(), list = out }
-    return out
+    collecting = false
+end
+
+--- 查询运行应用列表：纯缓存读取，零阻塞；无缓存时后台立即收集（先回空）
+function manager.runningApps()
+    if not runningAppsCache.list and not collecting then
+        collectRunningApps()
+    end
+    return runningAppsCache.list or {}
+end
+
+--- 启动定期后台刷新（reload/启动后调用；3s 后首次预热，之后每 intervalSec 一次）
+function manager.startRunningRefresh(intervalSec)
+    manager.stopRunningRefresh()
+    hs.timer.doAfter(3, collectRunningApps)
+    refreshTimer = hs.timer.doEvery(intervalSec or 30, collectRunningApps)
+end
+
+--- 停止定期刷新（stop 时调用）
+function manager.stopRunningRefresh()
+    if refreshTimer then refreshTimer:stop() refreshTimer = nil end
 end
 
 --- 测试：触发该应用的显隐逻辑（与热键相同）

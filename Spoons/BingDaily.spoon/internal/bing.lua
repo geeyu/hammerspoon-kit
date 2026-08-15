@@ -82,18 +82,29 @@ function bing.fetchInfo(n, cb)
 end
 
 --- 归档列表（搜索页用）：缓存 10 分钟
+--- 注意：HSUtil dispatch 为同步分发，异步回调的 res:json 会丢（响应已发出）。
+--- 因此缓存 miss 时同步回 nil（触发方拿到空即知未就绪），后台拉取填缓存。
 --- @param cb function(rows|nil, err|nil)
 function bing.fetchArchive(cb)
     local n = cfg.archive_days or 7
     if archiveCache and archiveCache.at and (os.time() - archiveCache.at) < 600 then
         return cb(archiveCache.rows)
     end
+    cb(nil)
     bing.fetchInfo(n, function(rows, err)
         if rows then
             archiveCache = { at = os.time(), rows = rows }
         end
-        cb(rows, err)
     end)
+end
+
+--- 当前归档缓存快照（不触发拉取；api 层用：miss 时同步回空 + 后台拉取）
+--- @return rows table|nil, cached boolean
+function bing.archiveSnapshot()
+    if archiveCache then
+        return archiveCache.rows, true
+    end
+    return nil, false
 end
 
 --- 设为桌面壁纸（按 cfg.apply_to_screens：主屏或全部屏幕）

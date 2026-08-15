@@ -31,8 +31,15 @@ createApp({
     }
 
     function remove(a) {
-      if (!confirm("删除「" + a.name + "」的显隐绑定？")) return;
-      store.remove(a);
+      UiConfirm.show({
+        title: "删除应用",
+        message: "删除「" + a.name + "」的显隐绑定？",
+        okText: "删除",
+        cancelText: "取消",
+        danger: true,
+      }).then((ok) => {
+        if (ok) store.remove(a);
+      });
     }
 
     function press(a) {
@@ -40,8 +47,15 @@ createApp({
     }
 
     function clearLayouts(a) {
-      if (!confirm("清除「" + a.name + "」在全部屏幕的锁定布局？")) return;
-      store.clearLayouts(a);
+      UiConfirm.show({
+        title: "清除锁定布局",
+        message: "清除「" + a.name + "」在全部屏幕的锁定布局？",
+        okText: "清除",
+        cancelText: "取消",
+        danger: true,
+      }).then((ok) => {
+        if (ok) store.clearLayouts(a);
+      });
     }
 
     // 返回：iframe 内关 launcher 子页面（回主页）；独立打开时 history.back

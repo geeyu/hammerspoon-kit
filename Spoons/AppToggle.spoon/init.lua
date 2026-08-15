@@ -62,6 +62,8 @@ function obj:start()
     end
     self._started = true
     obj.logger.f("AppToggle 已启动（%d 个应用热键）", manager.boundCount())
+    -- 运行应用列表：后台定期分批刷新（3s 预热 + 每 30s 一次），查询永远走缓存零阻塞
+    manager.startRunningRefresh(30)
     return self
 end
 
@@ -70,6 +72,7 @@ end
 --- 释放全部热键并关闭数据库。
 function obj:stop()
     manager.clear()
+    manager.stopRunningRefresh()
     pcall(store.close)
     self._started = false
     return self
