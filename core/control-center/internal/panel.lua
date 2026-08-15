@@ -42,7 +42,16 @@ local SHIM_JS_TMPL = [[
 (function () {
   var agg = %s;
   function goAggregate() {
-    if (window.location.href !== agg) { window.location.href = agg; }
+    // 优先 history.back()（WKWebView bfcache/缓存页，秒回不重载资源）；
+    // setUrl 切换会写入 webview 历史，back 即回到聚合页。
+    // 无历史（首次直达/外部打开）才整页跳转。
+    if (window.location.href !== agg) {
+      if (window.history && window.history.length > 1) {
+        window.history.back();
+      } else {
+        window.location.href = agg;
+      }
+    }
   }
   // launcher 子页面协议兼容:顶层打开时 parent === window,
   // 既有页面调 parent.closePage() / parent.closeStayAwake() 即可返回聚合页

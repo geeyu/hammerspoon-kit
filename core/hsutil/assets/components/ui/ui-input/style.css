@@ -27,7 +27,7 @@
 .ui-input:hover {
   border-color: var(--border-h);
   background: var(--glass-bg-hover);
-  box-shadow: 0 0 12px rgba(74, 139, 245, 0.08);   /* 悬停微发光 */
+  box-shadow: 0 0 12px rgba(74, 139, 245, 0.08); /* 悬停微发光 */
 }
 .ui-input:focus {
   border-color: var(--accent);
@@ -35,7 +35,7 @@
   box-shadow:
     0 0 0 2px var(--accent-soft),
     0 0 16px var(--accent-soft),
-    0 2px 8px rgba(0, 0, 0, 0.25);   /* 聚焦发光环 */
+    0 2px 8px rgba(0, 0, 0, 0.25); /* 聚焦发光环 */
 }
 .ui-input:disabled {
   opacity: 0.45;

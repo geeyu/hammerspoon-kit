@@ -42,8 +42,12 @@
 }
 
 /* 发光 hover：accent 微光（primary/ghost 共用，语义色按钮保持自身色） */
-.ui-btn:hover:not(:disabled):not(.ui-btn--loading):not(.ui-btn--danger):not(.ui-btn--success):not(.ui-btn--warning) {
-  box-shadow: 0 0 14px rgba(74, 139, 245, 0.18), 0 3px 10px rgba(0, 0, 0, 0.3);
+.ui-btn:hover:not(:disabled):not(.ui-btn--loading):not(.ui-btn--danger):not(
+  .ui-btn--success
+):not(.ui-btn--warning) {
+  box-shadow:
+    0 0 14px rgba(74, 139, 245, 0.18),
+    0 3px 10px rgba(0, 0, 0, 0.3);
 }
 
 /* size */

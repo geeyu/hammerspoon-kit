@@ -32,7 +32,7 @@
 .ui-select__btn:hover {
   border-color: var(--border-h);
   background: var(--glass-bg-hover);
-  box-shadow: 0 0 12px rgba(74, 139, 245, 0.08);   /* 悬停微发光 */
+  box-shadow: 0 0 12px rgba(74, 139, 245, 0.08); /* 悬停微发光 */
 }
 .ui-select--open .ui-select__btn {
   border-color: var(--accent);
