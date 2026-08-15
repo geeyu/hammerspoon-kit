@@ -12,7 +12,7 @@ HSUtil UI 快速开发脚手架。复制本目录 → 改名 `<你的包>.spoon`
   - `pages/<page>/components/` — 页面私有组件（每组件一文件夹）
   - `components/` — 业务全局共享组件
   - `utils/` — 业务工具
-  - `styles/` — 业务全局样式
+  - `styles/` — 业务全局样式（页面骨架统一用 page.css 共享类，本目录只写业务样式）
 - `test/` — Lua 单元测试
 
 ## 页面接入 hsutil UI
@@ -24,6 +24,10 @@ index.html 中声明占位符，服务端自动注入（勿手写 hsutil 的 lin
 <!-- hsutil:fx glass -->
 <!-- hsutil:amis -->
 ```
+
+`hsutil:ui` 会自动注入 vue + theme.css/base.css/page.css（配置页共享布局层）+ 组件资源；页面私有 css 的 `<link>` 放在占位符之后即可覆盖共享类。
+
+页面骨架统一用 page.css 共享类：`.page-panel`（面板壳，flex column + 100% 高度）→ `.page-head`/`.page-title`/`.nav-back`（页头）→ `.ctrl-body`（滚动区）→ `.setting-row` 系（`.setting-label`/`.setting-name`/`.setting-desc`/`.setting-control(s)`）→ `.page-actions`（底部操作）；glass 质感挂 `.glass-panel` 类，光尘特效用 `<!-- hsutil:fx glass -->` 占位符 + `HSUI.initGlassFX()`。app.css 不要重复定义共享类。
 
 注意：`ui-amis` 是组件名，占位符 `<!-- hsutil:ui ... ui-amis -->` 会自动带出 amis SDK + utils/amis.js；纯 JS 页面（无组件）才用独立 `<!-- hsutil:amis -->` 占位符。
 

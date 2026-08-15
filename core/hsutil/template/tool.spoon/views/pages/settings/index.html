@@ -3,34 +3,52 @@
 <head>
 <meta charset="utf-8">
 <title>Settings - Tool</title>
+<!-- 占位符：声明即自动注入 theme.css + base.css + page.css + 组件；每组件一文件夹由服务端注册表管理 -->
+<!-- hsutil:ui form,switch,radio,toast -->
+<!-- hsutil:fx glass -->
+<!-- 业务样式：全局（位于占位符之后，可覆盖 page.css 共享类） -->
 <link rel="stylesheet" href="/tool/assets/styles/app.css">
 </head>
 <body>
-<!-- 占位符：声明即自动注入；每组件一文件夹由服务端注册表管理 -->
-<!-- hsutil:ui form,switch,radio,toast -->
-<!-- hsutil:fx glass -->
-
 <div id="app" v-cloak>
-  <div class="fx-layer" v-if="fxOn"></div>
-  <div class="page-head">
-    <div class="page-title">Tool 设置</div>
-    <a class="nav-back" href="#/home">回首页</a>
-  </div>
+  <div class="page-panel">
+    <div class="fx-layer" v-if="fxOn"></div>
+    <div class="page-head">
+      <div class="page-title">Tool 设置</div>
+      <a class="nav-back" href="#/home">回首页</a>
+    </div>
 
-  <!-- 设置项：switch + radio + 保存 -->
-  <div class="row">
-    <label class="row-item">
-      <ui-switch v-model="settings.notify" />
-      <span>通知</span>
-    </label>
-    <ui-radio-group v-model="settings.theme" :options="[{label:'浅色',value:'light'},{label:'深色',value:'dark'}]" />
-    <ui-button variant="primary" @click="save">保存</ui-button>
-  </div>
+    <!-- 中间滚动区（页头/底部操作固定，仅此处滚动） -->
+    <div class="ctrl-body">
+      <!-- 设置项：switch + radio -->
+      <div class="setting-row">
+        <div class="setting-label">
+          <div class="setting-name">通知</div>
+          <div class="setting-desc">开关演示：开启后点击保存生效</div>
+        </div>
+        <div class="setting-controls">
+          <ui-switch v-model="settings.notify" />
+          <ui-radio-group v-model="settings.theme" :options="[{label:'浅色',value:'light'},{label:'深色',value:'dark'}]" />
+        </div>
+      </div>
 
-  <!-- 服务端状态示例：来自 /api/tool/hello -->
-  <div class="row">
-    <ui-status-badge status="success" :text="hello.message || '...'" />
-    <span class="row-item">时间戳 {{ hello.time || '-' }}</span>
+      <!-- 服务端状态示例：来自 /api/tool/hello -->
+      <div class="setting-row">
+        <div class="setting-label">
+          <div class="setting-name">服务端状态</div>
+          <div class="setting-desc">来自 /api/tool/hello 的演示数据</div>
+        </div>
+        <div class="setting-controls">
+          <ui-status-badge status="success" :text="hello.message || '...'" />
+          <span class="row-item">时间戳 {{ hello.time || '-' }}</span>
+        </div>
+      </div>
+    </div><!-- /ctrl-body -->
+
+    <!-- 底部操作：保存 -->
+    <div class="page-actions">
+      <ui-button variant="primary" @click="save">保存</ui-button>
+    </div>
   </div>
 </div>
 
