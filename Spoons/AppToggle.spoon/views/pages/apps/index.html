@@ -1,123 +1,199 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
-<head>
-<meta charset="utf-8">
-<title>应用显隐管理</title>
-<link rel="icon" href="data:,">
-<!-- 占位符：服务端展开注入 vue + theme.css + base.css + 组件（声明即可，勿手写 link/script） -->
-<!-- hsutil:ui select,switch,button,toast,input,hotkey,drawer,empty -->
-<link rel="stylesheet" href="/apptoggle/view/pages/apps/style.css">
-</head>
-<body>
-<div id="app" v-cloak>
-  <div class="settings-panel">
-    <div class="page-head">
-      <div class="page-title">🔄 应用显隐管理</div>
-      <ui-button variant="ghost" size="sm" @click="goBack">← 返回</ui-button>
-    </div>
-
-    <!-- 顶部说明 + 新增入口 -->
-    <div class="ctrl-body thin-scroll">
-
-      <div class="intro-card">
-        <div class="intro-text">
-          每个应用一个全局热键：按一下呼出（按鼠标所在屏锁定布局），再按隐藏并记录布局。
-          <span class="intro-dim">布局只在手动调整窗口后按热键隐藏时锁定。</span>
-        </div>
-        <ui-button variant="primary" size="sm" @click="openEditor(null)">＋ 添加应用</ui-button>
-      </div>
-
-      <!-- 应用列表 -->
-      <div class="empty-state anim-fade-in" v-if="apps.length === 0">
-        <div class="empty-icon anim-beat">🔄</div>
-        <div class="empty-text">还没有应用<br>点击上方「添加应用」绑定第一个</div>
-      </div>
-
-      <div class="app-row" v-for="a in apps" :key="a.id"
-           :class="{ disabled: !a.enabled }">
-        <div class="app-main">
-          <div class="app-name">
-            {{ a.name }}
-            <span class="app-badge off" v-if="!a.enabled">停用</span>
-            <span class="app-badge running" v-else-if="a.running && !a.hidden">运行中</span>
-            <span class="app-badge hidden" v-else-if="a.running && a.hidden">已隐藏</span>
-            <span class="app-badge" v-else>未运行</span>
-          </div>
-          <div class="app-sub">{{ a.bundle_id }}</div>
-          <div class="app-opts">
-            <span class="opt-chip" v-if="a.layout_count > 0" title="已锁定布局的屏幕数">
-              {{ a.layout_count }} 屏布局
-            </span>
-            <span class="opt-chip" title="应用未运行时的行为">{{ a.on_no_window === 'activate' ? '仅激活' : '启动' }}</span>
-            <span class="opt-chip" v-if="a.fullscreen_fallback" title="全屏 Space 上呼出 → 全屏接管">全屏接管</span>
-            <span class="opt-chip" v-if="a.restore_focus" title="隐藏后焦点还原给呼出前的应用">还原焦点</span>
-            <span class="opt-chip" v-if="a.move_to_mouse_screen" title="呼出时移动到鼠标所在屏">跟随鼠标屏</span>
-          </div>
+  <head>
+    <meta charset="utf-8" />
+    <title>应用显隐管理</title>
+    <link rel="icon" href="data:," />
+    <!-- 占位符：服务端展开注入 vue + theme.css + base.css + 组件（声明即可，勿手写 link/script） -->
+    <!-- hsutil:ui select,switch,button,toast,input,hotkey,drawer,empty -->
+    <link rel="stylesheet" href="/apptoggle/view/pages/apps/style.css" />
+  </head>
+  <body>
+    <div id="app" v-cloak>
+      <div class="settings-panel">
+        <div class="page-head">
+          <div class="page-title">🔄 应用显隐管理</div>
+          <ui-button variant="ghost" size="sm" @click="goBack"
+            >← 返回</ui-button
+          >
         </div>
 
-        <div class="app-side">
-          <span class="hotkey-chip" :class="{ off: !a.enabled }">{{ fmtHotkey(a) }}</span>
-          <div class="app-actions">
-            <ui-button variant="ghost" size="sm" title="触发一次显隐（与热键相同）"
-                       @click="press(a)">测试</ui-button>
-            <ui-button variant="ghost" size="sm" @click="openEditor(a)">编辑</ui-button>
-            <ui-button variant="danger" size="sm" @click="remove(a)">删除</ui-button>
+        <!-- 顶部说明 + 新增入口 -->
+        <div class="ctrl-body thin-scroll">
+          <div class="intro-card">
+            <div class="intro-text">
+              每个应用一个全局热键：按一下呼出（按鼠标所在屏锁定布局），再按隐藏并记录布局。
+              <span class="intro-dim"
+                >布局只在手动调整窗口后按热键隐藏时锁定。</span
+              >
+            </div>
+            <ui-button variant="primary" size="sm" @click="openEditor(null)"
+              >＋ 添加应用</ui-button
+            >
+          </div>
+
+          <!-- 应用列表 -->
+          <div class="empty-state anim-fade-in" v-if="apps.length === 0">
+            <div class="empty-icon anim-beat">🔄</div>
+            <div class="empty-text">
+              还没有应用<br />点击上方「添加应用」绑定第一个
+            </div>
+          </div>
+
+          <div
+            class="app-row"
+            v-for="a in apps"
+            :key="a.id"
+            :class="{ disabled: !a.enabled }"
+          >
+            <div class="app-main">
+              <div class="app-name">
+                {{ a.name }}
+                <span class="app-badge off" v-if="!a.enabled">停用</span>
+                <span
+                  class="app-badge running"
+                  v-else-if="a.running && !a.hidden"
+                  >运行中</span
+                >
+                <span class="app-badge hidden" v-else-if="a.running && a.hidden"
+                  >已隐藏</span
+                >
+                <span class="app-badge" v-else>未运行</span>
+              </div>
+              <div class="app-sub">{{ a.bundle_id }}</div>
+              <div class="app-opts">
+                <span
+                  class="opt-chip"
+                  v-if="a.layout_count > 0"
+                  title="已锁定布局的屏幕数"
+                >
+                  {{ a.layout_count }} 屏布局
+                </span>
+                <span class="opt-chip" title="应用未运行时的行为"
+                  >{{ a.on_no_window === 'activate' ? '仅激活' : '启动' }}</span
+                >
+                <span
+                  class="opt-chip"
+                  v-if="a.fullscreen_fallback"
+                  title="全屏 Space 上呼出 → 全屏接管"
+                  >全屏接管</span
+                >
+                <span
+                  class="opt-chip"
+                  v-if="a.restore_focus"
+                  title="隐藏后焦点还原给呼出前的应用"
+                  >还原焦点</span
+                >
+                <span
+                  class="opt-chip"
+                  v-if="a.move_to_mouse_screen"
+                  title="呼出时移动到鼠标所在屏"
+                  >跟随鼠标屏</span
+                >
+              </div>
+            </div>
+
+            <div class="app-side">
+              <span class="hotkey-chip" :class="{ off: !a.enabled }"
+                >{{ fmtHotkey(a) }}</span
+              >
+              <div class="app-actions">
+                <ui-button
+                  variant="ghost"
+                  size="sm"
+                  title="触发一次显隐（与热键相同）"
+                  @click="press(a)"
+                  >测试</ui-button
+                >
+                <ui-button variant="ghost" size="sm" @click="openEditor(a)"
+                  >编辑</ui-button
+                >
+                <ui-button variant="danger" size="sm" @click="remove(a)"
+                  >删除</ui-button
+                >
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </div>
 
-  <!-- 编辑抽屉：新增/修改应用 -->
-  <ui-drawer :open="editorOpen" title="编辑应用" @update:open="editorOpen = $event">
-    <div class="editor-body" v-if="editor">
-      <div class="form-row">
-        <label>名称</label>
-        <ui-input v-model="editor.name" placeholder="如 Ghostty" />
-      </div>
-      <div class="form-row">
-        <label>Bundle ID</label>
-        <ui-input v-model="editor.bundle_id" placeholder="如 com.mitchellh.ghostty" />
-      </div>
-      <div class="form-row">
-        <label>热键</label>
-        <ui-hotkey :model-value="editor.hotkeyStr" remote remote-url="/apptoggle/api/hotkey-guard"
-                   @update:model-value="onHotkey"></ui-hotkey>
-        <div class="form-hint">点击后按下组合键（修饰键 + 主键）；Esc 取消录制</div>
-      </div>
-      <div class="form-row">
-        <label>未运行时</label>
-        <ui-select v-model="editor.on_no_window" :options="noWindowOptions" />
-      </div>
-      <div class="form-row switch-row">
-        <label>全屏接管</label>
-        <ui-switch v-model="editor.fullscreen_fallback" />
-        <span class="form-hint">光标在别的应用全屏 Space 时，呼出走全屏形态接管</span>
-      </div>
-      <div class="form-row switch-row">
-        <label>还原焦点</label>
-        <ui-switch v-model="editor.restore_focus" />
-        <span class="form-hint">隐藏后焦点还原给呼出前的应用</span>
-      </div>
-      <div class="form-row switch-row">
-        <label>跟随鼠标屏</label>
-        <ui-switch v-model="editor.move_to_mouse_screen" />
-        <span class="form-hint">呼出时按鼠标所在屏定位/移动窗口</span>
-      </div>
+      <!-- 编辑抽屉：新增/修改应用 -->
+      <ui-drawer
+        :open="editorOpen"
+        title="编辑应用"
+        @update:open="editorOpen = $event"
+      >
+        <div class="editor-body" v-if="editor">
+          <div class="form-row">
+            <label>名称</label>
+            <ui-input v-model="editor.name" placeholder="如 Ghostty" />
+          </div>
+          <div class="form-row">
+            <label>Bundle ID</label>
+            <ui-input
+              v-model="editor.bundle_id"
+              placeholder="如 com.mitchellh.ghostty"
+            />
+          </div>
+          <div class="form-row">
+            <label>热键</label>
+            <ui-hotkey
+              :model-value="editor.hotkeyStr"
+              remote
+              remote-url="/apptoggle/api/hotkey-guard"
+              @update:model-value="onHotkey"
+            ></ui-hotkey>
+            <div class="form-hint">
+              点击后按下组合键（修饰键 + 主键）；Esc 取消录制
+            </div>
+          </div>
+          <div class="form-row">
+            <label>未运行时</label>
+            <ui-select
+              v-model="editor.on_no_window"
+              :options="noWindowOptions"
+            />
+          </div>
+          <div class="form-row switch-row">
+            <label>全屏接管</label>
+            <ui-switch v-model="editor.fullscreen_fallback" />
+            <span class="form-hint"
+              >光标在别的应用全屏 Space 时，呼出走全屏形态接管</span
+            >
+          </div>
+          <div class="form-row switch-row">
+            <label>还原焦点</label>
+            <ui-switch v-model="editor.restore_focus" />
+            <span class="form-hint">隐藏后焦点还原给呼出前的应用</span>
+          </div>
+          <div class="form-row switch-row">
+            <label>跟随鼠标屏</label>
+            <ui-switch v-model="editor.move_to_mouse_screen" />
+            <span class="form-hint">呼出时按鼠标所在屏定位/移动窗口</span>
+          </div>
+        </div>
+        <template #footer>
+          <div class="editor-footer">
+            <ui-button
+              variant="ghost"
+              size="sm"
+              v-if="editor && editor.id"
+              @click="clearLayouts(editor)"
+              >清除锁定布局</ui-button
+            >
+            <span class="spacer"></span>
+            <ui-button variant="ghost" size="sm" @click="editorOpen = false"
+              >取消</ui-button
+            >
+            <ui-button variant="primary" size="sm" @click="saveEditor"
+              >保存</ui-button
+            >
+          </div>
+        </template>
+      </ui-drawer>
     </div>
-    <template #footer>
-      <div class="editor-footer">
-        <ui-button variant="ghost" size="sm" v-if="editor && editor.id"
-                   @click="clearLayouts(editor)">清除锁定布局</ui-button>
-        <span class="spacer"></span>
-        <ui-button variant="ghost" size="sm" @click="editorOpen = false">取消</ui-button>
-        <ui-button variant="primary" size="sm" @click="saveEditor">保存</ui-button>
-      </div>
-    </template>
-  </ui-drawer>
-</div>
 
-<script src="store.js" defer></script>
-<script src="app.js" defer></script>
-</body>
+    <script src="store.js" defer></script>
+    <script src="app.js" defer></script>
+  </body>
 </html>

@@ -1,118 +1,180 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
-<head>
-<meta charset="utf-8">
-<title>Bing 壁纸设置</title>
-<!-- 占位符：ui 注入 vue + theme/base + 组件（对齐 Clipboard settings 页） -->
-<!-- hsutil:ui select,input,switch,button,toast -->
-<!-- hsutil:fx glass -->
-<link rel="stylesheet" href="/bingdaily/view/pages/settings/style.css">
-</head>
-<body>
-<div id="app" v-cloak>
-  <div class="settings-panel glass-panel">
-    <div class="page-head">
-      <div class="page-title">🖼️ Bing 壁纸设置</div>
-      <ui-button variant="ghost" size="sm" @click="goBack">← 返回</ui-button>
+  <head>
+    <meta charset="utf-8" />
+    <title>Bing 壁纸设置</title>
+    <!-- 占位符：ui 注入 vue + theme/base + 组件（对齐 Clipboard settings 页） -->
+    <!-- hsutil:ui select,input,switch,button,toast -->
+    <!-- hsutil:fx glass -->
+    <link rel="stylesheet" href="/bingdaily/view/pages/settings/style.css" />
+  </head>
+  <body>
+    <div id="app" v-cloak>
+      <div class="settings-panel glass-panel">
+        <div class="page-head">
+          <div class="page-title">🖼️ Bing 壁纸设置</div>
+          <ui-button variant="ghost" size="sm" @click="goBack"
+            >← 返回</ui-button
+          >
+        </div>
+
+        <!-- 滚动内容区（对齐防睡眠 .ctrl-body：页头/底部操作锁定，中间滚动） -->
+        <div class="ctrl-body thin-scroll">
+          <!-- 当前状态（独立卡片，只读） -->
+          <div class="status-card" :class="{ on: status.status === 'ok' }">
+            <span class="status-dot"></span>
+            <div class="status-body">
+              <div class="status-main">{{ statusText }}</div>
+              <div class="status-line" v-if="status.last_pic">
+                当前：{{ status.last_pic }}
+              </div>
+              <div class="status-line" v-if="status.updated_at">
+                更新：{{ fmtTime(status.updated_at) }}
+              </div>
+              <div class="status-line" v-if="status.expanded_dir">
+                保存位置：{{ status.expanded_dir }}
+              </div>
+            </div>
+          </div>
+
+          <!-- 一键执行 -->
+          <div class="action-card">
+            <div class="action-title">⚡ 一键执行</div>
+            <div class="action-row">
+              <ui-button
+                variant="ghost"
+                size="sm"
+                :loading="busy === 'refresh'"
+                :disabled="!!busy"
+                @click="refresh"
+                >立即刷新今日</ui-button
+              >
+              <ui-button
+                variant="primary"
+                size="sm"
+                :loading="busy === 'applyToday'"
+                :disabled="!!busy"
+                @click="applyToday"
+                >应用今日壁纸</ui-button
+              >
+              <ui-button
+                variant="ghost"
+                size="sm"
+                :loading="busy === 'random'"
+                :disabled="!!busy"
+                @click="applyRandom"
+                >随机一张</ui-button
+              >
+              <ui-button
+                variant="ghost"
+                size="sm"
+                :loading="busy === 'openDir'"
+                :disabled="!!busy"
+                @click="openDir"
+                >打开保存目录</ui-button
+              >
+            </div>
+          </div>
+
+          <!-- 轮询间隔 -->
+          <div class="setting-row">
+            <div class="setting-label">
+              <div class="setting-name">轮询间隔</div>
+              <div class="setting-desc">
+                每 N 小时检查一次今日壁纸（启动后 5 秒首次拉取）
+              </div>
+            </div>
+            <ui-select
+              v-model="form.intervalHours"
+              :options="hourOptions"
+              class="setting-control"
+            />
+          </div>
+
+          <!-- 保存目录（默认图片保存位置） -->
+          <div class="setting-row">
+            <div class="setting-label">
+              <div class="setting-name">默认保存位置</div>
+              <div class="setting-desc">
+                壁纸下载目录（支持 ~ 缩写，自动创建）
+              </div>
+            </div>
+            <ui-input
+              v-model="form.saveDir"
+              placeholder="~/Pictures/BingDaily"
+              class="setting-control"
+            />
+          </div>
+
+          <!-- 归档天数 -->
+          <div class="setting-row">
+            <div class="setting-label">
+              <div class="setting-name">归档天数</div>
+              <div class="setting-desc">搜索页展示最近 N 天的壁纸（1~30）</div>
+            </div>
+            <ui-input
+              v-model.number="form.archiveDays"
+              type="number"
+              placeholder="如 7"
+              class="setting-control"
+              style="width: 120px"
+            />
+          </div>
+
+          <!-- 自动应用 -->
+          <div class="setting-row">
+            <div class="setting-label">
+              <div class="setting-name">自动应用</div>
+              <div class="setting-desc">轮询到新壁纸后自动设为桌面壁纸</div>
+            </div>
+            <ui-switch v-model="form.autoApply" />
+          </div>
+
+          <!-- 应用范围 -->
+          <div class="setting-row">
+            <div class="setting-label">
+              <div class="setting-name">应用范围</div>
+              <div class="setting-desc">壁纸应用到主屏或全部屏幕</div>
+            </div>
+            <ui-select
+              v-model="form.applyToScreens"
+              :options="screenOptions"
+              class="setting-control"
+            />
+          </div>
+
+          <!-- 应用后通知 -->
+          <div class="setting-row">
+            <div class="setting-label">
+              <div class="setting-name">应用后通知</div>
+              <div class="setting-desc">壁纸切换成功后发送系统通知</div>
+            </div>
+            <ui-switch v-model="form.notifyEnabled" />
+          </div>
+
+          <!-- 下载历史 -->
+          <div class="history-card" v-if="downloads.length > 0">
+            <div class="action-title">📥 最近下载</div>
+            <div class="history-row" v-for="d in downloads" :key="d.id">
+              <span class="history-name" :title="d.name">{{ d.name }}</span>
+              <span class="history-meta"
+                >{{ fmtDate(d.date) }}<template v-if="d.applied">
+                  · 已应用</template
+                ></span
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- 底部操作 -->
+        <div class="page-actions">
+          <ui-button variant="primary" @click="save">保存</ui-button>
+          <ui-button variant="ghost" @click="load">重置为已保存值</ui-button>
+          <span class="save-state" v-if="saved">✓ 已保存</span>
+        </div>
+      </div>
     </div>
-
-    <!-- 滚动内容区（对齐防睡眠 .ctrl-body：页头/底部操作锁定，中间滚动） -->
-    <div class="ctrl-body thin-scroll">
-      <!-- 当前状态（独立卡片，只读） -->
-      <div class="status-card" :class="{ on: status.status === 'ok' }">
-        <span class="status-dot"></span>
-        <div class="status-body">
-          <div class="status-main">{{ statusText }}</div>
-          <div class="status-line" v-if="status.last_pic">当前：{{ status.last_pic }}</div>
-          <div class="status-line" v-if="status.updated_at">更新：{{ fmtTime(status.updated_at) }}</div>
-          <div class="status-line" v-if="status.expanded_dir">保存位置：{{ status.expanded_dir }}</div>
-        </div>
-      </div>
-
-      <!-- 一键执行 -->
-      <div class="action-card">
-        <div class="action-title">⚡ 一键执行</div>
-        <div class="action-row">
-          <ui-button variant="ghost" size="sm" :loading="busy === 'refresh'" :disabled="!!busy" @click="refresh">立即刷新今日</ui-button>
-          <ui-button variant="primary" size="sm" :loading="busy === 'applyToday'" :disabled="!!busy" @click="applyToday">应用今日壁纸</ui-button>
-          <ui-button variant="ghost" size="sm" :loading="busy === 'random'" :disabled="!!busy" @click="applyRandom">随机一张</ui-button>
-          <ui-button variant="ghost" size="sm" :loading="busy === 'openDir'" :disabled="!!busy" @click="openDir">打开保存目录</ui-button>
-        </div>
-      </div>
-
-      <!-- 轮询间隔 -->
-      <div class="setting-row">
-        <div class="setting-label">
-          <div class="setting-name">轮询间隔</div>
-          <div class="setting-desc">每 N 小时检查一次今日壁纸（启动后 5 秒首次拉取）</div>
-        </div>
-        <ui-select v-model="form.intervalHours" :options="hourOptions" class="setting-control" />
-      </div>
-
-      <!-- 保存目录（默认图片保存位置） -->
-      <div class="setting-row">
-        <div class="setting-label">
-          <div class="setting-name">默认保存位置</div>
-          <div class="setting-desc">壁纸下载目录（支持 ~ 缩写，自动创建）</div>
-        </div>
-        <ui-input v-model="form.saveDir" placeholder="~/Pictures/BingDaily" class="setting-control" />
-      </div>
-
-      <!-- 归档天数 -->
-      <div class="setting-row">
-        <div class="setting-label">
-          <div class="setting-name">归档天数</div>
-          <div class="setting-desc">搜索页展示最近 N 天的壁纸（1~30）</div>
-        </div>
-        <ui-input v-model.number="form.archiveDays" type="number" placeholder="如 7" class="setting-control" style="width:120px" />
-      </div>
-
-      <!-- 自动应用 -->
-      <div class="setting-row">
-        <div class="setting-label">
-          <div class="setting-name">自动应用</div>
-          <div class="setting-desc">轮询到新壁纸后自动设为桌面壁纸</div>
-        </div>
-        <ui-switch v-model="form.autoApply" />
-      </div>
-
-      <!-- 应用范围 -->
-      <div class="setting-row">
-        <div class="setting-label">
-          <div class="setting-name">应用范围</div>
-          <div class="setting-desc">壁纸应用到主屏或全部屏幕</div>
-        </div>
-        <ui-select v-model="form.applyToScreens" :options="screenOptions" class="setting-control" />
-      </div>
-
-      <!-- 应用后通知 -->
-      <div class="setting-row">
-        <div class="setting-label">
-          <div class="setting-name">应用后通知</div>
-          <div class="setting-desc">壁纸切换成功后发送系统通知</div>
-        </div>
-        <ui-switch v-model="form.notifyEnabled" />
-      </div>
-
-      <!-- 下载历史 -->
-      <div class="history-card" v-if="downloads.length > 0">
-        <div class="action-title">📥 最近下载</div>
-        <div class="history-row" v-for="d in downloads" :key="d.id">
-          <span class="history-name" :title="d.name">{{ d.name }}</span>
-          <span class="history-meta">{{ fmtDate(d.date) }}<template v-if="d.applied"> · 已应用</template></span>
-        </div>
-      </div>
-    </div>
-
-    <!-- 底部操作 -->
-    <div class="page-actions">
-      <ui-button variant="primary" @click="save">保存</ui-button>
-      <ui-button variant="ghost" @click="load">重置为已保存值</ui-button>
-      <span class="save-state" v-if="saved">✓ 已保存</span>
-    </div>
-  </div>
-</div>
-<script src="store.js" defer></script>
-<script src="app.js" defer></script>
-</body>
+    <script src="store.js" defer></script>
+    <script src="app.js" defer></script>
+  </body>
 </html>

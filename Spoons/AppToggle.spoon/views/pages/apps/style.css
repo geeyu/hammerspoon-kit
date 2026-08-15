@@ -1,5 +1,10 @@
 /* 应用显隐管理页样式（对齐 Clipboard settings：设置面板 + 滚动区 + 行布局） */
-html, body, #app { height: 100%; margin: 0; }
+html,
+body,
+#app {
+  height: 100%;
+  margin: 0;
+}
 
 .settings-panel {
   height: 100%;
@@ -43,8 +48,13 @@ html, body, #app { height: 100%; margin: 0; }
   flex-shrink: 0;
 }
 
-.intro-text { font-size: 12.5px; line-height: 1.6; }
-.intro-dim { opacity: 0.55; }
+.intro-text {
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+.intro-dim {
+  opacity: 0.55;
+}
 
 /* 应用行 */
 .app-row {
@@ -57,9 +67,14 @@ html, body, #app { height: 100%; margin: 0; }
   background: rgba(127, 127, 127, 0.06);
 }
 
-.app-row.disabled { opacity: 0.55; }
+.app-row.disabled {
+  opacity: 0.55;
+}
 
-.app-main { min-width: 0; flex: 1; }
+.app-main {
+  min-width: 0;
+  flex: 1;
+}
 
 .app-name {
   font-size: 14px;
@@ -77,9 +92,17 @@ html, body, #app { height: 100%; margin: 0; }
   border-radius: 999px;
   background: rgba(127, 127, 127, 0.18);
 }
-.app-badge.running { background: rgba(52, 199, 89, 0.22); color: #34c759; }
-.app-badge.hidden  { background: rgba(255, 159, 10, 0.2); color: #ff9f0a; }
-.app-badge.off     { background: rgba(127, 127, 127, 0.25); }
+.app-badge.running {
+  background: rgba(52, 199, 89, 0.22);
+  color: #34c759;
+}
+.app-badge.hidden {
+  background: rgba(255, 159, 10, 0.2);
+  color: #ff9f0a;
+}
+.app-badge.off {
+  background: rgba(127, 127, 127, 0.25);
+}
 
 .app-sub {
   font-size: 11.5px;
@@ -120,9 +143,16 @@ html, body, #app { height: 100%; margin: 0; }
   color: #0a84ff;
   white-space: nowrap;
 }
-.hotkey-chip.off { background: rgba(127, 127, 127, 0.16); color: inherit; opacity: 0.7; }
+.hotkey-chip.off {
+  background: rgba(127, 127, 127, 0.16);
+  color: inherit;
+  opacity: 0.7;
+}
 
-.app-actions { display: flex; gap: 6px; }
+.app-actions {
+  display: flex;
+  gap: 6px;
+}
 
 /* 空状态 */
 .empty-state {
@@ -130,8 +160,14 @@ html, body, #app { height: 100%; margin: 0; }
   padding: 40px 0;
   opacity: 0.75;
 }
-.empty-icon { font-size: 34px; margin-bottom: 10px; }
-.empty-text { font-size: 13px; line-height: 1.8; }
+.empty-icon {
+  font-size: 34px;
+  margin-bottom: 10px;
+}
+.empty-text {
+  font-size: 13px;
+  line-height: 1.8;
+}
 
 /* 编辑器抽屉 */
 .editor-body {
@@ -162,7 +198,9 @@ html, body, #app { height: 100%; margin: 0; }
   justify-content: space-between;
   gap: 10px;
 }
-.switch-row .form-hint { flex: 1; }
+.switch-row .form-hint {
+  flex: 1;
+}
 
 .editor-footer {
   display: flex;
@@ -170,4 +208,6 @@ html, body, #app { height: 100%; margin: 0; }
   gap: 8px;
   width: 100%;
 }
-.editor-footer .spacer { flex: 1; }
+.editor-footer .spacer {
+  flex: 1;
+}

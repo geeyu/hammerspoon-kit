@@ -9,7 +9,9 @@ hs_*.log
 *.swp
 
 # 本地数据目录（HSUtil/各 Spoon 运行时数据，不推 GitHub）
+# 注：data/ 只匹配真目录；软链安装（data → ~/.hammerspoon.bak-*/data）时 git 视软链为文件，需再匹配 data
 data/
+data
 
 # 头脑风暴视觉伴侣产物（浏览器原型/交互事件）
 .superpowers/
