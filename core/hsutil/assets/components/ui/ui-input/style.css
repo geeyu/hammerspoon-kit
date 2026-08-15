@@ -4,7 +4,8 @@
 /* ── UiInput ── */
 .ui-input {
   display: block;
-  width: 100%;
+  min-width: 100px;   /* 不自带宽度：由使用方控制（.setting-control 200px / 抽屉内自适应），
+                         与 ui-select/ui-datetime 同策略——width:100% 会撑破父级定宽 */
   height: 28px;
   padding: 0 8px;
   font-size: 12px;

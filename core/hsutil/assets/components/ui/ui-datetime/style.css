@@ -5,7 +5,8 @@
   position: relative;
   display: inline-flex;
   align-items: center;
-  width: 100%;
+  min-width: 100px;   /* 不自带宽度：由使用方控制（.setting-control 200px 等），
+                         与 ui-select 同策略——width:100% 会撑破父级定宽 */
   box-sizing: border-box;
 }
 .ui-datetime input {

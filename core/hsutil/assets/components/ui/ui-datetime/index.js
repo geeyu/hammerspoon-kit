@@ -14,18 +14,18 @@ var UiDatetime = Vue.defineComponent({
   emits: ['update:modelValue', 'change'],
   template:
     '<div class="ui-datetime" :class="{ \'ui-datetime--disabled\': disabled }">' +
-      '<input ref="inputEl" :placeholder="placeholder" :disabled="disabled" readonly>' + +
+      '<input ref="inputEl" :placeholder="placeholder" :disabled="disabled" readonly>' +
       '<ui-icon name="calendar" :size="14" class="ui-datetime__icon"></ui-icon>' +
       '<button v-if="modelValue && clearable && !disabled" type="button" class="ui-datetime__clear" @click.stop="onClear" title="清除">✕</button>' +
     '</div>',
-  setup: function (props, ctx) {
+  setup: (props, ctx) => {
     var inputEl = Vue.ref(null);
     var fp = Vue.ref(null);
 
     // 选择结果统一补秒输出
     function toOutput(dateStr) { return dateStr + ':00'; }
 
-    Vue.onMounted(function () {
+    Vue.onMounted(() => {
       if (typeof flatpickr === 'undefined') {
         console.error('[UiDatetime] flatpickr 未加载（vendor 未注入）');
         return;
@@ -38,7 +38,7 @@ var UiDatetime = Vue.defineComponent({
         dateFormat: 'Y-m-d H:i',
         minDate: props.minDate || min,
         locale: (flatpickr.l10ns && flatpickr.l10ns.zh) ? flatpickr.l10ns.zh : undefined,
-        onChange: [function (selectedDates, dateStr) {
+        onChange: [(selectedDates, dateStr) => {
           // 防御：时间输入被删空/非法时 flatpickr 会产出含 NaN 的值，过滤不 emit
           if (String(dateStr).indexOf('NaN') !== -1) return;
           ctx.emit('update:modelValue', toOutput(dateStr));
@@ -49,13 +49,13 @@ var UiDatetime = Vue.defineComponent({
     });
 
     // 外部重置/回填同步（如页面启动后清空）
-    Vue.watch(function () { return props.modelValue; }, function (v) {
+    Vue.watch(() => props.modelValue, (v) => {
       if (!fp.value) return;
       if (v) fp.value.setDate(String(v).slice(0, 16));
       else fp.value.clear();
     });
 
-    Vue.onBeforeUnmount(function () { if (fp.value) fp.value.destroy(); });
+    Vue.onBeforeUnmount(() => { if (fp.value) fp.value.destroy(); });
 
     function onClear() {
       if (fp.value) fp.value.clear();
