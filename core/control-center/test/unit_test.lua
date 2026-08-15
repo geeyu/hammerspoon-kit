@@ -8,6 +8,8 @@
 --      返回 shim 注入时机(导航完成检测)与内容 / teardown 停止轮询
 --   C. menubar:菜单结构(聚合页/各 Spoon 入口/重载/退出)、每次打开重新扫描、
 --      扫描异常降级、点击入口打开面板配置页(含真实兄弟模块集成)
+--   D. api:路由注册(providers/open/close + 静态挂载)、参数校验 400、pcall 容错 500、
+--      未注册路径 404(与 /launcher、/stayawake 命名空间无冲突)
 -- =========================================================
 
 local results = { pass = 0, fail = 0 }
@@ -917,6 +919,333 @@ do
         and W.view:raw() ~= nil and W.view:raw():url() == "/stayawake/view/pages/control/index.html",
         W.view and W.view:raw() and W.view:raw():url() or "nil")
 end
+
+-- =========================================================
+-- D. api HTTP 路由(23 用例)
+-- =========================================================
+package.loaded["core.hsutil"] = nil
+
+-- 最小 JSON 编解码(测试基础设施:mock http 请求/响应用)
+local function jsonEncode(v)
+    local t = type(v)
+    if t == "nil" then return "null" end
+    if t == "boolean" then return v and "true" or "false" end
+    if t == "number" then
+        if v ~= v then return "null" end -- NaN
+        return tostring(v)
+    end
+    if t == "string" then
+        return '"' .. v:gsub('[%z\1-\31\\"]', function(c)
+            local map = { ['"'] = '\\"', ["\\"] = "\\\\", ["\n"] = "\\n", ["\r"] = "\\r", ["\t"] = "\\t", ["\b"] = "\\b", ["\f"] = "\\f" }
+            if map[c] then return map[c] end
+            return string.format("\\u%04x", c:byte())
+        end) .. '"'
+    end
+    if t == "table" then
+        -- 数组判定:连续 1..n 整数键
+        local n, isArr = 0, true
+        for k in pairs(v) do
+            if type(k) ~= "number" or k < 1 or k ~= n + 1 then isArr = false; break end
+            n = n + 1
+        end
+        local parts = {}
+        if isArr and n > 0 then
+            for i = 1, n do parts[i] = jsonEncode(v[i]) end
+            return "[" .. table.concat(parts, ",") .. "]"
+        end
+        for k, val in pairs(v) do
+            if type(k) == "string" then
+                parts[#parts + 1] = jsonEncode(k) .. ":" .. jsonEncode(val)
+            end
+        end
+        return "{" .. table.concat(parts, ",") .. "}"
+    end
+    return "null"
+end
+
+local function jsonDecode(s)
+    if type(s) ~= "string" then return nil end
+    local pos, len = 1, #s
+    local function skip()
+        while pos <= len do
+            local c = s:sub(pos, pos)
+            if c == " " or c == "\t" or c == "\n" or c == "\r" then pos = pos + 1 else break end
+        end
+    end
+    local function parseString()
+        pos = pos + 1 -- 跳过开引号
+        local out = {}
+        while pos <= len do
+            local c = s:sub(pos, pos)
+            if c == '"' then pos = pos + 1; return table.concat(out) end
+            if c == "\\" then
+                local e = s:sub(pos + 1, pos + 1)
+                local plain = { n = "\n", t = "\t", r = "\r", b = "\b", f = "\f", ['/'] = "/", ["\\"] = "\\", ['"'] = '"' }
+                if plain[e] then out[#out + 1] = plain[e]; pos = pos + 2
+                elseif e == "u" then
+                    -- BMP 直转 UTF-8(测试用最小实现;不处理代理对)
+                    local code = tonumber(s:sub(pos + 2, pos + 5), 16) or 0
+                    if code < 0x80 then out[#out + 1] = string.char(code)
+                    elseif code < 0x800 then
+                        out[#out + 1] = string.char(0xC0 + math.floor(code / 0x40), 0x80 + code % 0x40)
+                    else
+                        out[#out + 1] = string.char(0xE0 + math.floor(code / 0x1000),
+                            0x80 + math.floor(code / 0x40) % 0x40, 0x80 + code % 0x40)
+                    end
+                    pos = pos + 6
+                else pos = pos + 2 end
+            else
+                out[#out + 1] = c
+                pos = pos + 1
+            end
+        end
+        return nil
+    end
+    local function parseValue()
+        skip()
+        local c = s:sub(pos, pos)
+        if c == '"' then return parseString() end
+        if c == "{" then
+            pos = pos + 1
+            local obj = {}
+            skip()
+            if s:sub(pos, pos) == "}" then pos = pos + 1; return obj end
+            while true do
+                skip()
+                if s:sub(pos, pos) ~= '"' then return nil end
+                local k = parseString()
+                skip()
+                if s:sub(pos, pos) ~= ":" then return nil end
+                pos = pos + 1
+                obj[k] = parseValue()
+                skip()
+                local sep = s:sub(pos, pos)
+                if sep == "}" then pos = pos + 1; return obj end
+                if sep ~= "," then return nil end
+                pos = pos + 1
+            end
+        end
+        if c == "[" then
+            pos = pos + 1
+            local arr = {}
+            skip()
+            if s:sub(pos, pos) == "]" then pos = pos + 1; return arr end
+            local i = 1
+            while true do
+                arr[i] = parseValue()
+                i = i + 1
+                skip()
+                local sep = s:sub(pos, pos)
+                if sep == "]" then pos = pos + 1; return arr end
+                if sep ~= "," then return nil end
+                pos = pos + 1
+            end
+        end
+        if c == "t" then if s:sub(pos, pos + 3) == "true" then pos = pos + 4; return true end return nil end
+        if c == "f" then if s:sub(pos, pos + 4) == "false" then pos = pos + 5; return false end return nil end
+        if c == "n" then if s:sub(pos, pos + 3) == "null" then pos = pos + 4; return nil end return nil end
+        local num = s:match("^-?%d+%.?%d*[eE]?[+-]?%d*", pos)
+        if num and num ~= "" then pos = pos + #num; return tonumber(num) end
+        return nil
+    end
+    local ok, v = pcall(parseValue)
+    if not ok then return nil end
+    return v
+end
+
+-- Mock HTTP app(api.lua 路由记录 + 分发,模拟 HSUtil.http.app)
+local mockRoutes = {}   -- { method=, pattern=, handler= }
+local mockStatic = {}   -- { prefix=, root= }
+local mockApp = {}
+for _, m in ipairs({ "get", "post", "put", "delete", "patch", "head", "options" }) do
+    mockApp[m] = function(_, pattern, handler)
+        mockRoutes[#mockRoutes + 1] = { method = m:upper(), pattern = pattern, handler = handler }
+        return mockApp
+    end
+end
+function mockApp:static(prefix, root)
+    mockStatic[#mockStatic + 1] = { prefix = prefix, root = root }
+    return mockApp
+end
+
+-- 与真实 router.compilePath 相同的路径编译(:param 支持)
+local function compilePath(pattern)
+    local regex = pattern:gsub("([%(%)%.%%%+%-%*%?%[%]%^%$])", "%%%1")
+    regex = regex:gsub("(:[%w_]+)", "([^/]+)")
+    return "^" .. regex .. "$"
+end
+
+-- 分发一个请求到 mock 路由(返回 body, code, headers;未命中 404)
+local function dispatch(method, path, headers, body)
+    local clean = path:match("^([^?]*)") or path
+    local req = {
+        method = method,
+        path = clean,
+        headers = headers or {},
+        body = body or "",
+        query = {},
+        params = {},
+        json = function(self) return jsonDecode(self.body) end,
+    }
+    local res = {
+        _code = 200,
+        _body = "",
+        _headers = {},
+        status = function(self, c) self._code = c; return self end,
+        header = function(self, k, v) self._headers[k] = v; return self end,
+        body = function(self, s) self._body = s or ""; return self end,
+        text = function(self, s) self._body = s or ""; return self end,
+        html = function(self, s) self._body = s or ""; return self end,
+        json = function(self, v)
+            self._body = jsonEncode(v)
+            self._headers["Content-Type"] = "application/json; charset=utf-8"
+            return self
+        end,
+        error = function(self, code, msg)
+            self._code = code
+            self._body = jsonEncode({ err = msg })
+            self._headers["Content-Type"] = "application/json; charset=utf-8"
+            return self
+        end,
+    }
+    for _, r in ipairs(mockRoutes) do
+        if r.method == method and clean:match(compilePath(r.pattern)) then
+            r.handler(req, res)
+            return res._body, res._code, res._headers
+        end
+    end
+    return nil, 404
+end
+
+-- mock core.hsutil(api.lua require 到的部分;dofile 时捕获 http.app = mockApp)
+package.preload["core.hsutil"] = function()
+    return {
+        log = { new = function() return makeLogger() end },
+        path = { join = function(a, b) return a .. "/" .. b end },
+        webview = { new = function() end },
+        json = { encode = function(v) return jsonEncode(v) end },
+        http = { app = mockApp },
+    }
+end
+
+-- dofile api.lua 一次(模块加载时捕获 HSUtil.http.app = mockApp)
+local api = dofile(ROOT .. "internal/api.lua")
+
+-- 与 sources.scan() 输出同构的提供者数据(name/icon/cards/pages,含 configUrl/searchUrl)
+local apiProviders = {
+    {
+        name = "apptoggle", icon = "🔄",
+        cards = {
+            { key = "应用显隐", description = "一键显隐应用(全局热键 + 布局锁定)", icon = "🔄", kind = "page", url = "/apptoggle/view/pages/apps/index.html" },
+        },
+        pages = {
+            { name = "应用显隐", icon = "🔄", configUrl = "/apptoggle/view/pages/apps/index.html" },
+        },
+    },
+    {
+        name = "bingdaily",
+        cards = {},
+        pages = {
+            { name = "Bing 壁纸", icon = "🖼️", configUrl = "/bingdaily/view/pages/settings/index.html", searchUrl = "/bingdaily/view/pages/search/index.html" },
+        },
+    },
+}
+
+-- fake 模块:记录调用 + 可注入故障(验证 pcall 容错)
+local openedUrls = {}
+local hideCalls = 0
+local failOpen, failHide, failGet = false, false, false
+local fakePanelMod = {
+    open = function(url)
+        if failOpen then error("panel.open boom") end
+        openedUrls[#openedUrls + 1] = url
+        return true
+    end,
+    hide = function()
+        if failHide then error("panel.hide boom") end
+        hideCalls = hideCalls + 1
+    end,
+}
+local fakeSourcesMod = {
+    get = function()
+        if failGet then error("sources.get boom") end
+        return apiProviders
+    end,
+}
+
+local VIEWS = "/tmp/cc-views"
+api.setup(fakeSourcesMod, fakePanelMod, VIEWS)
+
+-- 注册面
+check("D1 静态挂载 /control-center/view", #mockStatic == 1
+    and mockStatic[1].prefix == "/control-center/view" and mockStatic[1].root == VIEWS)
+check("D2 三个路由已注册(providers/open/close)", #mockRoutes == 3)
+local allCCOk = true
+for _, r in ipairs(mockRoutes) do
+    if r.pattern:sub(1, #"/control-center/api/") ~= "/control-center/api/" then allCCOk = false end
+end
+check("D3 路由全部挂在 /control-center/api 前缀(与 /launcher、/stayawake 命名空间无冲突)", allCCOk)
+
+-- GET providers
+local body, code = dispatch("GET", "/control-center/api/providers")
+local providersBody = jsonDecode(body)
+check("D4 providers 返回 200 合法 JSON", code == 200 and type(providersBody) == "table", tostring(code))
+check("D5 providers 数量与数据源一致", providersBody and #providersBody.providers == 2, providersBody and tostring(#providersBody.providers))
+local atj = providersBody and providersBody.providers[1]
+check("D6 提供者 name/icon 透传", atj and atj.name == "apptoggle" and atj.icon == "🔄")
+check("D7 卡片字段透传(key/url)", atj and atj.cards[1].key == "应用显隐"
+    and atj.cards[1].url == "/apptoggle/view/pages/apps/index.html")
+check("D8 页面 configUrl/searchUrl 透传", atj and atj.pages[1].configUrl == "/apptoggle/view/pages/apps/index.html")
+local bdj = providersBody and providersBody.providers[2]
+check("D9 searchUrl 透传(bingdaily)", bdj and bdj.pages[1].searchUrl == "/bingdaily/view/pages/search/index.html")
+
+-- GET providers 故障 → 500
+failGet = true
+local _, codeFail = dispatch("GET", "/control-center/api/providers")
+check("D10 sources.get 抛错 → 500 + err", codeFail == 500)
+failGet = false
+
+-- POST open
+local P_URL = "http://127.0.0.1:8821/stayawake/view/pages/control/index.html"
+local ob, oc = dispatch("POST", "/control-center/api/open", {}, jsonEncode({ url = P_URL }))
+local oj = jsonDecode(ob)
+check("D11 open 带 url → 200 {ok:true}", oc == 200 and oj and oj.ok == true, tostring(oc))
+check("D12 open 调用 panel.open(url)", #openedUrls == 1 and openedUrls[1] == P_URL, tostring(#openedUrls))
+
+-- POST open 参数校验 → 400
+local _, cNoBody = dispatch("POST", "/control-center/api/open")
+check("D13 open 缺 body → 400", cNoBody == 400, tostring(cNoBody))
+local _, cNoUrl = dispatch("POST", "/control-center/api/open", {}, jsonEncode({}))
+check("D14 open 缺 url → 400", cNoUrl == 400, tostring(cNoUrl))
+local _, cBadType = dispatch("POST", "/control-center/api/open", {}, jsonEncode({ url = 123 }))
+check("D15 open url 非字符串 → 400", cBadType == 400, tostring(cBadType))
+local _, cEmpty = dispatch("POST", "/control-center/api/open", {}, jsonEncode({ url = "" }))
+check("D16 open url 空串 → 400", cEmpty == 400, tostring(cEmpty))
+local _, cBadJson = dispatch("POST", "/control-center/api/open", {}, "not-json{")
+check("D17 open body 非法 JSON → 400", cBadJson == 400, tostring(cBadJson))
+check("D18 校验失败不触发 panel.open", #openedUrls == 1)
+
+-- POST open 故障 → 500
+failOpen = true
+local _, cOpenFail = dispatch("POST", "/control-center/api/open", {}, jsonEncode({ url = P_URL }))
+check("D19 panel.open 抛错 → 500 + err", cOpenFail == 500, tostring(cOpenFail))
+failOpen = false
+
+-- POST close
+local cb_, cc = dispatch("POST", "/control-center/api/close")
+local cj = jsonDecode(cb_)
+check("D20 close → 200 {ok:true}", cc == 200 and cj and cj.ok == true, tostring(cc))
+check("D21 close 调用 panel.hide", hideCalls == 1, tostring(hideCalls))
+
+-- POST close 故障 → 500
+failHide = true
+local _, cCloseFail = dispatch("POST", "/control-center/api/close")
+check("D22 panel.hide 抛错 → 500 + err", cCloseFail == 500, tostring(cCloseFail))
+failHide = false
+
+-- 与既有路由无冲突:未注册的路径不被命中
+local _, cOther = dispatch("GET", "/launcher/api/query")
+check("D23 未注册路径(/launcher/api/query)→ 404", cOther == 404, tostring(cOther))
 
 -- =========================================================
 -- 汇总
