@@ -10,25 +10,25 @@
 git clone <本仓库地址> ~/.hammerspoon
 ```
 
-4. 点击菜单栏 Hammerspoon 图标 → **Reload Config**
+1. 点击菜单栏 Hammerspoon 图标 → **Reload Config**
 
 ## 2. 立即试试
 
 | 操作 | 效果 |
-|------|------|
+| ------ | ------ |
 | `Ctrl+Opt+Cmd+←` | 当前窗口左半屏 |
 | `Ctrl+V` | 呼出剪贴板历史，输入关键字过滤，Enter 粘贴 |
-| `Option+Space` | 命令中枢：输入应用名回车启动；输入 `sc` 截屏 |
-| `Option+Space` → 点「防睡眠」卡片 | 打开防睡眠控制台，选 30 分钟保持清醒 |
+| 菜单栏 🛠 | 打开控制中心：下拉直达各组件配置；点「打开控制中心」进聚合配置页 |
+| 菜单栏 🛠 → 防睡眠 | 打开防睡眠控制台，选 30 分钟保持清醒 |
 
 ## 3. 常用配置入口
 
 | 想改什么 | 去哪改 |
-|----------|--------|
+| ---------- | -------- |
 | 窗口居中尺寸（默认 800×600） | `Spoons/QuantumWindow.spoon/internal/config.lua` |
-| Launcher 热键、URL 模板、书签 | `core/launcher/internal/config.lua` |
 | 剪贴板保留天数 | `Spoons/Clipboard.spoon/internal/config.lua` |
 | 防睡眠默认模式 | `Spoons/StayAwake.spoon/internal/config.lua` |
+| 控制中心面板尺寸 | `core/control-center/internal/panel.lua` |
 
 改完执行 `Cmd+Opt+Ctrl+R` 重载生效。
 
