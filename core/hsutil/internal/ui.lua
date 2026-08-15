@@ -4,7 +4,9 @@
 ---   <!-- hsutil:ui button,form,table use-crud -->
 ---   <!-- hsutil:fx glass -->
 ---   <!-- hsutil:icons -->
---- 服务端对 text/html 响应展开：vendor → base.css → 组件 css → tpl 内联 → 组件 js(defer, 拓扑序)。
+--- 服务端对 text/html 响应展开：vendor → theme.css → base.css → page.css → 组件 css → tpl 内联 → 组件 js(defer, 拓扑序)。
+--- page.css 为配置页共享布局层（styles/page.css），随 ui 占位符恒注入（在 base.css 之后、
+--- 组件 css 之前；页面私有 css 在 <head> 中位于占位符之后，天然可覆盖共享类）。
 local ui = {}
 
 local assetsDir = nil
@@ -61,6 +63,7 @@ local vendor = {
 }
 
 local BASE_CSS = "styles/base.css"
+local PAGE_CSS = "styles/page.css"
 
 -- ===== 工具 =====
 
@@ -134,9 +137,10 @@ local function renderComponents(names, seen)
         for _, vn in ipairs(registry[n].vendor or {}) do addVendor(vn) end
     end
 
-    -- 2. theme.css（恒有：组件变量源）→ base.css（恒有）
+    -- 2. theme.css（恒有：组件变量源）→ base.css（恒有）→ page.css（恒有：配置页共享布局层）
     parts[#parts + 1] = link("styles/theme.css")
     parts[#parts + 1] = link(BASE_CSS)
+    parts[#parts + 1] = link(PAGE_CSS)
 
     -- 3. 组件 css（拓扑序，去重）
     for _, n in ipairs(ordered) do

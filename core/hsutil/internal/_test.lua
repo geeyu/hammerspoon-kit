@@ -229,7 +229,8 @@ function test.run()
     --- ui.lua：占位符展开（纯函数，同步）
     local ui = require("HSUtil.internal.ui")
     local hsRoot = (debug.getinfo(1, "S").source:sub(2)):match("^(.*)/core/hsutil/internal/_test%.lua$")
-    ui.init(hsRoot .. "/assets")
+    -- 资产目录与 _test.lua 同级（…/core/hsutil/assets），不能取仓库根下的 assets
+    ui.init(hsRoot .. "/core/hsutil/assets")
 
     local html = [[
 <!DOCTYPE html><html><head><title>t</title></head><body>
@@ -238,6 +239,13 @@ function test.run()
 ]]
     local out = ui.expand(html)
     check("ui.expand 注入 base.css", out:find("styles/base%.css") ~= nil)
+    check("ui.expand 注入 page.css", out:find("styles/page%.css") ~= nil)
+    check("ui.expand 展开顺序 theme→base→page", (function()
+        local t = out:find("styles/theme%.css")
+        local b = out:find("styles/base%.css")
+        local p = out:find("styles/page%.css")
+        return t ~= nil and b ~= nil and p ~= nil and t < b and b < p
+    end)())
     check("ui.expand 注入 vue vendor", out:find("vendor/vue%.global%.prod%.js") ~= nil)
     check("ui.expand 注入 button js", out:find("ui%-button/index%.js") ~= nil)
     check("ui.expand 恒注入注册表 index.js", out:find("components/ui/index%.js") ~= nil)
@@ -258,8 +266,8 @@ function test.run()
     local fxHtml = [[<!-- hsutil:fx glass -->]]
     local fxOut = ui.expand(fxHtml)
     check("ui.expand fx 注入 anime", fxOut:find("anime%.umd%.min%.js") ~= nil)
-    check("ui.expand fx 注入 glass js", fxOut:find("glass%-fx%.js") ~= nil)
-    check("ui.expand fx 注入 glass css", fxOut:find("glass%-fx%.css") ~= nil)
+    check("ui.expand fx 注入 glass js", fxOut:find("glass%-fx/index%.js") ~= nil)
+    check("ui.expand fx 注入 glass css", fxOut:find("glass%-fx/style%.css") ~= nil)
 
     local iconsHtml = [[<!-- hsutil:icons -->]]
     local iconsOut = ui.expand(iconsHtml)
