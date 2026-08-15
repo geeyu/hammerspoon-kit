@@ -62,6 +62,9 @@ function webview.new(opts)
         _loadedOnce = false,
         _readyTimer = nil,
         _escTap = nil,
+        _navRetries = 0,    -- 导航失败重试计数（懒加载竞态：webview 扩展首次加载时
+                            -- WebKit 进程未就绪，立即导航报 didFailProvisionalNavigation(101)，
+                            -- 延迟重载即可恢复；最多重试 3 次）
     }, View)
 end
 
@@ -102,9 +105,22 @@ function View:_ensure()
     wv:navigationCallback(function(action, _, _, err)
         if action == "didFinishNavigation" then
             self._pageReady = true
+            self._navRetries = 0   -- 成功加载：重置重试计数
             if self._readyTimer then self._readyTimer:stop(); self._readyTimer = nil end
         elseif action == "didFailNavigation" or action == "didFailProvisionalNavigation" then
             self._pageReady = false
+            -- 懒加载竞态自动重试：webview 扩展首次加载时 WebKit 进程未就绪，
+            -- 立即导航会报 WebKit 101（URL can't be shown）；延迟 0.4s 重载通常即恢复。
+            -- 重试成功则不再通知 onLoadFail；3 次仍失败才上报（真实错误）
+            if self._navRetries < 3 and self._url then
+                self._navRetries = self._navRetries + 1
+                hs.timer.doAfter(0.4, function()
+                    if self._wv then
+                        pcall(function() self._wv:url(self._url) end)
+                    end
+                end)
+                return
+            end
             if self._onLoadFail then
                 pcall(self._onLoadFail, action, err)
             else
@@ -160,6 +176,10 @@ function View:show()
 
     if not self._loadedOnce then
         -- 首次：加载 URL + 超时保护
+        -- 扩展预热：webview 扩展是懒加载的（首次 require 才加载原生扩展），
+        -- 直接 wv:url() 可能撞上扩展初始化未完成 → WebKit 101。
+        -- 显式访问 hs.webview 模块函数触发扩展加载，再延迟导航，避开竞态
+        pcall(function() return hs.webview.newBrowser end)
         self._pageReady = false
         wv:url(self._url)
         self._loadedOnce = true
