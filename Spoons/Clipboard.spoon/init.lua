@@ -123,12 +123,12 @@ function obj:start()
         -- 配置保存后：热键变更立即重绑（watcher 的条数/天数/图片开关走 config 引用，自动生效）
         if settings and settings.hotkey_show then
             rebindHotkey()
-            obj.logger.i("热键已更新: %s+%s", table.concat(settings.hotkey_show[1], "+"), settings.hotkey_show[2])
+            obj.logger.f("热键已更新: %s+%s", table.concat(settings.hotkey_show[1], "+"), settings.hotkey_show[2])
         end
         -- 面板尺寸变更立即应用（webview resize，下次呼出即新尺寸）
         if settings and settings.panel then
             panel.applySettings(settings.panel)
-            obj.logger.i("面板尺寸已更新: %s%% x %s%% @ %s%%",
+            obj.logger.f("面板尺寸已更新: %s%% x %s%% @ %s%%",
                 math.floor((settings.panel.widthRatio or 0.52) * 100),
                 math.floor((settings.panel.heightRatio or 0.62) * 100),
                 math.floor((settings.panel.yRatio or 0.22) * 100))
@@ -139,7 +139,7 @@ function obj:start()
     -- 全局热键（toggle：可见时关闭，隐藏时呼出）
     rebindHotkey()
 
-    obj.logger.i("Clipboard 已启动（Ctrl+V 呼出，数据 %s）", config.data_dir)
+    obj.logger.f("Clipboard 已启动（Ctrl+V 呼出，数据 %s）", config.data_dir)
     return self
 end
 

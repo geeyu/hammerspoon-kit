@@ -48,7 +48,7 @@ obj.logger = hs.logger.new("AppToggle", "info")
 function obj:start()
     if self._started then return self end
     if not store.open(config.data_dir) then
-        obj.logger.e("无法打开数据库: %s", config.data_dir)
+        obj.logger.ef("无法打开数据库: %s", config.data_dir)
         return self
     end
     manager.setup(config, store)
@@ -57,11 +57,11 @@ function obj:start()
     api.setup(config, manager, spoonPath .. "views")
     if not ok and conflicts and #conflicts > 0 then
         for _, c in ipairs(conflicts) do
-            obj.logger.e("「%s」(%s) 绑定失败: %s", c.name, c.bundle_id, c.err)
+            obj.logger.ef("「%s」(%s) 绑定失败: %s", c.name, c.bundle_id, c.err)
         end
     end
     self._started = true
-    obj.logger.i("AppToggle 已启动（%d 个应用热键）", manager.boundCount())
+    obj.logger.f("AppToggle 已启动（%d 个应用热键）", manager.boundCount())
     return self
 end
 
@@ -116,7 +116,7 @@ end
 function obj:bindApp(app)
     local result, err = manager.upsert(app)
     if result then
-        obj.logger.i("已绑定「%s」%s+%s", result.app.name,
+        obj.logger.f("已绑定「%s」%s+%s", result.app.name,
             table.concat(result.app.mods, "+"), result.app.key)
     end
     return result and result.id or nil, err

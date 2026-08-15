@@ -68,7 +68,7 @@ function obj:start()
     menubar.start()
 
     obj.started = true
-    obj.logger.i("ControlCenter 已启动（菜单栏 🛠，聚合配置页 %s）", aggregateUrl)
+    obj.logger.f("ControlCenter 已启动（菜单栏 🛠，聚合配置页 %s）", aggregateUrl)
     return self
 end
 

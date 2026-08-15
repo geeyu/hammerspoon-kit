@@ -26,7 +26,7 @@ function panel.setup(config)
         logger = logger,
         -- 启动器加载失败只记日志，不弹窗打断（保持原行为）
         onLoadFail = function(action, err)
-            logger.e("webview 加载失败: %s %s", action, tostring(err))
+            logger.ef("webview 加载失败: %s %s", action, tostring(err))
         end,
     })
 end

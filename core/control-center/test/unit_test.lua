@@ -1325,7 +1325,8 @@ package.preload["core.hsutil"] = function()
             return {
                 i = function(msg) G.logs[#G.logs + 1] = msg end,
                 w = function() end, e = function() end,
-                f = function() end, wf = function() end, ef = function() end, df = function() end,
+                f = function(msg) G.logs[#G.logs + 1] = msg end,
+                wf = function() end, ef = function() end, df = function() end,
             }
         end },
         http = { app = gApp, BASE = "http://127.0.0.1:8821" },

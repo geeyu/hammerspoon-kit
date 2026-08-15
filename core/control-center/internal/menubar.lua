@@ -49,7 +49,7 @@ local function ensureDeps()
             if ok and type(mod) == "table" then
                 sources = mod
             else
-                logger.e("加载 sources.lua 失败,配置入口将不可用: %s", tostring(mod))
+                logger.ef("加载 sources.lua 失败,配置入口将不可用: %s", tostring(mod))
                 sources = { scan = function() return {} end, get = function() return {} end }
             end
         end
@@ -58,7 +58,7 @@ local function ensureDeps()
             if ok and type(mod) == "table" then
                 panel = mod
             else
-                logger.e("加载 panel.lua 失败,配置面板将不可用: %s", tostring(mod))
+                logger.ef("加载 panel.lua 失败,配置面板将不可用: %s", tostring(mod))
                 panel = { open = function() return false end, showAggregate = function() return false end }
             end
         end
@@ -208,7 +208,7 @@ function menubar.start()
     bar:setMenu(function()
         return menubar.buildMenu()
     end)
-    logger.i("ControlCenter 菜单栏就绪(%s)", barTitle)
+    logger.f("ControlCenter 菜单栏就绪(%s)", barTitle)
     return menubar
 end
 

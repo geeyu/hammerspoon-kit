@@ -69,7 +69,7 @@ function obj:start()
     end)
     rescheduleTimer()
     self._started = true
-    obj.logger.i("BingDaily 已启动（间隔 %d 小时，保存到 %s）", config.interval_hours, config.save_dir)
+    obj.logger.f("BingDaily 已启动（间隔 %d 小时，保存到 %s）", config.interval_hours, config.save_dir)
     return self
 end
 

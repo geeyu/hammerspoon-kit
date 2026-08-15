@@ -98,7 +98,7 @@ function obj:start()
     end
     self.hotkeyToggle:enable()
 
-    obj.logger.i("Launcher 已启动（Option+Space 呼出，源: %s）",
+    obj.logger.f("Launcher 已启动（Option+Space 呼出，源: %s）",
         table.concat(config.enabled_sources, ","))
     return self
 end

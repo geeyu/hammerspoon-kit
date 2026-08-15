@@ -84,7 +84,7 @@ local function ensureView(url)
         logger = logger,
         -- 加载失败只记日志,不弹窗打断(与 launcher 面板一致)
         onLoadFail = function(action, err)
-            logger.e("配置面板加载失败: %s %s", action, tostring(err))
+            logger.ef("配置面板加载失败: %s %s", action, tostring(err))
         end,
     })
     return view
@@ -122,7 +122,7 @@ local function startShimPolling()
             wv:evaluateJavaScript(js)
         end)
         if not ok then
-            logger.w("返回 shim 注入失败: %s", cur)
+            logger.wf("返回 shim 注入失败: %s", cur)
         end
     end)
 end
@@ -163,7 +163,7 @@ function panel.open(url)
         -- setUrl 切换:先切后 show(面板隐藏时先切好,避免旧页闪现);
         -- 加载完成后的 shim 注入由常驻轮询负责
         local okSet = pcall(function() wv:url(url) end)
-        if not okSet then logger.w("setUrl 切换失败: %s", url) end
+        if not okSet then logger.wf("setUrl 切换失败: %s", url) end
     end
     return view:show()
 end

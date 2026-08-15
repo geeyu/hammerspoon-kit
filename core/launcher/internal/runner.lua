@@ -149,7 +149,7 @@ function runner.run(row)
         taskUtil.run("/usr/sbin/screencapture", { args, filename })
 
     else
-        logger.e("run: 未知 type=%s", t); return false
+        logger.ef("run: 未知 type=%s", t); return false
     end
     return true
 end

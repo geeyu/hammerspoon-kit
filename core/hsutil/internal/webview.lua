@@ -108,7 +108,7 @@ function View:_ensure()
             if self._onLoadFail then
                 pcall(self._onLoadFail, action, err)
             else
-                self._logger.e("webview 页面加载失败: %s %s", action, tostring(err))
+                self._logger.ef("webview 页面加载失败: %s %s", action, tostring(err))
                 hs.alert.show("面板加载失败，请重试")
             end
         end

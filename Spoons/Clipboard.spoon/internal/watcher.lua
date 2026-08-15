@@ -61,7 +61,7 @@ function watcher.start()
     if not (pbWatcher and pbWatcher:running()) then
         pbWatcher = hs.pasteboard.watcher.new(function()
             local ok, err = pcall(watcher.captureCurrent)
-            if not ok then logger.e("剪贴板捕获异常: %s", tostring(err)) end
+            if not ok then logger.ef("剪贴板捕获异常: %s", tostring(err)) end
         end)
         pbWatcher:start()
     end
