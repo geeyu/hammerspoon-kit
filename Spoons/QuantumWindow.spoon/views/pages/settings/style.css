@@ -1,58 +1,16 @@
-/* ===== 窗口管理配置页样式（views/pages/settings/style.css）=====
-   对齐防睡眠/剪贴板配置页：占满 + 顶固定中间滚动；纯深色无边框。
-   每个功能一行：左标签右控件（启用开关 + 热键录制）。 */
+/* ===== 窗口管理配置页样式（页面私有，views/pages/settings/style.css）=====
+   面板壳(.page-panel)/页头(.page-head)/滚动区(.ctrl-body)/设置行(.setting-row 系)
+   由 hsutil 共享布局层 styles/page.css 提供（ui 占位符恒注入：theme→base→page→
+   组件 css→私有 css，本文件最后加载，可覆盖共享类）。
+   本页私有：全元素盒模型复位、webview 透明背景、禁选中、整页不滚动。 */
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 html, body {
-  height: 100%;
-  font-family: var(--font);
-  background: transparent;
-  color: var(--fg-1);
-  overflow: hidden;
+  background: transparent;   /* webview 透明背景（共享层未设背景） */
+  overflow: hidden;          /* 整页不滚动，滚动收敛到 .ctrl-body */
   -webkit-user-select: none;
-  user-select: none;
-  -webkit-font-smoothing: antialiased;
+  user-select: none;         /* 配置页禁选中，防误选热键文本 */
 }
 
 [v-cloak] { display: none; }
-#app { height: 100%; }
-
-.qw-panel {
-  width: 100%; height: 100%;
-  background: var(--bg-deep);
-  display: flex; flex-direction: column;
-  overflow: hidden;   /* 滚动交给 .ctrl-body */
-}
-
-/* 中间滚动区（顶固定） */
-.ctrl-body {
-  flex: 1; min-height: 0;
-  overflow-y: auto;
-}
-
-/* ── 页头 ── */
-.page-head {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 18px 22px 14px;
-  border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
-}
-.page-title { font-size: 16px; font-weight: 600; color: var(--fg-1); }
-
-/* ── 设置行（左标签 右控件组）── */
-.setting-row {
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 20px;
-  padding: 14px 22px;
-  border-bottom: 1px solid var(--border);
-}
-.setting-label { min-width: 0; }
-.setting-name { font-size: 14px; color: var(--fg-1); margin-bottom: 3px; }
-.setting-desc { font-size: 12px; color: var(--fg-3); line-height: 1.5; }
-
-/* ── 行内控件组（启用开关 + 热键录制）── */
-.row-controls {
-  display: flex; align-items: center; gap: 14px;
-  flex-shrink: 0;
-}

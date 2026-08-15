@@ -11,7 +11,7 @@
 </head>
 <body>
 <div id="app" v-cloak>
-  <div class="qw-panel">
+  <div class="page-panel">
     <!-- 页头：标题 + 返回 -->
     <div class="page-head">
       <div class="page-title">🪟 窗口管理</div>
@@ -27,7 +27,7 @@
           <div class="setting-name">{{ a.label }}</div>
           <div class="setting-desc">{{ a.desc }}</div>
         </div>
-        <div class="row-controls">
+        <div class="setting-controls">
           <!-- 注意：in-DOM 模板里事件名必须用 kebab-case（浏览器会把属性名小写化，
                驼峰 @update:modelValue 会变成 modelvalue 与 emit 的 update:modelValue 匹配不上）
                → 统一 :model-value + @update:model-value 手动赋值 -->
