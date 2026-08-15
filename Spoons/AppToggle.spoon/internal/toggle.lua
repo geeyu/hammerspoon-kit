@@ -290,8 +290,10 @@ function toggle.bind(app)
     if not bundleID or not key or key == "" then
         return nil, "缺 bundle_id 或 key"
     end
-    if #mods == 0 then
-        return nil, "至少需要一个修饰键"
+    -- 功能键（F1-F12）允许无修饰键；普通键必须带修饰键
+    local isFnKey = key:match("^[Ff]1?[0-9]$") ~= nil or key:match("^[Ff]1[0-2]$") ~= nil
+    if #mods == 0 and not isFnKey then
+        return nil, "至少需要一个修饰键（或使用 F1-F12）"
     end
 
     -- 同一组合已存在则先替换

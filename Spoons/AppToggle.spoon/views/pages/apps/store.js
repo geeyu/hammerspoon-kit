@@ -18,8 +18,21 @@ const AppToggleStore = {
       editorOpen: Vue.ref(false),
       editor: Vue.ref(null), // 编辑中的草稿
       saving: Vue.ref(false),
-      runningApps: Vue.ref([]), // 运行中的应用（添加时下拉选择）
+      runningApps: Vue.ref([]), // 运行中的应用（添加时搜索选择）
+      appSearch: Vue.ref(""), // 应用搜索关键字
     };
+
+    // 过滤后的应用列表（按名称/BundleID 搜索）
+    function filteredApps() {
+      const kw = state.appSearch.value.trim().toLowerCase();
+      const list = state.runningApps.value;
+      if (!kw) return list;
+      return list.filter(
+        (a) =>
+          (a.name || "").toLowerCase().includes(kw) ||
+          (a.bundle_id || "").toLowerCase().includes(kw)
+      );
+    }
 
     // 后端应用行 → 编辑器草稿
     function toDraft(a) {
@@ -32,7 +45,6 @@ const AppToggleStore = {
         fullscreen_fallback: a ? a.fullscreen_fallback : true,
         restore_focus: a ? a.restore_focus : true,
         move_to_mouse_screen: a ? a.move_to_mouse_screen : true,
-        selectedApp: "", // 新增时下拉选中值（bundle_id）
       };
     }
 
@@ -55,12 +67,11 @@ const AppToggleStore = {
         if (!a) actions.loadRunningApps();
       },
 
-      // 运行中的应用 → 下拉选项（{label: '名称 (BundleID)', value: bundle_id}）
+      // 运行中的应用（{name, bundle_id}；后端已用 .app 目录名=中文名）
       loadRunningApps() {
         return hsFetch("/running-apps")
           .then((d) => {
             state.runningApps.value = (d.apps || []).map((app) => ({
-              label: app.name + "  (" + app.bundle_id + ")",
               value: app.bundle_id,
               name: app.name,
               bundle_id: app.bundle_id,
@@ -68,6 +79,17 @@ const AppToggleStore = {
           })
           .catch((e) => console.error("加载运行应用失败", e));
       },
+
+      // 点击搜索结果：自动填名称 + Bundle ID，清空搜索
+      pickApp(a) {
+        const ed = state.editor.value;
+        if (!ed || !a) return;
+        ed.name = a.name;
+        ed.bundle_id = a.bundle_id;
+        state.appSearch.value = "";
+      },
+
+      filteredApps,
 
       // 下拉选择应用：自动填名称 + Bundle ID
       onSelectApp() {
@@ -83,12 +105,15 @@ const AppToggleStore = {
       },
 
       // hotkeyStr 形如 "ctrl+alt+t" → {mods: ['ctrl','alt'], key: 't'}
+      // F1-F12 等功能键允许无修饰键（"F1" → {mods: [], key: 'F1'}）
       parseHotkey(s) {
         if (!s) return null;
         const parts = String(s).split("+");
         const key = (parts.pop() || "").trim();
         const mods = parts.map((m) => m.trim()).filter(Boolean);
-        if (!key || mods.length === 0) return null;
+        const isFnKey = /^F1?[0-9]$/.test(key) || /^F1[0-2]$/.test(key);
+        if (!key) return null;
+        if (mods.length === 0 && !isFnKey) return null;
         return { mods: mods, key: key };
       },
 
@@ -102,7 +127,7 @@ const AppToggleStore = {
         if (!ed) return Promise.resolve();
         const hk = actions.parseHotkey(ed.hotkeyStr);
         if (!hk) {
-          alert("热键格式无效：需为 修饰键+主键，如 ctrl+alt+t");
+          alert("热键格式无效：需为 修饰键+主键（如 ctrl+alt+t），或 F1-F12 功能键");
           return Promise.resolve();
         }
         if (!ed.name.trim()) {

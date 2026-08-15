@@ -185,3 +185,62 @@
 .editor-footer .spacer {
   flex: 1;
 }
+
+/* ── 应用搜索选择器（添加应用弹窗内）── */
+.app-picker {
+  position: relative;
+  width: 100%;
+}
+.app-picker-list {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 200;
+  max-height: 200px;
+  overflow-y: auto;
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-top-color: var(--glass-highlight);
+  border-radius: var(--radius-r);
+  box-shadow: var(--shadow-overlay);
+  padding: 4px;
+}
+.app-picker-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 7px 10px;
+  border-radius: var(--radius-c);
+  cursor: pointer;
+  font-size: 12px;
+  transition: background 0.1s var(--ease);
+}
+.app-picker-item:hover {
+  background: var(--glass-bg-hover);
+}
+.app-picker-name {
+  font-weight: 500;
+  color: var(--fg-1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.app-picker-bid {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--fg-3);
+  flex-shrink: 0;
+  max-width: 45%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.app-picker-empty {
+  padding: 12px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--fg-3);
+}

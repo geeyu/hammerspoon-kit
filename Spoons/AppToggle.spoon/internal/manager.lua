@@ -98,8 +98,13 @@ function manager.sanitize(app)
     local key = tostring(app.key or ""):gsub("^%s+", ""):gsub("%s+$", "")
     if key == "" then return nil, "热键主键不能为空" end
     local mods = app.mods
+    -- 功能键（F1-F12 等）允许无修饰键；普通键必须带修饰键（防误录/与系统冲突）
+    local isFnKey = key:match("^[Ff]1?[0-9]$") ~= nil or key:match("^[Ff]1[0-2]$") ~= nil
     if type(mods) ~= "table" or #mods == 0 then
-        return nil, "至少需要一个修饰键（Ctrl/Cmd/Alt/Shift）"
+        if not isFnKey then
+            return nil, "至少需要一个修饰键（Ctrl/Cmd/Alt/Shift）或使用 F1-F12"
+        end
+        mods = {}
     end
     local whitelist = { ctrl = true, cmd = true, alt = true, shift = true }
     local modsOut = {}
@@ -110,8 +115,8 @@ function manager.sanitize(app)
         for _, om in ipairs(modsOut) do if om == m then dup = true break end end
         if not dup then modsOut[#modsOut + 1] = m end
     end
-    if #modsOut == 0 then return nil, "至少需要一个修饰键" end
-    -- 主键合法性（简单校验：非空且不含 '+')
+    if #modsOut == 0 and not isFnKey then return nil, "至少需要一个修饰键" end
+    -- 主键合法性（简单校验：非空且不含 '+'）
     if key:find("+") then return nil, "主键不能包含 +" end
 
     local onNoWindow = tostring(app.on_no_window or "launch")
@@ -185,19 +190,37 @@ end
 
 --- 运行中的应用列表（添加应用时下拉选择用；排除已绑定的）
 --- @return table [{name, bundle_id}]
+--- 运行中的应用列表（添加应用时下拉选择用；排除已绑定）
+--- 显示名优先用 .app 目录名（中文应用名如「知音楼」「微信」），
+--- 兑底用 hs name()（英文）；只列有窗口的应用（过滤系统后台进程）
+--- @return table [{name, bundle_id}]
 function manager.runningApps()
     local out = {}
     local bound = {}
     for _, a in ipairs(store.listApps()) do bound[a.bundle_id] = true end
-    -- hs.application.runningApplications(): {name, bundleID, ...}（pcall 容错）
     local ok, apps = pcall(function() return hs.application.runningApplications() end)
     if ok and type(apps) == "table" then
         for _, app in ipairs(apps) do
-            local name = app and app:name() or nil
             local bid = app and app:bundleID() or nil
-            if type(name) == "string" and name ~= "" and type(bid) == "string" and bid ~= ""
-                and not bound[bid] then
-                out[#out + 1] = { name = name, bundle_id = bid }
+            if type(bid) == "string" and bid ~= "" and not bound[bid] then
+                -- 只列有窗口的应用（用户可见；过滤 loginwindow/WindowManager 等后台进程）
+                local okW, wins = pcall(function() return app:allWindows() end)
+                if okW and type(wins) == "table" and #wins > 0 then
+                    -- 显示名：.app 目录名优先（知音楼/微信 等中文/真实名）
+                    local name = ""
+                    local okP, path = pcall(function() return app:path() end)
+                    if okP and type(path) == "string" then
+                        local appName = path:match("/([^/]+)%.app$")
+                        if appName and appName ~= "" then name = appName end
+                    end
+                    if name == "" then
+                        local okN, n = pcall(function() return app:name() end)
+                        if okN and type(n) == "string" then name = n end
+                    end
+                    if name ~= "" then
+                        out[#out + 1] = { name = name, bundle_id = bid }
+                    end
+                end
             end
         end
     end

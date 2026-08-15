@@ -26,6 +26,10 @@ createApp({
       store.onSelectApp();
     }
 
+    function pickApp(a) {
+      store.pickApp(a);
+    }
+
     function saveEditor() {
       store.saveEditor();
     }
@@ -68,11 +72,13 @@ createApp({
       editorOpen: state.editorOpen,
       editor: state.editor,
       saving: state.saving,
-      appOptions: state.runningApps,
+      appSearch: state.appSearch,
+      filteredApps: store.filteredApps,
       noWindowOptions,
       openEditor,
       onHotkey,
       onSelectApp,
+      pickApp,
       saveEditor,
       remove,
       press,

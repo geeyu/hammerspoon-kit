@@ -16,6 +16,11 @@ local guard = { tap = nil, result = nil, timer = nil }
 local MOD_CODES = {}
 for _, code in ipairs({ 54, 55, 58, 61, 59, 62, 56, 60 }) do MOD_CODES[code] = true end
 
+-- F1-F12 功能键键码（允许无修饰键录制——功能键不参与打字，
+-- 用户常绑定 F1/F2 等单键热键；普通字母键仍需修饰键防误录）
+local FN_CODES = {}
+for _, code in ipairs({ 122, 120, 99, 118, 96, 97, 98, 100, 101, 109, 103, 111 }) do FN_CODES[code] = true end
+
 -- 键码 → hs.hotkey 主键名（left→Left、f5→F5、m→M）
 local function keyNameForCode(code)
     local name = hs.keycodes.map[code]
@@ -48,7 +53,8 @@ local function startGuard()
             if flags.ctrl then mods[#mods + 1] = "ctrl" end
             if flags.shift then mods[#mods + 1] = "shift" end
             local key = keyNameForCode(code)
-            if key and #mods > 0 then
+            -- 允许：带修饰键的任何键 + 无修饰的 F1-F12 功能键
+            if key and (#mods > 0 or FN_CODES[code]) then
                 guard.result = table.concat(mods, "+") .. "+" .. key
                 stopGuard()   -- 记录完成即停止吞键
             end
