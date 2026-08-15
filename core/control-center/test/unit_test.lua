@@ -816,7 +816,7 @@ check("E1 静态挂载 /control-center/view", #mockStatic == 1
 check("E2 三个路由已注册（providers/open/close）", #mockRoutes == 3)
 local allCCOk = true
 for _, r in ipairs(mockRoutes) do
-    if r.pattern:sub(1, 18) ~= "/control-center/api/" then allCCOk = false end
+    if r.pattern:sub(1, #"/control-center/api/") ~= "/control-center/api/" then allCCOk = false end
 end
 check("E3 路由全部挂在 /control-center/api 前缀（与 /launcher、/stayawake 命名空间无冲突）", allCCOk)
 
