@@ -120,16 +120,34 @@
   color: var(--fg-1);
 }
 
-/* 月份/年份行：去掉 dark.css 原生 select 外观与灰蓝底（#3f4458），统一为文字风格 */
+/* 月份/年份标题行：重写 dark.css 原始布局（absolute + 135% 字号 + padding 7.48px 偏上），
+   统一 13px/600 风格并垂直居中——此前月份 select 与年份 input 行高不一致（13px vs 20.5px）导致错位 */
+.flatpickr-calendar .flatpickr-current-month {
+  position: absolute;
+  width: 75%;
+  left: 12.5%;
+  top: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 0;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+}
 .flatpickr-calendar .flatpickr-current-month .flatpickr-monthDropdown-months {
   appearance: none;
   -webkit-appearance: none;
   background: transparent;
   color: var(--fg-1);
-  font-weight: 600;
-  font-size: 13px;
   font-family: var(--font);
-  padding: 0 6px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  height: auto;
+  padding: 4px 6px;
   margin: 0;
   border-radius: 4px;
   cursor: pointer;
@@ -146,9 +164,17 @@
   background: var(--glass-bg);
   color: var(--fg-1);
 }
+.flatpickr-calendar .flatpickr-current-month .numInputWrapper {
+  height: auto;
+  display: inline-flex;
+  align-items: center;
+}
 .flatpickr-calendar .flatpickr-current-month .numInputWrapper input {
   font-weight: 600;
   font-size: 13px;
+  line-height: 1;
+  height: auto;
+  padding: 4px 6px;
 }
 
 /* 星期行（周一~周日）：去掉 dark.css 的灰蓝背景块，浅色文字 + 下留白 */
