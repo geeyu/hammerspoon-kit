@@ -106,7 +106,26 @@
   color: var(--fg-invert) !important;
 }
 
-/* 年月切换箭头 + 月份/年份输入：跟随前景色（dark.css 默认填充偏暗） */
+/* 年月切换箭头：块高对齐标题行（dark.css 默认 padding 10px 导致 54px 溢出 34px 行），图标居中 */
+.flatpickr-calendar .flatpickr-prev-month,
+.flatpickr-calendar .flatpickr-next-month {
+  height: 34px;
+  width: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border-radius: 6px;
+}
+.flatpickr-calendar .flatpickr-prev-month:hover,
+.flatpickr-calendar .flatpickr-next-month:hover {
+  background: var(--bg-row-h);
+}
+.flatpickr-calendar .flatpickr-prev-month svg,
+.flatpickr-calendar .flatpickr-next-month svg {
+  width: 14px;
+  height: 14px;
+}
 .flatpickr-calendar .flatpickr-prev-month svg,
 .flatpickr-calendar .flatpickr-next-month svg {
   fill: var(--fg-2);
@@ -121,7 +140,8 @@
 }
 
 /* 月份/年份标题行：重写 dark.css 原始布局（absolute + 135% 字号 + padding 7.48px 偏上），
-   统一 13px/600 风格并垂直居中——此前月份 select 与年份 input 行高不一致（13px vs 20.5px）导致错位 */
+   统一为「纯文字」风格：月份与年份等高、同色、无背景块——此前月份 select 高度 21px、
+   年份 input 27px 且月份 hover 有灰底圆角块而年份没有，视觉分裂 */
 .flatpickr-calendar .flatpickr-current-month {
   position: absolute;
   width: 75%;
@@ -145,17 +165,19 @@
   font-family: var(--font);
   font-size: 13px;
   font-weight: 600;
-  line-height: 1;
-  height: auto;
-  padding: 4px 6px;
+  line-height: 22px;
+  height: 22px;
+  padding: 0 4px;
   margin: 0;
-  border-radius: 4px;
+  border: none;
+  border-radius: 0;
   cursor: pointer;
+  box-sizing: border-box;
 }
 .flatpickr-calendar
   .flatpickr-current-month
   .flatpickr-monthDropdown-months:hover {
-  background: var(--bg-row-h);
+  background: transparent; /* 纯文字风格：hover 无背景块（与年份一致） */
 }
 .flatpickr-calendar
   .flatpickr-current-month
@@ -172,9 +194,11 @@
 .flatpickr-calendar .flatpickr-current-month .numInputWrapper input {
   font-weight: 600;
   font-size: 13px;
-  line-height: 1;
-  height: auto;
-  padding: 4px 6px;
+  line-height: 22px;
+  height: 22px;
+  padding: 0 4px;
+  border: none;
+  box-sizing: border-box;
 }
 
 /* 星期行（周一~周日）：去掉 dark.css 的灰蓝背景块，浅色文字 + 下留白 */
