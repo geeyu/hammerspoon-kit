@@ -118,6 +118,44 @@
 .flatpickr-calendar .flatpickr-current-month .numInputWrapper span {
   color: var(--fg-1);
 }
+
+/* 月份/年份行：去掉 dark.css 原生 select 外观与灰蓝底（#3f4458），统一为文字风格 */
+.flatpickr-calendar .flatpickr-current-month .flatpickr-monthDropdown-months {
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  color: var(--fg-1);
+  font-weight: 600;
+  font-size: 13px;
+  font-family: var(--font);
+  padding: 0 6px;
+  margin: 0;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.flatpickr-calendar .flatpickr-current-month .flatpickr-monthDropdown-months:hover {
+  background: var(--bg-row-h);
+}
+.flatpickr-calendar .flatpickr-current-month .flatpickr-monthDropdown-months option {
+  background: var(--glass-bg);
+  color: var(--fg-1);
+}
+.flatpickr-calendar .flatpickr-current-month .numInputWrapper input {
+  font-weight: 600;
+  font-size: 13px;
+}
+
+/* 星期行（周一~周日）：去掉 dark.css 的灰蓝背景块，浅色文字 + 下留白 */
+.flatpickr-calendar .flatpickr-weekday {
+  background: transparent;
+  color: var(--fg-3);
+  font-weight: 600;
+  font-size: 11px;
+  padding: 6px 0 5px;
+}
+.flatpickr-calendar .flatpickr-weekdays {
+  border-bottom: 1px solid var(--border);
+}
 .flatpickr-day.selected,
 .flatpickr-day.selected:hover {
   background: var(--accent) !important;
@@ -145,6 +183,9 @@
 }
 .flatpickr-time input {
   color: var(--fg-1);
+}
+.flatpickr-calendar.hasTime .flatpickr-time {
+  border-top: 1px solid var(--border); /* dark.css 默认 #20222c 在深色面板上不可见 */
 }
 .flatpickr-time input:hover,
 .flatpickr-time input:focus {
