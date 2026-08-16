@@ -1,89 +1,121 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
-<head>
-<meta charset="utf-8">
-<title>剪贴板设置</title>
-<link rel="icon" href="data:,">
-<!-- 占位符：服务端展开注入 vue + theme.css + base.css + 组件（声明即可，勿手写 link/script）
+  <head>
+    <meta charset="utf-8" />
+    <title>剪贴板设置</title>
+    <link rel="icon" href="data:," />
+    <!-- 占位符：服务端展开注入 vue + theme.css + base.css + 组件（声明即可，勿手写 link/script）
      select/switch/button/toast/input：表单控件 + 保存反馈 -->
-<!-- hsutil:ui select,switch,button,toast,input,hotkey -->
-<!-- 业务样式：全局 → 页面私有组件（每组件一文件夹） -->
-<link rel="stylesheet" href="/clipboard/view/styles/app.css">
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
-<div id="app" v-cloak>
-  <div class="page-panel">
-    <div class="page-head">
-      <div class="page-title">剪贴板设置</div>
-      <ui-button variant="ghost" size="sm" @click="goBack">← 返回</ui-button>
-    </div>
+    <!-- hsutil:ui select,switch,button,toast,input,hotkey -->
+    <!-- 业务样式：全局 → 页面私有组件（每组件一文件夹） -->
+    <link rel="stylesheet" href="/clipboard/view/styles/app.css" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="app" v-cloak>
+      <div class="page-panel">
+        <div class="page-head">
+          <div class="page-title">剪贴板设置</div>
+          <ui-button variant="ghost" size="sm" @click="goBack"
+            >← 返回</ui-button
+          >
+        </div>
 
-    <!-- 中间滚动区（顶/底固定，对齐防睡眠 control 页） -->
-    <div class="ctrl-body">
+        <!-- 中间滚动区（顶/底固定，对齐防睡眠 control 页） -->
+        <div class="ctrl-body">
+          <!-- 呼出热键（点击后直接按组合键，Esc 清空） -->
+          <div class="setting-row">
+            <div class="setting-label">
+              <div class="setting-name">呼出热键</div>
+              <div class="setting-desc">
+                点击输入框后按下组合键，保存后立即生效
+              </div>
+            </div>
+            <ui-hotkey
+              v-model="form.hotkey"
+              remote
+              remote-url="/clipboard/api/hotkey-guard"
+            />
+          </div>
 
-    <!-- 呼出热键（点击后直接按组合键，Esc 清空） -->
-    <div class="setting-row">
-      <div class="setting-label">
-        <div class="setting-name">呼出热键</div>
-        <div class="setting-desc">点击输入框后按下组合键，保存后立即生效</div>
+          <!-- 保留天数 -->
+          <div class="setting-row">
+            <div class="setting-label">
+              <div class="setting-name">保留天数</div>
+              <div class="setting-desc">
+                超过 N 天的记录自动清理（每日检查）
+              </div>
+            </div>
+            <ui-select
+              v-model="form.retainDays"
+              :options="dayOptions"
+              class="setting-control"
+            />
+          </div>
+
+          <!-- 保留条数（手动输入，50~5000） -->
+          <div class="setting-row">
+            <div class="setting-label">
+              <div class="setting-name">保留条数</div>
+              <div class="setting-desc">超出后自动裁剪最旧记录（50~5000）</div>
+            </div>
+            <ui-input
+              v-model="form.maxEntries"
+              type="number"
+              placeholder="如 300"
+              class="setting-control"
+            />
+          </div>
+
+          <!-- 记录图片（注意：switch 固定尺寸，不能套 .setting-control 的宽度） -->
+          <div class="setting-row">
+            <div class="setting-label">
+              <div class="setting-name">记录图片</div>
+              <div class="setting-desc">关闭后仅记录文本内容</div>
+            </div>
+            <ui-switch v-model="form.recordImages" />
+          </div>
+
+          <!-- 面板尺寸（宽/高占屏幕比例 + 垂直位置；保存后即时生效） -->
+          <div class="setting-row">
+            <div class="setting-label">
+              <div class="setting-name">面板尺寸</div>
+              <div class="setting-desc">
+                宽/高按鼠标所在屏幕的比例；位置 0=贴顶 50=居中
+              </div>
+            </div>
+            <div class="setting-controls">
+              <ui-input
+                v-model="form.panelWidth"
+                type="number"
+                placeholder="宽 %"
+                class="setting-control-sm"
+              />
+              <ui-input
+                v-model="form.panelHeight"
+                type="number"
+                placeholder="高 %"
+                class="setting-control-sm"
+              />
+              <ui-input
+                v-model="form.panelPos"
+                type="number"
+                placeholder="位置 %"
+                class="setting-control-sm"
+              />
+            </div>
+          </div>
+        </div>
+        <!-- /ctrl-body -->
+
+        <div class="page-actions">
+          <ui-button variant="primary" @click="save">保存</ui-button>
+          <ui-button variant="ghost" @click="load">重置为已保存值</ui-button>
+        </div>
       </div>
-      <ui-hotkey
-        v-model="form.hotkey"
-        remote
-        remote-url="/clipboard/api/hotkey-guard"
-      />
     </div>
 
-    <!-- 保留天数 -->
-    <div class="setting-row">
-      <div class="setting-label">
-        <div class="setting-name">保留天数</div>
-        <div class="setting-desc">超过 N 天的记录自动清理（每日检查）</div>
-      </div>
-      <ui-select v-model="form.retainDays" :options="dayOptions" class="setting-control" />
-    </div>
-
-    <!-- 保留条数（手动输入，50~5000） -->
-    <div class="setting-row">
-      <div class="setting-label">
-        <div class="setting-name">保留条数</div>
-        <div class="setting-desc">超出后自动裁剪最旧记录（50~5000）</div>
-      </div>
-      <ui-input v-model="form.maxEntries" type="number" placeholder="如 300" class="setting-control" />
-    </div>
-
-    <!-- 记录图片（注意：switch 固定尺寸，不能套 .setting-control 的宽度） -->
-    <div class="setting-row">
-      <div class="setting-label">
-        <div class="setting-name">记录图片</div>
-        <div class="setting-desc">关闭后仅记录文本内容</div>
-      </div>
-      <ui-switch v-model="form.recordImages" />
-    </div>
-
-    <!-- 面板尺寸（宽/高占屏幕比例 + 垂直位置；保存后即时生效） -->
-    <div class="setting-row">
-      <div class="setting-label">
-        <div class="setting-name">面板尺寸</div>
-        <div class="setting-desc">宽/高按鼠标所在屏幕的比例；位置 0=贴顶 50=居中</div>
-      </div>
-      <div class="setting-controls">
-        <ui-input v-model="form.panelWidth" type="number" placeholder="宽 %" class="setting-control-sm" />
-        <ui-input v-model="form.panelHeight" type="number" placeholder="高 %" class="setting-control-sm" />
-        <ui-input v-model="form.panelPos" type="number" placeholder="位置 %" class="setting-control-sm" />
-      </div>
-    </div>
-    </div><!-- /ctrl-body -->
-
-    <div class="page-actions">
-      <ui-button variant="primary" @click="save">保存</ui-button>
-      <ui-button variant="ghost" @click="load">重置为已保存值</ui-button>
-    </div>
-  </div>
-</div>
-
-<script src="store.js" defer></script>
-<script src="app.js" defer></script>
-</body>
+    <script src="store.js" defer></script>
+    <script src="app.js" defer></script>
+  </body>
 </html>
