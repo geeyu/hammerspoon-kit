@@ -28,7 +28,11 @@
         <div class="setting-name">呼出热键</div>
         <div class="setting-desc">点击输入框后按下组合键，保存后立即生效</div>
       </div>
-      <ui-hotkey v-model="form.hotkey" />
+      <ui-hotkey
+        v-model="form.hotkey"
+        remote
+        remote-url="/clipboard/api/hotkey-guard"
+      />
     </div>
 
     <!-- 保留天数 -->

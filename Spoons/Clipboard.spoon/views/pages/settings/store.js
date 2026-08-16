@@ -3,9 +3,10 @@
 // 注意：本文件必须在 app.js 之前引入（defer 顺序）。
 
 // ===== 热键编码/解码（后端 {mods,key} ↔ 前端 "mods+key" 字符串）=====
+// 后端格式：[mods数组, key]（0-based，如 [{"ctrl"}, "v"]）
 function hotkeyEncode(hk) {
-  if (!hk || !hk[1] || !hk[2]) return '';
-  return hk[1].join('+') + '+' + hk[2];
+  if (!hk || !hk[0] || !hk[1]) return '';
+  return hk[0].join('+') + '+' + hk[1];
 }
 function hotkeyDecode(s) {
   if (!s) return null;
@@ -34,10 +35,10 @@ const SettingsStore = {
     const actions = {
       // 拉取当前配置 → 填充表单
       load() {
-        return fetch('/clipboard/api/settings').then(function (r) {
+        return fetch('/clipboard/api/settings').then((r) => {
           if (!r.ok) throw new Error('HTTP ' + r.status);
           return r.json();
-        }).then(function (s) {
+        }).then((s) => {
           state.form.hotkey = hotkeyEncode(s.hotkey_show);
           state.form.retainDays = s.retain_days;
           state.form.maxEntries = s.max_entries;
@@ -66,12 +67,10 @@ const SettingsStore = {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
-        }).then(function (r) {
-          return r.json().then(function (d) {
+        }).then((r) => r.json().then((d) => {
             if (!r.ok) throw new Error(d.err || ('HTTP ' + r.status));
             return d;
-          });
-        });
+          }));
       },
     };
 

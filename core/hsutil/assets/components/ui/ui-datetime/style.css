@@ -88,6 +88,36 @@
 .flatpickr-calendar::after {
   display: none;
 } /* 去掉箭头，深色下更干净 */
+
+/* 普通日期文字：dark.css 默认中灰(#555)在深色毛玻璃面板上对比不足，提亮 */
+.flatpickr-calendar .flatpickr-day {
+  color: var(--fg-2);
+}
+.flatpickr-calendar .flatpickr-day:hover {
+  color: var(--fg-1);
+}
+.flatpickr-calendar .flatpickr-day.today {
+  color: var(--fg-1);
+  font-weight: 600;
+}
+.flatpickr-calendar .flatpickr-day.selected,
+.flatpickr-calendar .flatpickr-day.selected:hover {
+  color: var(--fg-invert) !important;
+}
+
+/* 年月切换箭头 + 月份/年份输入：跟随前景色（dark.css 默认填充偏暗） */
+.flatpickr-calendar .flatpickr-prev-month svg,
+.flatpickr-calendar .flatpickr-next-month svg {
+  fill: var(--fg-2);
+}
+.flatpickr-calendar .flatpickr-prev-month:hover svg,
+.flatpickr-calendar .flatpickr-next-month:hover svg {
+  fill: var(--fg-1);
+}
+.flatpickr-calendar .flatpickr-current-month .cur-month,
+.flatpickr-calendar .flatpickr-current-month .numInputWrapper span {
+  color: var(--fg-1);
+}
 .flatpickr-day.selected,
 .flatpickr-day.selected:hover {
   background: var(--accent) !important;

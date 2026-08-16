@@ -24,6 +24,58 @@ local onConfirmFn   -- 确认回调（init 注入：写回+提升+粘贴）
 local onCloseFn     -- 关闭面板回调（init 注入：panel.hide）
 local onSettingsApplied  -- 配置保存后回调（init 注入：热键重绑等）
 
+-- ===== 热键录制 guard：录制期间 eventtap 吞掉 keyDown（系统快捷键不触发）=====
+-- 对齐 QuantumWindow/AppToggle：前端 ui-hotkey remote 模式需要
+--   POST <url> {action:'start'|'stop'} + GET <url>/poll → {result}
+local guard = { tap = nil, result = nil, timer = nil }
+
+-- 修饰键键码（左右 cmd/alt/ctrl/shift）
+local MOD_CODES = {}
+for _, code in ipairs({ 54, 55, 58, 61, 59, 62, 56, 60 }) do MOD_CODES[code] = true end
+
+-- 键码 → hs.hotkey 主键名（left→Left、f5→F5、m→M）
+local function keyNameForCode(code)
+    local name = hs.keycodes.map[code]
+    if not name then return nil end
+    if name:match("^%l") then name = name:sub(1, 1):upper() .. name:sub(2) end
+    return name
+end
+
+local function stopGuard()
+    if guard.tap then guard.tap:stop() guard.tap = nil end
+    if guard.timer then guard.timer:stop() guard.timer = nil end
+end
+
+local function startGuard()
+    stopGuard()
+    guard.result = nil
+    guard.tap = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, function(e)
+        local code = e:getKeyCode()
+        -- Esc（53）：放行 + 停止录制（用户取消录制）
+        if code == 53 then
+            stopGuard()
+            return false
+        end
+        -- Backspace/Delete 保持吞掉：放行会误删焦点所在其他应用的文本
+        if not MOD_CODES[code] then
+            local flags = e:getFlags()
+            local mods = {}
+            if flags.cmd then mods[#mods + 1] = "cmd" end
+            if flags.alt then mods[#mods + 1] = "alt" end
+            if flags.ctrl then mods[#mods + 1] = "ctrl" end
+            if flags.shift then mods[#mods + 1] = "shift" end
+            local key = keyNameForCode(code)
+            if key and #mods > 0 then
+                guard.result = table.concat(mods, "+") .. "+" .. key
+                stopGuard()   -- 记录完成即停止吞键
+            end
+        end
+        return true   -- 吞掉：系统快捷键（Spotlight 等）不触发
+    end)
+    guard.tap:start()
+    guard.timer = hs.timer.doAfter(6, stopGuard)   -- 超时兜底
+end
+
 --- 注册路由
 --- @param w watcher 业务入口
 --- @param onConfirm function(entry) 确认动作（由 init 提供）
@@ -128,6 +180,20 @@ function api.setup(w, onConfirm, onClose, assetsDir, pkg, cfg, onSettingsApplied
     end)
 
     -- ===== 设置（settings 页）=====
+    -- 热键录制 guard（吞键屏蔽系统快捷键；前端轮询取结果）
+    app:post("/" .. PKG .. "/api/hotkey-guard", function(req, res)
+        local body = req:json() or {}
+        if body.action == "start" then startGuard()
+        elseif body.action == "stop" then stopGuard()
+        else return res:status(400):json({ err = "bad action" }) end
+        res:json({ ok = true })
+    end)
+    app:get("/" .. PKG .. "/api/hotkey-guard/poll", function(req, res)
+        local r = guard.result
+        guard.result = nil   -- 取走即清
+        res:json({ result = r })
+    end)
+
     if config then
         -- 读取可编辑配置
         app:get("/" .. PKG .. "/api/settings", function(req, res)
