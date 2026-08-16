@@ -142,6 +142,13 @@
 /* 月份/年份标题行：重写 dark.css 原始布局（absolute + 135% 字号 + padding 7.48px 偏上），
    统一为「纯文字」风格：月份与年份等高、同色、无背景块——此前月份 select 高度 21px、
    年份 input 27px 且月份 hover 有灰底圆角块而年份没有，视觉分裂 */
+/* 标题行中间容器：dark.css 给 .flatpickr-months .flatpickr-month 设了 #3f4458 灰蓝底，
+   这是标题行背景色不对的根因，必须清掉 */
+.flatpickr-calendar .flatpickr-months .flatpickr-month {
+  background: transparent;
+  color: var(--fg-1);
+  fill: var(--fg-1);
+}
 .flatpickr-calendar .flatpickr-current-month {
   position: absolute;
   width: 75%;
@@ -186,6 +193,12 @@
   background: var(--glass-bg);
   color: var(--fg-1);
 }
+/* 月份改纯展示（Apple 风格）：禁用原生 select 交互，靠左右箭头切月——
+   原生 select 弹出的下拉菜单是系统渲染（白底/系统字体），与深色玻璃 UI 颜色对不上 */
+.flatpickr-calendar .flatpickr-current-month .flatpickr-monthDropdown-months {
+  pointer-events: none;
+  cursor: default;
+}
 .flatpickr-calendar .flatpickr-current-month .numInputWrapper {
   height: auto;
   display: inline-flex;
@@ -199,6 +212,11 @@
   padding: 0 4px;
   border: none;
   box-sizing: border-box;
+}
+/* 年份输入旁 dark.css 的 arrowUp/arrowDown 三角控件与整体风格不符，隐藏 */
+.flatpickr-calendar .numInputWrapper span.arrowUp,
+.flatpickr-calendar .numInputWrapper span.arrowDown {
+  display: none !important;
 }
 
 /* 星期行（周一~周日）：去掉 dark.css 的灰蓝背景块，浅色文字 + 下留白 */
@@ -220,6 +238,12 @@
 }
 .flatpickr-day.today {
   border-color: var(--accent);
+}
+.flatpickr-day.today:hover,
+.flatpickr-day.today:focus {
+  border-color: var(--accent);
+  background: var(--bg-row-h); /* dark.css 默认 #eee 白底深字，与深色 UI 不符 */
+  color: var(--fg-1);
 }
 .flatpickr-day:hover {
   background: var(--bg-row-h) !important;
