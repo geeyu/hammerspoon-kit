@@ -15,6 +15,41 @@ local function screenSpaces(win)
     return list
 end
 
+--- 兜底移动：官方 moveWindowToSpace 在部分系统（macOS 14.5+ yabai workaround 受 SIP 限制）
+--- 假成功（返回 true 但窗口不动）。改用可靠流程：
+---   ① gotoSpace 切到目标 Space（Mission Control AX，已验证可用）
+---   ② 对窗口 setFullScreen（不可见窗口也会在当前屏创建全屏 Space）
+---   ③ 退全屏 → 窗口落到当前（目标）Space
+--- 同步执行（热键回调内），期间有 MC 过渡 + 全屏闪烁的视觉反馈。
+--- @return boolean, string|nil
+local function fallbackMoveToSpace(win, targetSpace)
+    if win:isFullScreen() then return false, "全屏窗口无法移动" end
+    local uuid = win:screen() and win:screen():getUUID()
+    -- ① 切到目标 Space
+    local ok, err = hs.spaces.gotoSpace(targetSpace)
+    if not ok then return false, "切换 Space 失败: " .. tostring(err or "未知错误") end
+    -- 等切换完成（轮询激活 space）
+    local t0 = hs.timer.secondsSinceEpoch()
+    while uuid and hs.timer.secondsSinceEpoch() - t0 < 3 do
+        if hs.spaces.activeSpaceOnScreen(uuid) == targetSpace then break end
+        hs.timer.usleep(100000)
+    end
+    -- ② 全屏（窗口虽不可见，也会在当前屏创建全屏 Space）
+    if not win:setFullScreen(true) then return false, "无法进入全屏" end
+    local t1 = hs.timer.secondsSinceEpoch()
+    while not win:isFullScreen() and hs.timer.secondsSinceEpoch() - t1 < 3 do
+        hs.timer.usleep(100000)
+    end
+    if not win:isFullScreen() then return false, "全屏超时" end
+    -- ③ 退全屏：窗口落到当前（目标）Space
+    win:setFullScreen(false)
+    local t2 = hs.timer.secondsSinceEpoch()
+    while win:isFullScreen() and hs.timer.secondsSinceEpoch() - t2 < 3 do
+        hs.timer.usleep(100000)
+    end
+    return true
+end
+
 --- 把窗口移动到相邻 space（dir=1 下一个，-1 上一个）
 local function moveWindowToAdjacentSpace(win, dir)
     if not win then return false, "无聚焦窗口" end
@@ -59,6 +94,21 @@ local function moveWindowToAdjacentSpace(win, dir)
     if not ok then
         return false, "移动失败: " .. tostring(err or "未知错误")
     end
+
+    -- 官方 API 在部分系统假成功（返回 true 但窗口不动）：延迟验证，未移动则走兜底方案
+    hs.timer.doAfter(0.5, function()
+        local ws = hs.spaces.windowSpaces(win) or {}
+        local moved = false
+        for _, s in ipairs(ws) do
+            if s == targetSpace then moved = true break end
+        end
+        if not moved then
+            local fok, ferr = fallbackMoveToSpace(win, targetSpace)
+            if not fok then
+                hs.alert.show("移动 Space 失败: " .. tostring(ferr or "未知错误"))
+            end
+        end
+    end)
 
     -- moveWindowToSpace 为异步切换；发起成功即视为已移动
     return true

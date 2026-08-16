@@ -13,10 +13,12 @@ config.split = {
 }
 
 -- Space / 多显示器移动
+-- 注意：space_left/right 不用 ctrl+cmd+Left/Right——那是 macOS 系统默认的
+-- 「Move left/right a space」（调度中心快捷键 79/81，默认启用），冲突时系统抢先、热键无效。
 config.spaces = {
     hotkeys = {
-        space_left  = { { "ctrl", "cmd" }, "Left"  },
-        space_right = { { "ctrl", "cmd" }, "Right" },
+        space_left  = { { "ctrl", "cmd", "shift" }, "Left"  },
+        space_right = { { "ctrl", "cmd", "shift" }, "Right" },
         screen_north = { { "ctrl", "cmd" }, "Up"   },
         screen_south = { { "ctrl", "cmd" }, "Down" },
     },

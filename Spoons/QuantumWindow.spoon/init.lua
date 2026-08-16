@@ -145,6 +145,11 @@ function obj:bindHotkeys(mapping)
             end
         end
         local hk = hs.hotkey.bindSpec(mods_key, fn)
+        if not hk then
+            -- 绑定失败（组合被系统或其他应用占用）静默吞掉会让人以为功能失效，显式告警
+            self.logger:ef("热键 %s 绑定失败（可能被系统或其他应用占用）",
+                table.concat(mods_key[1], "+") .. "+" .. tostring(mods_key[2]))
+        end
         boundHotkeys[name] = hk
     end
 
