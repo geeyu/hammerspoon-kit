@@ -75,8 +75,9 @@
 /* ── flatpickr 日历适配主题（覆盖 dark.css 默认色）── */
 .flatpickr-calendar {
   font-family: var(--font);
-  /* 毛玻璃日历弹层 */
-  background: var(--glass-bg);
+  /* 毛玻璃日历弹层：背景比 --glass-bg(0.72) 更实——日历文字小且密集，
+     背景太透会透出壁纸色块导致字体对比不足看不清 */
+  background: rgba(22, 22, 28, 0.9);
   -webkit-backdrop-filter: var(--glass-blur);
   backdrop-filter: var(--glass-blur);
   border: 1px solid var(--glass-border);
@@ -133,10 +134,15 @@
   border-radius: 4px;
   cursor: pointer;
 }
-.flatpickr-calendar .flatpickr-current-month .flatpickr-monthDropdown-months:hover {
+.flatpickr-calendar
+  .flatpickr-current-month
+  .flatpickr-monthDropdown-months:hover {
   background: var(--bg-row-h);
 }
-.flatpickr-calendar .flatpickr-current-month .flatpickr-monthDropdown-months option {
+.flatpickr-calendar
+  .flatpickr-current-month
+  .flatpickr-monthDropdown-months
+  option {
   background: var(--glass-bg);
   color: var(--fg-1);
 }
