@@ -211,7 +211,9 @@ end
 function menubar.start()
     ensureDeps()
     if bar then return menubar end
-    bar = hs.menubar.new(true)
+    -- autosaveName 让 macOS 记住图标位置(跨 reload/重启恢复),避免每次重载
+    -- 都新建到菜单栏最右端;名称须唯一(同 app 内多个菜单栏图标不能重名)。
+    bar = hs.menubar.new(true, "ControlCenter")
     if not bar then
         logger.e("创建菜单栏按钮失败")
         return menubar
